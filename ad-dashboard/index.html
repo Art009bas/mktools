@@ -50,11 +50,34 @@ tr:hover{background:#f9fafb}
     <span><span class="dot" style="background:#3b82f6"></span>Лиды</span>
     <span><span class="dot" style="background:#10b981"></span>Продажи</span>
   </div><div id="leadChart" style="width:100%;max-width:900px;margin:0 auto"></div></div>
+    <div class="chart-wrap">
+    <h3>Динамический график</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <select id="dimSelect" style="padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:.85rem">
+        <option value="weeks">По неделям</option>
+        <option value="months">По месяцам</option>
+      </select>
+      <select id="metricSelect" style="padding:6px 10px;border:1px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:.85rem">
+        <option value="romi">ROMI</option>
+        <option value="roi">Чистый ROI</option>
+        <option value="leads">Лиды</option>
+        <option value="sales">Продажи</option>
+        <option value="revenue">Доход</option>
+        <option value="spend">Расход РК</option>
+        <option value="conv">Конверсия</option>
+        <option value="cac">CAC</option>
+      </select>
+    </div>
+    <div id="dynChart" style="width:100%;max-width:900px;margin:0 auto"></div>
+  </div>
   <div class="chart-wrap" style="overflow-x:auto"><h3>Понедельная развёртка</h3>
     <table id="weeklyTable"></table>
   </div>
 </div>
 <script>
+// Month data for dynamic chart
+const monthData = DATA.map(m => ({name:m.name, romi:m.totals.romi, roi:m.totals.roi, leads:m.totals.leads, sales:m.totals.sales, revenue:m.totals.income, cost:m.totals.rk}));
+
 const DATA = [{"name": "\u042f\u043d\u0432\u0430\u0440\u044c", "weeks": [{"label": "01.01-04.01", "spend": 0, "leads": 1, "sales": 1, "revenue": 9098}, {"label": "05.01-11.01", "spend": 0, "leads": 2, "sales": 0, "revenue": 0}, {"label": "12.01-18.01", "spend": 5527.81, "leads": 37, "sales": 2, "revenue": 22918.14}, {"label": "19.01-25.01", "spend": 1114.94, "leads": 17, "sales": 3, "revenue": 41566}, {"label": "26.01-31.01", "spend": 9527.79, "leads": 68, "sales": 0, "revenue": 0}], "totals": {"rk": 16170.54, "rk_plus": 22687.27, "svc_fixed": 2425.58, "clean_cost": 64112.85, "income": 73582.14, "net_income": 55186.61, "romi": 355.04, "roi": -13.92, "leads": 125, "sales": 6}}, {"name": "\u0424\u0435\u0432\u0440\u0430\u043b\u044c", "weeks": [{"label": "01.02-07.02", "spend": 18608.82, "leads": 143, "sales": 4, "revenue": 50634}, {"label": "08.02-14.02", "spend": 15981.68, "leads": 80, "sales": 7, "revenue": 52149}, {"label": "15.02-21.02", "spend": 16088, "leads": 59, "sales": 5, "revenue": 50337}, {"label": "22.02-28.02", "spend": 2660.92, "leads": 15, "sales": 3, "revenue": 42900}], "totals": {"rk": 53339.42, "rk_plus": 74835.21, "svc_fixed": 8000.91, "clean_cost": 121836.12, "income": 196020.0, "net_income": 147015.0, "romi": 267.5, "roi": 20.67, "leads": 297, "sales": 19}}, {"name": "\u041c\u0430\u0440\u0442", "weeks": [{"label": "01.03-07.03", "spend": 31979.43, "leads": 90, "sales": 3, "revenue": 34440.63}, {"label": "08.03-14.03", "spend": 36764, "leads": 68, "sales": 8, "revenue": 91741.89}, {"label": "15.03-21.03", "spend": 26437.26, "leads": 45, "sales": 4, "revenue": 38071.99}, {"label": "22.03-28.03", "spend": 13971.63, "leads": 55, "sales": 0, "revenue": 0}, {"label": "29.03-31.03", "spend": 3325.83, "leads": 29, "sales": 1, "revenue": 6696}], "totals": {"rk": 112478.15, "rk_plus": 157806.84, "svc_fixed": 16871.72, "clean_cost": 213678.57, "income": 170950.51, "net_income": 128212.88, "romi": 51.99, "roi": -40.0, "leads": 287, "sales": 16}}, {"name": "\u0410\u043f\u0440\u0435\u043b\u044c", "weeks": [{"label": "01.04-05.04", "spend": 9445.72, "leads": 20, "sales": 1, "revenue": 7649}, {"label": "06.04-12.04", "spend": 8690.75, "leads": 15, "sales": 1, "revenue": 5591.5}, {"label": "13.04-19.04", "spend": 8424.21, "leads": 21, "sales": 3, "revenue": 11117.12}, {"label": "20.04-26.04", "spend": 853.45, "leads": 6, "sales": 1, "revenue": 2243}, {"label": "27.04-30.04", "spend": 1469.25, "leads": 6, "sales": 2, "revenue": 18030.2}], "totals": {"rk": 28883.38, "rk_plus": 40523.38, "svc_fixed": 4332.51, "clean_cost": 83855.89, "income": 44630.82, "net_income": 33473.12, "romi": 54.52, "roi": -60.08, "leads": 68, "sales": 8}}];
 const fmt = v => {if(Math.abs(v)>=1e6) return (v/1e6).toFixed(1)+'M'; if(Math.abs(v)>=1e3) return (v/1e3).toFixed(1)+'K'; return v.toFixed(0)};
 const fmtPct = v => (v>=0?'+':'')+v.toFixed(1)+'%';
@@ -129,6 +152,8 @@ svgChart('romiChart', allWeeks, {width:800,height:250,lines:[{key:'romi',color:'
 
 // Revenue vs cost chart (monthly)
 svgChart('revChart', DATA.map(m => ({name:m.name,revenue:m.totals.income,cost:m.totals.rk_plus})), {width:500,height:220,lines:[{key:'revenue',color:'#10b981'},{key:'cost',color:'#ef4444'}]});
+// Make month data available for dyn chart
+const monthData = DATA.map(m => ({name:m.name, romi:m.totals.romi, roi:m.totals.roi, leads:m.totals.leads, sales:m.totals.sales, revenue:m.totals.income, cost:m.totals.rk}));
 
 // Leads & sales chart
 const lsData = DATA.map(m => ({name:m.name,leads:m.totals.leads,sales:m.totals.sales,conv:m.totals.sales/m.totals.leads*100||0}));
@@ -144,5 +169,90 @@ allWeeks.forEach(w => {
   const conv = w.leads>0 ? (w.sales/w.leads*100).toFixed(1)+'%' : '-';
   tbl.innerHTML += `<tr><td>${w.label}</td><td class="num">${fmt(w.cost)}</td><td class="num">${w.leads}</td><td class="num">${w.sales}</td><td class="num">${fmt(w.revenue)}</td><td class="num ${romiCls}">${romi}%</td><td class="num">${cac}</td><td class="num">${conv}</td></tr>`;
 });
+
+function drawDynChart() {
+  const dim = document.getElementById('dimSelect').value;
+  const metric = document.getElementById('metricSelect').value;
+  const data = dim === 'months' ? monthData : allWeeks;
+  const labelKey = dim === 'months' ? 'name' : 'label';
+  
+  const vals = data.map(d => {
+    let v;
+    if (metric === 'romi') v = d.romi;
+    else if (metric === 'roi') v = d.roi !== undefined ? d.roi : 0;
+    else if (metric === 'leads') v = d.leads;
+    else if (metric === 'sales') v = d.sales;
+    else if (metric === 'revenue') v = d.revenue;
+    else if (metric === 'spend') v = d.cost || 0;
+    else if (metric === 'conv') v = d.leads > 0 ? (d.sales/d.leads*100) : 0;
+    else if (metric === 'cac') v = d.sales > 0 ? (d.cost / d.sales) : 0;
+    else v = 0;
+    return {label:d[labelKey]||d.name, value:v};
+  });
+
+  const W = 800, H = 280;
+  const pad = {t:20,r:20,b:40,l:60};
+  const iw = W-pad.l-pad.r, ih = H-pad.t-pad.b;
+  const maxV = Math.max(...vals.map(d=>Math.abs(d.value)), 0.001) * 1.15;
+  const minV = Math.min(...vals.map(d=>d.value), 0);
+  const range = maxV - minV || 1;
+  const yScale = v => pad.t + ih - ((v-minV)/range)*ih;
+  const xStep = vals.length > 1 ? iw / (vals.length-1) : iw;
+
+  const colors = {romi:'#f97316',roi:'#ef4444',leads:'#3b82f6',sales:'#10b981',revenue:'#10b981',spend:'#8b5cf6',conv:'#d97706',cac:'#ec4899'};
+  const color = colors[metric] || '#f97316';
+  const labels = {romi:'ROMI (%)',roi:'Чистый ROI (%)',leads:'Лиды',sales:'Продажи',revenue:'Доход (₽)',spend:'Расход РК (₽)',conv:'Конверсия (%)',cac:'CAC (₽)'};
+
+  let svg = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">';
+
+  // Grid
+  for(let i=0;i<=4;i++) {
+    const y = pad.t + ih*(i/4);
+    const v = minV + range*(1-i/4);
+    svg += '<line x1="'+pad.l+'" y1="'+y+'" x2="'+(W-pad.r)+'" y2="'+y+'" stroke="#e5e7eb" stroke-dasharray="4,4"/>';
+    svg += '<text x="'+(pad.l-5)+'" y="'+(y+3)+'" text-anchor="end" fill="#9ca3af" font-size="10">'+(v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(v%1>0.01?1:0))+'</text>';
+  }
+
+  // Zero line if min < 0
+  if (minV < 0) {
+    const zy = yScale(0);
+    svg += '<line x1="'+pad.l+'" y1="'+zy+'" x2="'+(W-pad.r)+'" y2="'+zy+'" stroke="#d1d5db" stroke-width="1"/>';
+  }
+
+  // Line
+  let pts = vals.map((d,i) => {
+    const x = pad.l+i*xStep, y = yScale(d.value);
+    return (i===0?'M':'L')+x+','+y;
+  }).join(' ');
+  svg += '<path d="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round"/>';
+
+  // Dots + hover
+  vals.forEach((d,i) => {
+    const x = pad.l+i*xStep, y = yScale(d.value);
+    svg += '<circle cx="'+x+'" cy="'+y+'" r="4" fill="'+color+'" stroke="#fff" stroke-width="2"/>';
+    // invisible hover zone
+    svg += '<rect x="'+(x-14)+'" y="0" width="28" height="'+H+'" fill="transparent" style="cursor:pointer" onmouseenter="this.parentElement.querySelector('.ht').setAttribute('display','block');this.parentElement.querySelector('.ht').setAttribute('transform','translate('+x+','+y+')');this.parentElement.querySelector('.ht text').textContent=''+d.label+': '+'+(d.value.toFixed(1))+'" onmouseleave="this.parentElement.querySelector('.ht').setAttribute('display','none')"/>';
+  });
+
+  // Tooltip group
+  svg += '<g class="ht" display="none"><rect x="-70" y="-45" width="140" height="30" rx="6" fill="#1a1a2e" opacity="0.95"/><text x="0" y="-25" text-anchor="middle" fill="#fff" font-size="10" font-weight="600"></text></g>';
+
+  // X labels
+  vals.forEach((d,i) => {
+    const x = pad.l+i*xStep;
+    if (vals.length > 12 && i % 2 !== 0) return;
+    svg += '<text x="'+x+'" y="'+(H-10)+'" text-anchor="middle" fill="#6b7280" font-size="9">'+d.label+'</text>';
+  });
+
+  svg += '</svg>';
+  document.getElementById('dynChart').innerHTML = svg;
+}
+
+// Event listeners
+document.getElementById('dimSelect').addEventListener('change', drawDynChart);
+document.getElementById('metricSelect').addEventListener('change', drawDynChart);
+
+// Initial draw
+drawDynChart();
 </script>
 </body></html>
