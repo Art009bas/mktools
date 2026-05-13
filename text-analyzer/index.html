@@ -178,7 +178,8 @@
           <span id="sentCount">0</span> предл.
         </div>
       </div>
-      <textarea id="textInput" placeholder="Вставьте текст для анализа..."></textarea>
+      <textarea id="textInput" placeholder="Вставьте текст для анализа..." style="display:none;"></textarea>
+      <div id="textPreview" contenteditable="true" style="font-family:var(--font);width:100%;padding:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;line-height:1.6;outline:none;transition:border-color 0.2s;background:var(--bg);resize:vertical;min-height:200px;overflow:auto;" oninput="syncTextarea()" onclick="clearPlaceholder()"></div>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="analyze()">🔍 Анализировать</button>
       </div>
@@ -259,10 +260,11 @@ function highlightText(ranges, activeEl) {
   if (activeEl) activeEl.classList.add('active');
   currentHl = activeEl;
 
-  var textarea = document.getElementById('textInput');
-  var text = textarea.value;
+  var preview = document.getElementById('textPreview');
+  var text = preview.innerText || preview.textContent || '';
   var highlighted = hlAllOccurrences(text, ranges);
-  textarea.value = highlighted;
+  preview.innerHTML = highlighted.replace(/
+/g, '<br>');
   showToast('Выделено в тексте');
 }
 
@@ -352,7 +354,8 @@ function checkGrammar(text) {
 
 // ======== АНАЛИЗ ========
 function analyze() {
-  var text = document.getElementById('textInput').value.trim();
+  var preview = document.getElementById('textPreview');
+  var text = (preview.innerText || preview.textContent || '').trim();
   if (!text || text.length < 20) { showToast('Введите хотя бы 20 символов'); return; }
 
   var results = document.getElementById('results');
@@ -569,8 +572,6 @@ function analyze() {
 
   // ========== SEO ==========
   var seoFlags = [];
-  var topKw = topWords.map(function(w){ return w.word + ' (' + w.count + ')'; }).join(', ');
-  seoFlags.push({ icon: '🔑', title: 'Топ-5 слов', desc: topKw, level: 'info', id: 'topwords' });
 
   if (classicNausea > 8) seoFlags.push({ icon: '🤢', title: 'Тошнота ' + classicNausea.toFixed(1) + '% (высокая)', desc: 'Рекомендуется < 7-8%.', level: 'bad' , id: 'nausea'});
   else if (classicNausea > 5) seoFlags.push({ icon: '👌', title: 'Тошнота ' + classicNausea.toFixed(1) + '% (умеренная)', desc: 'Можно снизить.', level: 'warning', id: 'nausea' });
@@ -661,9 +662,10 @@ function renderKeywords(topWords, topPhrases) {
 function highlightWord(word, el) {
   clearHighlights();
   el.classList.add('active');
-  var textarea = document.getElementById('textInput');
-  var text = textarea.value;
-  textarea.value = hlAllOccurrences(text, [{word: word}]);
+  var preview = document.getElementById('textPreview');
+  var text = preview.innerText || preview.textContent || '';
+  preview.innerHTML = hlAllOccurrences(text, [{word: word}]).replace(/
+/g, '<br>');
   showToast('Выделено: ' + word);
 }
 
@@ -716,8 +718,27 @@ function renderGrammar(issues) {
 function escapeHtml(s) { if (!s) return ''; return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
 // ========== Live stats ==========
-document.getElementById('textInput').addEventListener('input', function() {
-  var text = this.value;
+function syncTextarea() {
+  var preview = document.getElementById('textPreview');
+  var textarea = document.getElementById('textInput');
+  var text = preview.innerText || preview.textContent || '';
+  textarea.value = text;
+  // live stats
+  document.getElementById('charCount').textContent = text.length;
+  document.getElementById('wordCount').textContent = (text.match(/[а-яёa-z]+/gi) || []).length;
+  document.getElementById('sentCount').textContent = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
+}
+
+function clearPlaceholder() {
+  var preview = document.getElementById('textPreview');
+  if (preview.innerText === 'Вставьте текст для анализа...' || (preview.innerText || '').trim() === '') {
+    preview.innerHTML = '';
+    syncTextarea();
+  }
+}
+
+document.getElementById('textPreview').addEventListener('input', function() {
+  var text = this.innerText || this.textContent || '';
   document.getElementById('charCount').textContent = text.length;
   document.getElementById('wordCount').textContent = (text.match(/[а-яёa-z]+/gi) || []).length;
   document.getElementById('sentCount').textContent = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
