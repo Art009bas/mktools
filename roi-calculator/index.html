@@ -430,7 +430,7 @@ function calculate() {
     var nds = cumSpend * ndsPct / 100;
     var pctRkPlain = cumSpend * rkPctPlain / 100;
     var pctRk = (cumSpend + nds) * rkPct / 100;
-    var svcPctAmt = cumSpend * svcPct / 100;
+    var svcPctAmt = (cumSpend + nds) * svcPct / 100;
     var totalCost = cumSpend + nds + pctRkPlain + pctRk + svcFixed + svcPctAmt + currExtra + otherCost;
     var netRev = cumRev * (1 - agencyPct/100);
     // Per-period (не накопленные)
@@ -439,10 +439,10 @@ function calculate() {
     var pNds = pSpend * ndsPct / 100;
     var pPctRkPlain = pSpend * rkPctPlain / 100;
     var pPctRk = (pSpend + pNds) * rkPct / 100;
-    var svcPctAmt = cumSpend * svcPct / 100;
+    var svcPctAmt = (cumSpend + nds) * svcPct / 100;
     var monthsCnt = months.length;
     var pSvcFixed = svcFixed / monthsCnt;
-    var pSvcPct = pSpend * svcPct / 100;
+    var pSvcPct = (pSpend + pNds) * svcPct / 100;
     var pTotal = pSpend + pNds + pPctRkPlain + pPctRk + pSvcFixed + pSvcPct + pExtra;
     var pNetRev = m.revenue * (1 - agencyPct/100);
     allCum.push({
@@ -463,7 +463,7 @@ function calculate() {
   var last = allCum[allCum.length - 1] || {cumRomi:0,cumNetRoi:0,cumCac:0,cumSpend:0};
   var totalRev = cumRev;
   var ndsCalc = cumSpend * ndsPct / 100;
-  var svcPctAmtTotal = cumSpend * svcPct / 100;
+  var svcPctAmtTotal = (cumSpend + cumSpend*ndsPct/100) * svcPct / 100;
   var totalCost = cumSpend + ndsCalc + cumSpend*rkPctPlain/100 + (cumSpend+ndsCalc)*rkPct/100 + svcFixed + svcPctAmtTotal + currExtra + otherCost;
   var totalNetRev = totalRev * (1 - agencyPct/100);
   var avgCheck = cumSales > 0 ? cumRev / cumSales : 0;
@@ -509,7 +509,7 @@ function calculate() {
   d.innerHTML += '<div class="detail-row"><span>% от РК без НДС (' + rkPctPlain + '%)</span><span class="val">' + fmt(cumSpend*rkPctPlain/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+cumSpend*ndsPct/100)*rkPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Услуги фикс</span><span class="val">' + fmt(svcFixed) + '</span></div>';
-  var svcPctAmtD = cumSpend * svcPct / 100;
+  var svcPctAmtD = (cumSpend + cumSpend*ndsPct/100) * svcPct / 100;
   d.innerHTML += '<div class="detail-row"><span>Услуги % (' + svcPct + '%)</span><span class="val">' + fmt(svcPctAmtD) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Прочее</span><span class="val">' + fmt(otherCost) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
