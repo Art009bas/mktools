@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ROI-калькулятор — mktools</title>
-  <meta name="description" content="Полный анализ окупаемости: недельная разбивка, ROMI, чистый ROI, LTV/CAC, точка безубыточности.">
+  <meta name="description" content="Проекты, недельный/месячный разбор, ROMI, чистый ROI, CAC, график динамики.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,21 +26,23 @@
       background: var(--surface); border-bottom: 1px solid var(--border);
       padding: 16px 24px; position: sticky; top: 0; z-index: 100;
     }
-    .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
     .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--text); }
     .logo span { color: var(--accent); }
     .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-left: auto; }
     .back-link:hover { color: var(--accent); }
-    .app { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+    .app { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
     h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
     .subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem; }
+
     .card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
     }
     .card-accent { border-color: #fed7aa; background: var(--accent-light); }
     .card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 16px; }
-    .field-group { margin-bottom: 14px; }
+
+    .field-group { margin-bottom: 12px; }
     .field-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 500; margin-bottom: 5px; }
     .field-label small { font-weight: 400; color: var(--text-tertiary); }
     .field-input {
@@ -49,16 +51,47 @@
       outline: none; background: var(--bg); transition: border-color 0.2s;
     }
     .field-input:focus { border-color: var(--accent); background: var(--surface); }
-    .field-input.tight { padding: 8px 10px; font-size: 0.85rem; }
+    .field-input.tight { padding: 7px 8px; font-size: 0.82rem; }
     .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .three-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .four-cols { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px;
+      border-radius: var(--radius-sm); font-weight: 600; font-size: 0.85rem; cursor: pointer;
+      border: none; font-family: var(--font); transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
     .calc-btn {
       width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
       background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700;
-      cursor: pointer; font-family: var(--font); transition: background 0.2s; margin-top: 4px;
+      cursor: pointer; font-family: var(--font); transition: background 0.2s;
     }
     .calc-btn:hover { background: var(--accent-hover); }
-    .calc-btn.small { padding: 10px; font-size: 0.9rem; }
+
+    /* === PROJECTS === */
+    .projects-header { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .project-tabs { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+    .project-tab {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; border: 1.5px solid var(--border); background: var(--surface);
+      transition: all 0.2s; font-family: var(--font);
+    }
+    .project-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .project-tab:hover:not(.active) { border-color: var(--accent); }
+
+    /* === PERIOD INPUT === */
+    .period-rows { display: flex; flex-direction: column; gap: 6px; }
+    .period-row { display: flex; gap: 6px; align-items: center; }
+    .period-row .pr-name { width: 120px; flex-shrink: 0; font-size: 0.82rem; font-weight: 500; }
+    .period-row input { flex: 1; min-width: 0; }
+    .period-row .pr-remove { cursor: pointer; color: var(--red); font-size: 1.1rem; flex-shrink: 0; padding: 4px; }
 
     .result-grid {
       display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;
@@ -76,59 +109,31 @@
     .result-card .lbl { font-size: 0.72rem; color: var(--text-secondary); }
     .result-card .sub { font-size: 0.72rem; color: var(--text-tertiary); margin-top: 2px; }
 
-    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    .detail-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
     .detail-row:last-child { border-bottom: none; }
     .detail-row .val { font-weight: 600; }
     .detail-row .val.green { color: var(--green); }
     .detail-row .val.red { color: var(--red); }
-    .detail-row .val.warn { color: var(--yellow); }
 
-    .bar-wrap { margin-bottom: 10px; }
-    .bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 3px; }
+    .bar-wrap { margin-bottom: 8px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; }
     .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s; }
     .bar-fill.green { background: var(--green); }
     .bar-fill.red { background: var(--red); }
-    .bar-fill.yellow { background: var(--yellow); }
 
-    .tip {
-      padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; line-height: 1.5;
-      background: var(--accent-light); border: 1px solid #fed7aa; color: #9a3412; margin-top: 12px;
-    }
+    .tip { padding: 14px; border-radius: var(--radius-sm); font-size: 0.85rem; line-height: 1.5; background: var(--accent-light); border: 1px solid #fed7aa; color: #9a3412; margin-top: 12px; }
     .tip.green-bg { background: var(--green-light); border-color: #a7f3d0; color: #065f46; }
 
-    .formula { font-size: 0.78rem; color: var(--text-tertiary); text-align: center; margin-top: 10px; }
-
-    /* === WEEK TABLE === */
-    .week-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 8px; }
-    .week-table th { background: var(--bg); padding: 8px 6px; text-align: center; font-weight: 600; color: var(--text-secondary); font-size: 0.75rem; }
-    .week-table td { padding: 7px 6px; text-align: center; border-bottom: 1px solid var(--border); }
-    .week-table .name { text-align: left; font-weight: 500; }
-    .week-table input { width: 100%; padding: 5px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.82rem; font-family: var(--font); text-align: center; background: var(--bg); outline: none; }
-    .week-table input:focus { border-color: var(--accent); background: var(--surface); }
-    .total-row td { font-weight: 700; background: #f3f4f6; border-top: 2px solid var(--border); }
-    .total-row .val { font-weight: 700; }
-    .week-table .val.green { color: var(--green); }
-    .week-table .val.red { color: var(--red); }
-
-    .scroll-wrap { overflow-x: auto; }
-
-    /* === CHART === */
-    .chart-wrap { margin-top: 16px; position: relative; height: 200px; display: flex; align-items: flex-end; gap: 4px; padding-top: 20px; }
-    .chart-bar { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
-    .chart-bar .col { width: 100%; min-height: 4px; border-radius: 3px 3px 0 0; transition: height 0.6s; position: relative; }
-    .chart-bar .col.romi { background: var(--accent); opacity: 0.8; }
-    .chart-bar .col.netroi { background: var(--red); opacity: 0.7; }
-    .chart-bar .label { font-size: 0.6rem; color: var(--text-tertiary); margin-top: 4px; text-align: center; white-space: nowrap; }
-    .chart-bar .ht { position: absolute; top: -18px; font-size: 0.65rem; font-weight: 600; width: 100%; text-align: center; }
-    .chart-legend { display: flex; gap: 16px; justify-content: center; font-size: 0.78rem; color: var(--text-secondary); margin-top: 8px; }
+    /* === LINE CHART === */
+    .chart-box { position: relative; width: 100%; height: 280px; margin-top: 12px; overflow: hidden; }
+    .chart-svg { width: 100%; height: 100%; }
+    .chart-legend { display: flex; gap: 16px; justify-content: center; font-size: 0.78rem; color: var(--text-secondary); margin-top: 8px; flex-wrap: wrap; }
     .chart-legend span { display: flex; align-items: center; gap: 4px; }
-    .chart-legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
     .insights { margin-top: 12px; }
     .insight-item { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
     .insight-item:last-child { border-bottom: none; }
-    .insight-icon { flex-shrink: 0; font-size: 1rem; }
 
     .badge-sm { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 600; }
     .badge-sm.green { background: var(--green-light); color: var(--green); }
@@ -136,11 +141,12 @@
 
     @media (max-width: 700px) {
       .result-grid { grid-template-columns: 1fr 1fr; }
-      .three-cols { grid-template-columns: 1fr; }
+      .four-cols { grid-template-columns: 1fr 1fr; }
+      .period-row .pr-name { width: 80px; font-size: 0.75rem; }
     }
     @media (max-width: 500px) {
-      .result-grid { grid-template-columns: 1fr 1fr; }
       .two-cols { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr 1fr; }
       .app { padding: 20px 16px 60px; }
       h1 { font-size: 1.4rem; }
     }
@@ -156,60 +162,62 @@
 
 <div class="app">
   <h1>💰 ROI-калькулятор</h1>
-  <p class="subtitle">Недельный разбор: ROMI, чистый ROI, CAC, LTV, точка безубыточности — как в вашей таблице.</p>
+  <p class="subtitle">Проекты, периоды, ROMI, чистый ROI, CAC — и общий график динамики.</p>
 
+  <!-- PROJECTS -->
   <div class="card">
-    <div class="card-title">📅 Недельные данные</div>
-    <div class="scroll-wrap">
-      <table class="week-table">
-        <thead><tr>
-          <th></th>
-          <th>Неделя 1</th>
-          <th>Неделя 2</th>
-          <th>Неделя 3</th>
-          <th>Неделя 4</th>
-          <th>Неделя 5</th>
-          <th>Итого</th>
-        </tr></thead>
-        <tbody id="weekBody"></tbody>
-      </table>
+    <div class="card-title">📁 Проекты</div>
+    <div class="projects-header">
+      <div class="project-tabs" id="projectTabs"></div>
+      <button class="btn btn-secondary btn-sm" onclick="newProject()">+ Новый</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteProject()">🗑</button>
     </div>
-    <div class="three-cols" style="margin-top:16px;">
-      <div class="field-group">
-        <div class="field-label">Период</div>
-        <input class="field-input" id="periodLabel" value="Апрель 2026">
-      </div>
+  </div>
+
+  <!-- DATA -->
+  <div class="card">
+    <div class="card-title">📅 Периоды проекта</div>
+    <div class="two-cols" style="margin-bottom:12px;">
       <div class="field-group">
         <div class="field-label">Агентские <small>%</small></div>
         <input class="field-input" type="number" id="agencyPct" value="25" step="1">
       </div>
       <div class="field-group">
-        <div class="field-label">LTV (средний) <small>₽</small></div>
+        <div class="field-label">LTV <small>₽, опционально</small></div>
         <input class="field-input" type="number" id="ltvVal" placeholder="120000">
       </div>
     </div>
+    <div class="period-rows" id="periodRows"></div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-sm" onclick="addPeriod()">+ Добавить период</button>
+      <button class="btn btn-secondary btn-sm" onclick="showExtra()">➕ Доп. расходы</button>
+    </div>
 
-    <details style="margin-top:12px;">
-      <summary style="cursor:pointer;font-size:0.85rem;color:var(--text-secondary);">➕ Доп. расходы (РК, услуги, зарплаты)</summary>
-      <div class="two-cols" style="margin-top:12px;">
-        <div class="field-group"><div class="field-label">РК (+%)</div><input class="field-input" type="number" id="rkCost" value="0"></div>
-        <div class="field-group"><div class="field-label">Услуги фикс</div><input class="field-input" type="number" id="servicesFixed" value="0"></div>
-        <div class="field-group"><div class="field-label">Услуги %</div><input class="field-input" type="number" id="servicesPct" value="0"></div>
-        <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" value="0"></div>
+    <div id="extraBlock" style="display:none;margin-top:10px;">
+      <div class="four-cols">
+        <div class="field-group"><div class="field-label">РК (+%)</div><input class="field-input" type="number" id="rkCost"></div>
+        <div class="field-group"><div class="field-label">Услуги фикс</div><input class="field-input" type="number" id="servicesFixed"></div>
+        <div class="field-group"><div class="field-label">Услуги %</div><input class="field-input" type="number" id="servicesPct"></div>
+        <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost"></div>
       </div>
-    </details>
+    </div>
 
     <button class="calc-btn" onclick="calculate()">🧮 Рассчитать</button>
   </div>
 
+  <!-- RESULTS -->
   <div class="card" id="resultCard" style="display:none;">
-    <div class="card-title">📊 Итоги за период: <span id="periodTitle"></span></div>
+    <div class="card-title">📊 Итоги: <span id="projectTitle"></span></div>
     <div class="result-grid" id="resultGrid"></div>
-    <div class="chart-legend">
-      <span><span class="dot" style="background:var(--accent);"></span> ROMI по неделям</span>
-      <span><span class="dot" style="background:var(--red);"></span> Чистый ROI по неделям</span>
+
+    <div class="chart-box" id="chartBox">
+      <svg class="chart-svg" id="chartSvg" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
-    <div class="chart-wrap" id="chart"></div>
+    <div class="chart-legend">
+      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#f97316"/></svg> ROMI</span>
+      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#ef4444"/></svg> Чистый ROI</span>
+      <span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="#10b981"/></svg> CAC</span>
+    </div>
 
     <div class="card-accent" style="margin-top:16px;padding:16px;border-radius:var(--radius-sm);">
       <div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;">📌 Инсайты</div>
@@ -220,224 +228,413 @@
       <div class="card-title">📋 Детализация</div>
       <div id="details"></div>
     </div>
-
     <div class="breakdown" id="breakdown" style="margin-top:12px;"></div>
-
     <div class="tip" id="tip"></div>
-    <div class="formula" id="formula"></div>
+    <div class="formula" style="font-size:0.78rem;color:var(--text-tertiary);text-align:center;margin-top:10px;">ROMI = (Выручка — Реклама) / Реклама × 100% | Чистый ROI = (Чистый доход — Все расходы) / Все расходы × 100%</div>
   </div>
 </div>
 
 <script>
-var WEEKS = 5;
-var WEEK_LABELS = ['1.04–5.04','6.04–12.04','13.04–19.04','20.04–26.04','27.04–30.04'];
+// ====== STATE ======
+var STORE_KEY = 'roi_calc_projects';
 
-// Заполняем таблицу
-(function() {
-  var tbody = document.getElementById('weekBody');
-  var rows = [
-    {label:'Расход (₽)', key:'spend', def:['9445.72','8690.75','8424.21','853.45','1469.25']},
-    {label:'Лиды', key:'leads', def:['20','15','21','6','6']},
-    {label:'Продажи', key:'sales', def:['1','1','3','1','2']},
-    {label:'Доход (₽)', key:'revenue', def:['7649','5591.50','11117.12','2243','18030.20']},
-  ];
-  rows.forEach(function(r) {
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<td class="name">' + r.label + '</td>';
-    for (var i = 0; i < WEEKS; i++) {
-      tr.innerHTML += '<td><input class="tight" type="text" id="w' + i + '_' + r.key + '" value="' + r.def[i] + '"></td>';
-    }
-    tr.innerHTML += '<td class="val" id="total_' + r.key + '">—</td>';
-    tbody.appendChild(tr);
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch(e) { return []; }
+}
+
+function saveProjects(projects) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(projects));
+}
+
+var projects = getProjects();
+var currentIdx = 0;
+var periodCounter = 0;
+
+// если нет проектов, создаём дефолтный
+if (projects.length === 0) {
+  projects.push({
+    name: 'Мой горящий тур',
+    agencyPct: 25,
+    ltv: 120000,
+    extra: {rk:0, svcFixed:0, svcPct:0, other:0},
+    periods: [
+      {label:'1.04–5.04', spend:9445.72, leads:20, sales:1, revenue:7649},
+      {label:'6.04–12.04', spend:8690.75, leads:15, sales:1, revenue:5591.50},
+      {label:'13.04–19.04', spend:8424.21, leads:21, sales:3, revenue:11117.12},
+      {label:'20.04–26.04', spend:853.45, leads:6, sales:1, revenue:2243},
+      {label:'27.04–30.04', spend:1469.25, leads:6, sales:2, revenue:18030.20},
+    ]
   });
-})();
+  saveProjects(projects);
+}
 
-function $(id) { return document.getElementById(id); }
-function w(i, key) { return parseFloat($('w' + i + '_' + key).value.replace(',','.')) || 0; }
+function currentProject() { return projects[currentIdx] || projects[0]; }
+
+function idxForName(name) {
+  for (var i = 0; i < projects.length; i++) if (projects[i].name === name) return i;
+  return 0;
+}
+
+// ====== UI ======
+function renderTabs() {
+  var tabs = document.getElementById('projectTabs');
+  tabs.innerHTML = '';
+  projects.forEach(function(p, i) {
+    var tab = document.createElement('button');
+    tab.className = 'project-tab' + (i === currentIdx ? ' active' : '');
+    tab.textContent = p.name;
+    tab.onclick = function() { switchProject(i); };
+    tabs.appendChild(tab);
+  });
+  if (projects.length === 0) tabs.innerHTML = '<span style="color:var(--text-tertiary);font-size:0.85rem;">Нет проектов</span>';
+}
+
+function switchProject(i) {
+  saveCurrent();
+  currentIdx = i;
+  loadProject();
+  renderTabs();
+  autoCalculate();
+}
+
+function newProject() {
+  var name = prompt('Название проекта:');
+  if (!name || !name.trim()) return;
+  saveCurrent();
+  projects.push({
+    name: name.trim(),
+    agencyPct: 25,
+    ltv: 0,
+    extra: {rk:0, svcFixed:0, svcPct:0, other:0},
+    periods: [{label:'Период 1', spend:0, leads:0, sales:0, revenue:0}]
+  });
+  currentIdx = projects.length - 1;
+  saveProjects(projects);
+  renderTabs();
+  loadProject();
+  autoCalculate();
+}
+
+function deleteProject() {
+  if (projects.length <= 1) { showToast('Нельзя удалить последний проект'); return; }
+  if (!confirm('Удалить "' + currentProject().name + '"?')) return;
+  projects.splice(currentIdx, 1);
+  currentIdx = 0;
+  saveProjects(projects);
+  renderTabs();
+  loadProject();
+  autoCalculate();
+}
+
+// ====== PERIOD ROWS ======
+function renderPeriods() {
+  var p = currentProject();
+  var container = document.getElementById('periodRows');
+  container.innerHTML = '';
+  p.periods.forEach(function(per, i) {
+    var row = document.createElement('div');
+    row.className = 'period-row';
+    row.innerHTML = ''
+      + '<input class="field-input tight pr-name" type="text" value="' + per.label + '" onchange="updatePeriod(' + i + ',\'label\',this.value)" placeholder="Период">'
+      + '<input class="field-input tight" type="number" value="' + per.spend + '" onchange="updatePeriod(' + i + ',\'spend\',+this.value)" placeholder="Реклама ₽">'
+      + '<input class="field-input tight" type="number" value="' + per.leads + '" onchange="updatePeriod(' + i + ',\'leads\',+this.value)" placeholder="Лиды">'
+      + '<input class="field-input tight" type="number" value="' + per.sales + '" onchange="updatePeriod(' + i + ',\'sales\',+this.value)" placeholder="Продажи">'
+      + '<input class="field-input tight" type="number" value="' + per.revenue + '" onchange="updatePeriod(' + i + ',\'revenue\',+this.value)" placeholder="Доход ₽">'
+      + '<span class="pr-remove" onclick="removePeriod(' + i + ')">✕</span>';
+    container.appendChild(row);
+  });
+}
+
+function updatePeriod(i, key, val) {
+  currentProject().periods[i][key] = val;
+  saveProjects(projects);
+  autoCalculate();
+}
+
+function addPeriod() {
+  var p = currentProject();
+  var n = p.periods.length + 1;
+  p.periods.push({label:'Период ' + n, spend:0, leads:0, sales:0, revenue:0});
+  saveProjects(projects);
+  renderPeriods();
+}
+
+function removePeriod(i) {
+  var p = currentProject();
+  if (p.periods.length <= 1) { showToast('Нужен хотя бы 1 период'); return; }
+  p.periods.splice(i, 1);
+  saveProjects(projects);
+  renderPeriods();
+  autoCalculate();
+}
+
+function showExtra() {
+  var b = document.getElementById('extraBlock');
+  b.style.display = b.style.display === 'none' ? 'block' : 'none';
+  // загружаем доп расходы
+  var p = currentProject();
+  document.getElementById('rkCost').value = p.extra.rk || 0;
+  document.getElementById('servicesFixed').value = p.extra.svcFixed || 0;
+  document.getElementById('servicesPct').value = p.extra.svcPct || 0;
+  document.getElementById('otherCost').value = p.extra.other || 0;
+}
+
+// ====== LOAD / SAVE ======
+function loadProject() {
+  var p = currentProject();
+  document.getElementById('agencyPct').value = p.agencyPct || 25;
+  document.getElementById('ltvVal').value = p.ltv || '';
+  document.getElementById('rkCost').value = p.extra.rk || 0;
+  document.getElementById('servicesFixed').value = p.extra.svcFixed || 0;
+  document.getElementById('servicesPct').value = p.extra.svcPct || 0;
+  document.getElementById('otherCost').value = p.extra.other || 0;
+  renderPeriods();
+}
+
+function saveCurrent() {
+  var p = currentProject();
+  p.agencyPct = parseFloat(document.getElementById('agencyPct').value) || 25;
+  p.ltv = parseFloat(document.getElementById('ltvVal').value) || 0;
+  p.extra = {
+    rk: parseFloat(document.getElementById('rkCost').value) || 0,
+    svcFixed: parseFloat(document.getElementById('servicesFixed').value) || 0,
+    svcPct: parseFloat(document.getElementById('servicesPct').value) || 0,
+    other: parseFloat(document.getElementById('otherCost').value) || 0,
+  };
+  saveProjects(projects);
+}
+
+// ====== CALC ======
+function autoCalculate() { setTimeout(calculate, 50); }
+
+function calculate() {
+  saveCurrent();
+  var p = currentProject();
+  var periods = p.periods;
+  var agencyPct = p.agencyPct;
+  var ltv = p.ltv;
+  var rkCost = p.extra.rk || 0;
+  var svcFixed = p.extra.svcFixed || 0;
+  var svcPct = p.extra.svcPct || 0;
+  var other = p.extra.other || 0;
+
+  document.getElementById('projectTitle').textContent = p.name;
+
+  // Итоги
+  var totalSpend = 0, totalLeads = 0, totalSales = 0, totalRevenue = 0;
+  var weekData = periods.map(function(per) {
+    totalSpend += per.spend;
+    totalLeads += per.leads;
+    totalSales += per.sales;
+    totalRevenue += per.revenue;
+    var conv = per.leads > 0 ? per.sales / per.leads * 100 : 0;
+    var netRev = per.revenue * (1 - agencyPct/100);
+    var netProfit = netRev - per.spend;
+    var romi = per.spend > 0 ? (per.revenue - per.spend) / per.spend * 100 : 0;
+    var netRoi = per.spend > 0 ? (netRev - per.spend) / per.spend * 100 : 0;
+    return {label:per.label, spend:per.spend, leads:per.leads, sales:per.sales, revenue:per.revenue,
+      conv:conv, netRev:netRev, netProfit:netProfit, romi:romi, netRoi:netRoi,
+      cpl: per.leads > 0 ? per.spend/per.leads : 0,
+      cps: per.sales > 0 ? per.spend/per.sales : 0};
+  });
+
+  var totalExtra = rkCost + svcFixed + svcPct + other;
+  var totalCost = totalSpend + totalExtra;
+  var totalNetRev = totalRevenue * (1 - agencyPct/100);
+  var romiAll = totalSpend > 0 ? (totalRevenue - totalSpend) / totalSpend * 100 : 0;
+  var netRoiAll = totalCost > 0 ? (totalNetRev - totalCost) / totalCost * 100 : 0;
+
+  var avgCheck = totalSales > 0 ? totalRevenue / totalSales : 0;
+  var cac = totalSales > 0 ? totalCost / totalSales : 0;
+  var cacPerLead = totalLeads > 0 ? totalCost / totalLeads : 0;
+  var margin = totalRevenue > 0 ? (totalRevenue - totalCost) / totalRevenue * 100 : 0;
+  var breakeven = avgCheck > 0 ? Math.ceil(totalCost / avgCheck) : 0;
+  var convAll = totalLeads > 0 ? totalSales / totalLeads * 100 : 0;
+  var ltvCac = cac > 0 && ltv > 0 ? ltv / cac : 0;
+
+  // GRID
+  var grid = document.getElementById('resultGrid');
+  var roiClass = netRoiAll >= 30 ? 'good' : (netRoiAll >= 0 ? 'warn' : 'bad');
+  grid.innerHTML = '';
+  grid.innerHTML += '<div class="result-card ' + (romiAll>=100?'good':romiAll>=0?'neutral':'bad') + '"><div class="num">' + (romiAll>=0?'+':'') + romiAll.toFixed(1) + '%</div><div class="lbl">ROMI</div><div class="sub">доход с рекламы</div></div>';
+  grid.innerHTML += '<div class="result-card ' + roiClass + '"><div class="num">' + (netRoiAll>=0?'+':'') + netRoiAll.toFixed(1) + '%</div><div class="lbl">Чистый ROI</div><div class="sub">доход − все расходы</div></div>';
+  grid.innerHTML += '<div class="result-card ' + (cac<=avgCheck*0.2?'good':cac<=avgCheck*0.5?'warn':'bad') + '"><div class="num">' + fmt(cac) + '</div><div class="lbl">CAC</div><div class="sub">на продажу</div></div>';
+  grid.innerHTML += '<div class="result-card neutral"><div class="num">' + fmt(totalRevenue) + '</div><div class="lbl">Выручка</div><div class="sub">' + totalSales + ' продаж</div></div>';
+
+  // === SVG LINE CHART ===
+  drawChart(weekData);
+
+  // === INSIGHTS ===
+  var ins = [];
+  if (weekData.length > 0) {
+    var bestRomi = -999, worstRomi = 999, bestIdx = 0, worstIdx = 0;
+    weekData.forEach(function(w, i) {
+      if (w.romi > bestRomi) { bestRomi = w.romi; bestIdx = i; }
+      if (w.romi < worstRomi) { worstRomi = w.romi; worstIdx = i; }
+    });
+    ins.push({icon:'📈', text:'<b>Лучший период:</b> ' + weekData[bestIdx].label + ' — ROMI ' + bestRomi.toFixed(1) + '%'});
+    ins.push({icon:'📉', text:'<b>Худший период:</b> ' + weekData[worstIdx].label + ' — ROMI ' + worstRomi.toFixed(1) + '%'});
+    if (avgCheck > 0) ins.push({icon:'💵', text:'<b>Средний чек:</b> ' + fmt(avgCheck) + (avgCheck > 10000 ? ' — нормально' : ' — можно поднимать')});
+    ins.push({icon:'🎯', text:'<b>CPL:</b> ' + fmt(cacPerLead) + ' | <b>Конверсия:</b> ' + convAll.toFixed(1) + '%' + (convAll < 10 ? ' ⚠️' : ' ✅')});
+    if (ltv > 0) ins.push({icon:'🔄', text:'<b>LTV/CAC:</b> ' + ltvCac.toFixed(1) + 'x' + (ltvCac>=3?' ✅':ltvCac>=2?' ⚠️':' ❌')});
+    ins.push({icon: totalNetRev >= totalCost ? '✅' : '🔴', text:'<b>Чистый результат:</b> ' + fmt(totalNetRev) + ' — ' + fmt(totalCost) + ' = ' + fmt(totalNetRev - totalCost)});
+  }
+  document.getElementById('insights').innerHTML = ins.map(function(i) {
+    return '<div class="insight-item"><span class="insight-icon">' + i.icon + '</span><span>' + i.text + '</span></div>';
+  }).join('');
+
+  // === DETAILS ===
+  var d = document.getElementById('details');
+  d.innerHTML = '';
+  d.innerHTML += '<div class="detail-row"><span>Расход на рекламу</span><span class="val">' + fmt(totalSpend) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Доп. расходы</span><span class="val">' + fmt(totalExtra) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Лиды / Продажи</span><span class="val">' + totalLeads + ' / ' + totalSales + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Конверсия общая</span><span class="val ' + (convAll>=10?'green':'red') + '">' + convAll.toFixed(1) + '%</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>CPL / CAC</span><span class="val">' + fmt(cacPerLead) + ' / ' + fmt(cac) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Средний чек</span><span class="val">' + fmt(avgCheck) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Выручка</span><span class="val">' + fmt(totalRevenue) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Агентские (' + agencyPct + '%)</span><span class="val">—' + fmt(totalRevenue * agencyPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span><b>Чистый доход</b></span><span class="val"><b>' + fmt(totalNetRev) + '</b></span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Маржинальность</span><span class="val ' + (margin>=20?'green':'red') + '">' + margin.toFixed(1) + '%</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Точка безубыточности</span><span class="val">' + breakeven + ' продаж</span></div>';
+  if (ltv > 0) d.innerHTML += '<div class="detail-row"><span>LTV / CAC</span><span class="val ' + (ltvCac>=3?'green':'red') + '">' + ltvCac.toFixed(1) + 'x</span></div>';
+
+  // BARS
+  var bars = '';
+  if (ltv > 0) {
+    var lv = Math.min(100, ltvCac/5*100);
+    bars += '<div class="bar-wrap"><div class="bar-label"><span>LTV/CAC ' + ltvCac.toFixed(1) + 'x</span><span>Цель<span>≥ 3x</span></div><div class="bar-track"><div class="bar-fill ' + (ltvCac>=3?'green':'red') + '" style="width:' + lv + '%"></div></div></div>';
+  }
+  var mPct = Math.min(100, Math.max(0, margin));
+  bars += '<div class="bar-wrap"><div class="bar-label"><span>Маржинальность ' + margin.toFixed(1) + '%</span><span>Цель ≥ 20%</span></div><div class="bar-track"><div class="bar-fill ' + (margin>=20?'green':'red') + '" style="width:' + mPct + '%"></div></div></div>';
+  var adShare = totalRevenue > 0 ? totalSpend/totalRevenue*100 : 0;
+  bars += '<div class="bar-wrap"><div class="bar-label"><span>Доля рекламы ' + adShare.toFixed(1) + '%</span><span>Норма ≤ 30%</span></div><div class="bar-track"><div class="bar-fill ' + (adShare<=30?'green':'red') + '" style="width:' + Math.min(100,adShare) + '%"></div></div></div>';
+  document.getElementById('breakdown').innerHTML = bars;
+
+  // TIP
+  var tip = document.getElementById('tip');
+  if (netRoiAll < -30) { tip.className='tip'; tip.innerHTML='🔴 <b>Критично:</b> Чистый ROI ' + netRoiAll.toFixed(1) + '%. Реклама глубоко убыточна.'; }
+  else if (netRoiAll < 0) { tip.className='tip'; tip.innerHTML='🟡 <b>Убыток:</b> Чистый ROI ' + netRoiAll.toFixed(1) + '%. Расходы превышают доход.'; }
+  else if (netRoiAll < 30) { tip.className='tip'; tip.innerHTML='🟠 <b>На грани:</b> Чистый ROI ' + netRoiAll.toFixed(1) + '%. Работа в ноль.'; }
+  else { tip.className='tip green-bg'; tip.innerHTML='🟢 <b>Прибыль:</b> Чистый ROI ' + netRoiAll.toFixed(1) + '%. Можно масштабировать.'; }
+
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ====== SVG CHART ======
+function drawChart(data) {
+  var svg = document.getElementById('chartSvg');
+  if (data.length < 2) { svg.innerHTML = '<text x="300" y="130" text-anchor="middle" fill="#9ca3af" font-size="14">Добавьте 2+ периода для графика</text>'; return; }
+
+  var W = 600, H = 240, pad = {top:20, right:50, bottom:40, left:50};
+  var cw = W - pad.left - pad.right;
+  var ch = H - pad.top - pad.bottom;
+
+  var allRomi = data.map(function(d){return d.romi;});
+  var allNet = data.map(function(d){return d.netRoi;});
+  var maxVal = Math.max.apply(null, allRomi.concat(allNet));
+  var minVal = Math.min.apply(null, allRomi.concat(allNet));
+  var range = Math.max(Math.abs(maxVal), Math.abs(minVal), 20);
+  range = Math.ceil(range / 10) * 10;
+
+  var yScale = function(v) { return pad.top + ch - (v - (-range)) / (2*range) * ch; };
+  var xStep = cw / (data.length - 1);
+
+  // lines
+  var pointsR = '', pointsN = '';
+  data.forEach(function(d, i) {
+    var x = pad.left + i * xStep;
+    pointsR += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.romi) + ' ';
+    pointsN += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.netRoi) + ' ';
+  });
+
+  // zero line
+  var zeroY = yScale(0);
+
+  var html = '';
+
+  // grid lines
+  var gridSteps = 4;
+  for (var g = 0; g <= gridSteps; g++) {
+    var val = -range + (2*range / gridSteps) * g;
+    var y = yScale(val);
+    html += '<line x1="' + pad.left + '" y1="' + y + '" x2="' + (W-pad.right) + '" y2="' + y + '" stroke="#e5e7eb" stroke-width="1"/>';
+    html += '<text x="' + (pad.left - 8) + '" y="' + (y+4) + '" text-anchor="end" fill="#9ca3af" font-size="11">' + (val >= 0 ? '+' : '') + val + '%</text>';
+  }
+
+  // zero line (bold)
+  html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="4,3"/>';
+
+  // area fill (ROMI — заштрихованная область)
+  var areaR = 'M' + pad.left + ',' + zeroY;
+  data.forEach(function(d, i) {
+    var x = pad.left + i * xStep;
+    areaR += ' L' + x + ',' + yScale(d.romi);
+  });
+  areaR += ' L' + (pad.left + (data.length-1)*xStep) + ',' + zeroY + ' Z';
+
+  // ROMI fill (light orange)
+  html += '<path d="' + areaR + '" fill="rgba(249,115,22,0.12)" stroke="none"/>';
+
+  // ROMI line
+  html += '<path d="' + pointsR + '" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
+  // Net ROI line
+  html += '<path d="' + pointsN + '" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="6,3" stroke-linejoin="round"/>';
+
+  // Points
+  data.forEach(function(d, i) {
+    var x = pad.left + i * xStep;
+    // ROMI dot
+    html += '<circle cx="' + x + '" cy="' + yScale(d.romi) + '" r="4" fill="#fff" stroke="#f97316" stroke-width="2"/>';
+    html += '<text x="' + x + '" y="' + (yScale(d.romi)-8) + '" text-anchor="middle" fill="#f97316" font-size="10" font-weight="700">' + (d.romi>=0?'+':'') + d.romi.toFixed(0) + '</text>';
+    // Net dot
+    html += '<circle cx="' + x + '" cy="' + yScale(d.netRoi) + '" r="3" fill="#fff" stroke="#ef4444" stroke-width="2"/>';
+    html += '<text x="' + (x+12) + '" y="' + (yScale(d.netRoi)+4) + '" text-anchor="start" fill="#ef4444" font-size="9">' + (d.netRoi>=0?'+':'') + d.netRoi.toFixed(0) + '%</text>';
+    // X labels
+    html += '<text x="' + x + '" y="' + (H-4) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.label + '</text>';
+
+    // CAC bar at bottom
+    var cacMax = 0;
+    data.forEach(function(dd){if(dd.cps>cacMax)cacMax=dd.cps;});
+    var barH = cacMax > 0 ? (d.cps/cacMax * 50) : 0;
+    var barY = H - pad.bottom + 18;
+    if (d.cps > 0) {
+      html += '<rect x="' + (x-6) + '" y="' + (barY-barH) + '" width="12" height="' + barH + '" rx="2" fill="rgba(16,185,129,' + (0.4 + 0.6*(barH/50)) + ')" stroke="#10b981" stroke-width="1"/>';
+      html += '<text x="' + x + '" y="' + (barY+12) + '" text-anchor="middle" fill="#10b981" font-size="9" font-weight="600">' + fmtShort(d.cps) + '</text>';
+    }
+  });
+
+  svg.innerHTML = html;
+}
 
 function fmt(x) {
   if (Math.abs(x) >= 10000000) return (x/1000000).toFixed(1) + ' млн';
   if (Math.abs(x) >= 1000) return Math.round(x).toLocaleString('ru-RU') + ' ₽';
   return x.toFixed(0) + ' ₽';
 }
-function pct(x) { return (x >= 0 ? '+' : '') + x.toFixed(1) + '%'; }
-
-function calculate() {
-  var period = $('periodLabel').value || 'Период';
-  $('periodTitle').textContent = period;
-
-  var agencyPct = parseFloat($('agencyPct').value) || 0;
-  var ltv = parseFloat($('ltvVal').value) || 0;
-  var rkCost = parseFloat($('rkCost').value) || 0;
-  var svcFixed = parseFloat($('servicesFixed').value) || 0;
-  var svcPct = parseFloat($('servicesPct').value) || 0;
-  var other = parseFloat($('otherCost').value) || 0;
-
-  // Собираем понедельно
-  var weeks = [];
-  var totals = {spend:0, leads:0, sales:0, revenue:0};
-  for (var i = 0; i < WEEKS; i++) {
-    var spend = w(i,'spend');
-    var leads = w(i,'leads');
-    var sales = w(i,'sales');
-    var revenue = w(i,'revenue');
-    weeks.push({spend:spend, leads:leads, sales:sales, revenue:revenue,
-      conv: leads > 0 ? sales/leads*100 : 0,
-      cpl: leads > 0 ? spend/leads : 0,
-      cps: sales > 0 ? spend/sales : 0,
-      romi: spend > 0 ? (revenue - spend)/spend*100 : 0,
-      netRevenue: revenue * (1 - agencyPct/100),
-      grossProfit: (revenue * (1 - agencyPct/100)) - spend,
-    });
-    totals.spend += spend;
-    totals.leads += leads;
-    totals.sales += sales;
-    totals.revenue += revenue;
-  }
-
-  // Итоговые расходы
-  var totalSpend = totals.spend;
-  var totalExtra = rkCost + svcFixed + svcPct + other;
-  var totalCost = totalSpend + totalExtra;
-  var totalNetRevenue = totals.revenue * (1 - agencyPct/100);
-
-  // Общий ROMI (классический)
-  var romiAll = totalSpend > 0 ? (totals.revenue - totalSpend) / totalSpend * 100 : 0;
-  // Чистый ROI
-  var netRoiAll = totalCost > 0 ? (totalNetRevenue - totalCost) / totalCost * 100 : 0;
-
-  // Общие метрики
-  var totalSales = totals.sales;
-  var cac = totalSales > 0 ? totalCost / totalSales : 0;
-  var cacPerLead = totals.leads > 0 ? totalCost / totals.leads : 0;
-  var margin = totals.revenue > 0 ? (totals.revenue - totalCost) / totals.revenue * 100 : 0;
-  var breakeven = totals.sales > 0 ? Math.ceil(totalCost / (totals.revenue/totals.sales)) : 0;
-  var ltvCac = cac > 0 && ltv > 0 ? ltv / cac : 0;
-  var avgCheck = totalSales > 0 ? totals.revenue / totalSales : 0;
-
-  // Обновляем итоговые суммы в таблице
-  for (var key in totals) {
-    var el = $('total_' + key);
-    if (el) el.textContent = key === 'spend' || key === 'revenue' ? fmt(totals[key]) : totals[key];
-  }
-
-  // ====== РЕНДЕР ======
-  var grid = $('resultGrid');
-  var roiClass = netRoiAll >= 30 ? 'good' : (netRoiAll >= 0 ? 'warn' : 'bad');
-  var romiClass = romiAll >= 100 ? 'good' : (romiAll >= 30 ? 'warn' : (romiAll >= 0 ? 'neutral' : 'bad'));
-  var cacClass = cac <= avgCheck * 0.2 ? 'good' : (cac <= avgCheck * 0.5 ? 'warn' : 'bad');
-  grid.innerHTML = '';
-  grid.innerHTML += '<div class="result-card ' + romiClass + '"><div class="num">' + pct(romiAll) + '</div><div class="lbl">ROMI</div><div class="sub">(доход — реклама)</div></div>';
-  grid.innerHTML += '<div class="result-card ' + roiClass + '"><div class="num">' + pct(netRoiAll) + '</div><div class="lbl">Чистый ROI</div><div class="sub">(чистый доход — все расходы)</div></div>';
-  grid.innerHTML += '<div class="result-card ' + cacClass + '"><div class="num">' + fmt(cac) + '</div><div class="lbl">CAC</div><div class="sub">на продажу</div></div>';
-  grid.innerHTML += '<div class="result-card neutral"><div class="num">' + fmt(totals.revenue) + '</div><div class="lbl">Выручка</div><div class="sub">' + totalSales + ' продаж</div></div>';
-
-  // === ГРАФИК ===
-  var chart = $('chart');
-  var maxRomi = 0;
-  var minRomi = 0;
-  weeks.forEach(function(w) {
-    if (w.romi > maxRomi) maxRomi = w.romi;
-    if (w.romi < minRomi) minRomi = w.romi;
-    var net = weeks.indexOf(w) === WEEKS-1 ? netRoiAll : (w.spend > 0 ? (w.netRevenue - w.spend)/w.spend*100 : 0);
-    if (net > maxRomi) maxRomi = net;
-    if (net < minRomi) minRomi = net;
-  });
-  var range = Math.max(Math.abs(maxRomi), Math.abs(minRomi), 20);
-
-  chart.innerHTML = weeks.map(function(w, idx) {
-    var net = w.spend > 0 ? (w.netRevenue - w.spend) / w.spend * 100 : 0;
-    var rH = Math.max(4, (w.romi / range) * 150);
-    var nH = Math.max(4, (net / range) * 150);
-    return '<div class="chart-bar">'
-      + '<div class="col romi" style="height:' + rH + 'px"><span class="ht" style="color:var(--text);font-size:0.6rem;">' + (w.romi>=0?'+':'') + w.romi.toFixed(0) + '%</span></div>'
-      + '<div class="col netroi" style="height:' + nH + 'px"><span class="ht" style="color:var(--red);top:-18px;font-size:0.6rem;">' + (net>=0?'+':'') + net.toFixed(0) + '%</span></div>'
-      + '<div class="label">W' + (idx+1) + '</div></div>';
-  }).join('');
-
-  // === ИНСАЙТЫ ===
-  var insights = [];
-  var bestWeek = 0, worstWeek = 0;
-  var bestRomi = -999, worstRomi = 999;
-  weeks.forEach(function(w, idx) {
-    if (w.romi > bestRomi) { bestRomi = w.romi; bestWeek = idx; }
-    if (w.romi < worstRomi) { worstRomi = w.romi; worstWeek = idx; }
-  });
-
-  insights.push({icon:'📈', text: '<b>Лучшая неделя:</b> ' + WEEK_LABELS[bestWeek] + ' — ROMI ' + bestRomi.toFixed(1) + '%' + (weeks[bestWeek].sales > 0 ? ', ' + weeks[bestWeek].sales + ' продаж' : '')});
-  insights.push({icon:'📉', text: '<b>Худшая неделя:</b> ' + WEEK_LABELS[worstWeek] + ' — ROMI ' + worstRomi.toFixed(1) + '%'});
-
-  if (totalSales > 0) insights.push({icon:'💵', text: '<b>Средний чек:</b> ' + fmt(avgCheck) + ' — ' + (avgCheck > 10000 ? 'хороший' : 'можно поднимать')});
-  if (cacPerLead > 0) insights.push({icon:'🎯', text: '<b>CPL (цена лида):</b> ' + fmt(cacPerLead) + ' — ' + (cacPerLead < 1000 ? 'низкая' : cacPerLead < 3000 ? 'средняя' : 'высокая')});
-
-  var convAll = totals.leads > 0 ? totalSales / totals.leads * 100 : 0;
-  insights.push({icon:'🔄', text: '<b>Конверсия лид→продажа:</b> ' + convAll.toFixed(1) + '%' + (convAll < 10 ? ' ⚠️ ниже 10%' : ' ✅')});
-
-  if (ltv > 0) {
-    insights.push({icon:'🔄', text: '<b>LTV/CAC:</b> ' + ltvCac.toFixed(1) + 'x' + (ltvCac >= 3 ? ' ✅ отлично' : ltvCac >= 2 ? ' ⚠️ приемлемо' : ' ❌ низкий')});
-  }
-
-  var totalNet = totalNetRevenue - totalCost;
-  insights.push({icon: totalNet >= 0 ? '✅' : '🔴', text: '<b>Чистый доход/убыток:</b> ' + fmt(totalNetRevenue) + ' — ' + fmt(totalCost) + ' = <b>' + fmt(totalNet) + '</b>'});
-
-  $('insights').innerHTML = insights.map(function(i) {
-    return '<div class="insight-item"><span class="insight-icon">' + i.icon + '</span><span>' + i.text + '</span></div>';
-  }).join('');
-
-  // === ДЕТАЛИ ===
-  var d = $('details');
-  d.innerHTML = '';
-  d.innerHTML += '<div class="detail-row"><span>Расход на рекламу</span><span class="val">' + fmt(totalSpend) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Доп. расходы (РК+услуги+прочее)</span><span class="val">' + fmt(totalExtra) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Всего лидов</span><span class="val">' + totals.leads + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Всего продаж</span><span class="val">' + totalSales + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Конверсия общая</span><span class="val ' + (convAll >= 10 ? 'green' : 'red') + '">' + convAll.toFixed(1) + '%</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Средняя цена лида (CPL)</span><span class="val">' + fmt(cacPerLead) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>CAC (стоимость продажи)</span><span class="val ' + (cac <= avgCheck * 0.3 ? 'green' : 'red') + '">' + fmt(cac) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Средний чек</span><span class="val">' + fmt(avgCheck) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Доход (выручка)</span><span class="val">' + fmt(totals.revenue) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Агентские (' + agencyPct + '%)</span><span class="val">—' + fmt(totals.revenue * agencyPct/100) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span><b>Чистый доход (после агентских)</b></span><span class="val"><b>' + fmt(totalNetRevenue) + '</b></span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Маржинальность</span><span class="val ' + (margin >= 20 ? 'green' : 'red') + '">' + margin.toFixed(1) + '%</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Точка безубыточности</span><span class="val">' + breakeven + ' продаж</span></div>';
-  if (ltv > 0) d.innerHTML += '<div class="detail-row"><span>LTV / CAC</span><span class="val ' + (ltvCac >= 3 ? 'green' : 'red') + '">' + ltvCac.toFixed(1) + 'x</span></div>';
-
-  // === ВИЗУАЛЬНЫЕ БАРЫ ===
-  var bars = '';
-  if (ltv > 0) {
-    var lv = Math.min(100, ltvCac/5*100);
-    bars += '<div class="bar-wrap"><div class="bar-label"><span>LTV/CAC ' + ltvCac.toFixed(1) + 'x</span><span>Цель ≥ 3x</span></div><div class="bar-track"><div class="bar-fill ' + (ltvCac>=3?'green':'red') + '" style="width:' + lv + '%"></div></div></div>';
-  }
-  var mPct = Math.min(100, Math.max(0, margin));
-  bars += '<div class="bar-wrap"><div class="bar-label"><span>Маржинальность ' + margin.toFixed(1) + '%</span><span>Цель ≥ 20%</span></div><div class="bar-track"><div class="bar-fill ' + (margin>=20?'green':'red') + '" style="width:' + mPct + '%"></div></div></div>';
-  var adShare = totals.revenue > 0 ? totalSpend/totals.revenue*100 : 0;
-  var adPct = Math.min(100, adShare);
-  bars += '<div class="bar-wrap"><div class="bar-label"><span>Доля рекламы ' + adShare.toFixed(1) + '%</span><span>Норма ≤ 30%</span></div><div class="bar-track"><div class="bar-fill ' + (adShare<=30?'green':'red') + '" style="width:' + adPct + '%"></div></div></div>';
-  $('breakdown').innerHTML = bars;
-
-  // === СОВЕТ ===
-  var tipText = '';
-  var tipClass = 'tip';
-  if (netRoiAll < -30) {
-    tipText = '🔴 <b>Критично:</b> реклама глубоко убыточна. Чистый ROI ' + netRoiAll.toFixed(1) + '%. Срочно: пересмотрите бюджет или средний чек.';
-  } else if (netRoiAll < 0) {
-    tipText = '🟡 <b>Убыток:</b> чистый ROI ' + netRoiAll.toFixed(1) + '%. Расходы превышают доход. Снижайте CAC или поднимайте чек.';
-  } else if (netRoiAll < 30) {
-    tipText = '🟠 <b>На грани:</b> чистый ROI ' + netRoiAll.toFixed(1) + '%. Работа в ноль. Нужно расти.';
-  } else {
-    tipText = '🟢 <b>Прибыль:</b> чистый ROI ' + netRoiAll.toFixed(1) + '%. Можно масштабировать при стабильном LTV.';
-    tipClass = 'tip green-bg';
-  }
-  $('tip').className = tipClass;
-  $('tip').innerHTML = tipText;
-
-  $('formula').innerHTML = 'ROMI = (Выручка — Реклама) / Реклама × 100% | Чистый ROI = (Чистый доход — Все расходы) / Все расходы × 100%';
-  $('resultCard').style.display = 'block';
-  $('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
+function fmtShort(x) {
+  if (x >= 1000) return (x/1000).toFixed(x>=10000?0:1) + 'K';
+  return x.toFixed(0);
 }
 
-window.addEventListener('DOMContentLoaded', calculate);
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:8px;font-size:0.9rem;font-weight:500;opacity:0;transition:all 0.3s;z-index:1000;pointer-events:none;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(function() {
+    t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(80px)';
+    setTimeout(function(){ t.remove(); }, 300);
+  }, 2500);
+}
+
+// INIT
+renderTabs();
+loadProject();
+autoCalculate();
 </script>
 </body>
 </html>
