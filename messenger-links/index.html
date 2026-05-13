@@ -248,11 +248,19 @@
     <!-- Вкладки -->
     <div class="tabs">
       <button class="tab tg active" onclick="switchTab('tg')">
-        <span class="icon">✈️</span>
+        <span class="icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.2-.04-.28-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.92-1.7 6.53-2.83 7.84-3.37 3.73-1.55 4.51-1.82 5.01-1.82.11 0 .36.03.52.17.14.12.18.28.2.45-.02.12 0 .31 0 .48z" fill="currentColor"/>
+            </svg>
+          </span>
         <span class="name">Telegram</span>
       </button>
       <button class="tab wa" onclick="switchTab('wa')">
-        <span class="icon">💚</span>
+        <span class="icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.79 0 3.46-.47 4.93-1.28l3.7 1.27-1.27-3.7A9.94 9.94 0 0022 12c0-5.52-4.48-10-10-10zm4.65 14.15c-.3.85-1.1 1.4-1.95 1.55-.52.1-1.08.08-1.62-.05-.35-.08-.7-.2-1.03-.35-1.18-.52-2.18-1.32-3.02-2.28-.45-.52-.82-1.1-1.12-1.72-.65-1.38-.85-2.98-.28-4.38.28-.68.75-1.27 1.35-1.68.22-.15.48-.25.75-.25.12 0 .25.02.37.08.13.05.25.12.35.22.15.15.3.32.42.5.28.42.52.88.7 1.35.1.25.16.52.16.78 0 .28-.05.55-.18.8-.1.2-.22.38-.37.55-.12.15-.25.3-.38.45-.1.12-.15.25-.15.38 0 .08.02.15.05.22.25.62.65 1.18 1.12 1.65.35.35.75.65 1.2.88.18.1.35.18.55.22.1.02.22.02.3-.02.1-.05.18-.15.25-.25.2-.28.42-.55.62-.82.1-.12.22-.2.38-.22.08-.02.15 0 .22.02.35.1.68.25 1.02.38.15.05.3.12.45.18.22.1.42.22.62.35.1.08.18.18.22.3.05.08.05.18.02.28-.02.05-.08.15-.12.22-.22.38-.52.72-.85.98-.22.18-.48.35-.75.48-.08.02-.15.05-.22.08z" fill="#25D366"/>
+            </svg>
+          </span>
         <span class="name">WhatsApp</span>
       </button>
     </div>
@@ -265,38 +273,10 @@
         <div class="form-group">
           <label for="tgUsername">Username или номер телефона</label>
           <input type="text" id="tgUsername" placeholder="username или 79123456789" value="">
-          <span class="helper">Без @. Пример: <code>moihottur</code> или <code>79137588607</code></span>
+          <span class="helper">Без @. Пример: <code>yandex</code> или <code>79137588607</code></span>
         </div>
 
-        <div class="param-row">
-          <span class="param-label">Текст</span>
-          <div class="param-input">
-            <input type="text" id="tgText" placeholder="Привет! Хочу узнать про туры" oninput="generateTg()">
-          </div>
-          <label class="param-toggle">
-            <span class="switch">
-              <input type="checkbox" id="tgTextToggle" checked onchange="generateTg()">
-              <span class="slider"></span>
-            </span>
-            Включить
-          </label>
-        </div>
 
-        <div class="param-row">
-          <span class="param-label">UTM-метки</span>
-          <div class="param-input" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input type="text" id="tgUtmSource" placeholder="source" value="telegram" style="flex:1;min-width:80px;">
-            <input type="text" id="tgUtmMedium" placeholder="medium" value="social" style="flex:1;min-width:80px;">
-            <input type="text" id="tgUtmCampaign" placeholder="campaign" style="flex:1;min-width:100px;">
-          </div>
-          <label class="param-toggle">
-            <span class="switch">
-              <input type="checkbox" id="tgUtmToggle" onchange="generateTg()">
-              <span class="slider"></span>
-            </span>
-            UTM
-          </label>
-        </div>
 
         <div class="param-row">
           <span class="param-label">Параметр <code>start</code></span>
@@ -313,7 +293,7 @@
         </div>
 
         <div class="helper" style="margin-top:4px;">
-          <code>start</code> — передаётся боту при старте диалога. Используйте для трекинга кампаний.
+          <code>start</code> — передаётся боту при старте. Используйте для трекинга кампаний.
         </div>
       </div>
     </div>
@@ -370,6 +350,7 @@
         <div class="result-actions">
           <button class="btn btn-primary" id="copyBtn" onclick="copyUrl()">📋 Копировать</button>
           <button class="btn btn-success" id="copiedBtn" style="display:none;">✅ Скопировано</button>
+          <button class="btn btn-outline" onclick="saveToHistory()">💾 Сохранить</button>
           <button class="btn btn-outline" id="openBtn" onclick="openUrl()">🔗 Открыть</button>
         </div>
       </div>
@@ -415,35 +396,12 @@
       if (!username) { return; }
 
       var url = 'https://t.me/' + encodeURIComponent(username);
-      var params = [];
-
-      // Текст
-      var textToggle = document.getElementById('tgTextToggle').checked;
-      var text = document.getElementById('tgText').value.trim();
-      if (textToggle && text) {
-        params.push('text=' + encodeURIComponent(text));
-      }
-
-      // UTM
-      var utmToggle = document.getElementById('tgUtmToggle').checked;
-      if (utmToggle) {
-        var s = document.getElementById('tgUtmSource').value.trim();
-        var m = document.getElementById('tgUtmMedium').value.trim();
-        var c = document.getElementById('tgUtmCampaign').value.trim();
-        if (s) params.push('utm_source=' + encodeURIComponent(s));
-        if (m) params.push('utm_medium=' + encodeURIComponent(m));
-        if (c) params.push('utm_campaign=' + encodeURIComponent(c));
-      }
 
       // start
       var startToggle = document.getElementById('tgStartToggle').checked;
       var start = document.getElementById('tgStart').value.trim();
       if (startToggle && start) {
-        params.push('start=' + encodeURIComponent(start));
-      }
-
-      if (params.length) {
-        url += '?' + params.join('&');
+        url += '?start=' + encodeURIComponent(start);
       }
 
       document.getElementById('resultUrl').value = url;
@@ -517,11 +475,7 @@
 
     // === Live generation ===
     document.getElementById('tgUsername').addEventListener('input', generateTg);
-    document.getElementById('tgText').addEventListener('input', generateTg);
     document.getElementById('tgStart').addEventListener('input', generateTg);
-    document.getElementById('tgUtmSource').addEventListener('input', generateTg);
-    document.getElementById('tgUtmMedium').addEventListener('input', generateTg);
-    document.getElementById('tgUtmCampaign').addEventListener('input', generateTg);
 
     document.getElementById('waPhone').addEventListener('input', generateWa);
     document.getElementById('waText').addEventListener('input', generateWa);
@@ -530,7 +484,7 @@
     document.getElementById('waUtmCampaign').addEventListener('input', generateWa);
 
     // init по умолчанию
-    document.getElementById('tgUsername').value = 'moihottur';
+    document.getElementById('tgUsername').value = 'yandex';
 
     // === История ===
     function getHistory() {
