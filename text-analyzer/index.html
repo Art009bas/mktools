@@ -155,6 +155,8 @@
       .input-header { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
   </style>
+
+
 </head>
 <body>
   <header>
@@ -179,9 +181,9 @@
         </div>
       </div>
       <textarea id="textInput" placeholder="Вставьте текст для анализа..." style="display:none;"></textarea>
-      <div id="textPreview" contenteditable="true" style="font-family:var(--font);width:100%;padding:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;line-height:1.6;outline:none;transition:border-color 0.2s;background:var(--bg);resize:vertical;min-height:200px;overflow:auto;" oninput="syncTextarea()" onclick="clearPlaceholder()"></div>
+      <div id="textPreview" contenteditable="true" style="font-family:var(--font);width:100%;padding:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;line-height:1.6;outline:none;transition:border-color 0.2s;background:var(--bg);resize:vertical;min-height:200px;overflow:auto;"></div>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="analyze()">🔍 Анализировать</button>
+        <button class="btn btn-primary" id="analyzeBtn">🔍 Анализировать</button>
       </div>
     </div>
 
@@ -729,14 +731,6 @@ function syncTextarea() {
   document.getElementById('sentCount').textContent = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
 }
 
-function clearPlaceholder() {
-  var preview = document.getElementById('textPreview');
-  if (preview.innerText === 'Вставьте текст для анализа...' || (preview.innerText || '').trim() === '') {
-    preview.innerHTML = '';
-    syncTextarea();
-  }
-}
-
 document.getElementById('textPreview').addEventListener('input', function() {
   var text = this.innerText || this.textContent || '';
   document.getElementById('charCount').textContent = text.length;
@@ -751,6 +745,10 @@ function showToast(msg) {
   toast.classList.add('show');
   setTimeout(function() { toast.classList.remove('show'); }, 2500);
 }
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('textPreview').innerHTML = '';
+  document.getElementById('analyzeBtn').addEventListener('click', analyze);
+  syncTextarea();
+});
 </script>
-</body>
-</html>
