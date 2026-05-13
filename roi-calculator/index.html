@@ -359,10 +359,8 @@ function toggleParams() {
   var b = document.getElementById('paramsBlock');
   b.style.display = b.style.display === 'none' ? 'block' : 'none';
   var p = cp();
-  document.getElementById('ndsPct').value = p.ndsPct || 20;
-  document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
-  document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
-  document.getElementById('rkPct').value = p.rkPct || 0;
+  document.getElementById('ndsPct').value = p.ndsPct || 22;
+  document.getElementById('rkPctPlain').value = p.rkPctPlain || 15;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
   document.getElementById('svcFixed').value = p.svcFixed || 0;
   document.getElementById('svcPct').value = p.svcPct || 0;
@@ -372,10 +370,8 @@ function toggleParams() {
 // ====== LOAD/SAVE ======
 function loadProject() {
   var p = cp();
-  document.getElementById('ndsPct').value = p.ndsPct || 20;
-  document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
-  document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
-  document.getElementById('rkPct').value = p.rkPct || 0;
+  document.getElementById('ndsPct').value = p.ndsPct || 22;
+  document.getElementById('rkPctPlain').value = p.rkPctPlain || 15;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
   document.getElementById('svcFixed').value = p.svcFixed || 0;
   document.getElementById('svcPct').value = p.svcPct || 0;
@@ -387,8 +383,7 @@ function loadProject() {
 function saveCurrent() {
   var p = cp();
   p.ndsPct = parseFloat(document.getElementById('ndsPct').value) || 20;
-  p.rkPctPlain = parseFloat(document.getElementById('rkPctPlain').value) || 0;
-  p.rkPct = parseFloat(document.getElementById('rkPct').value) || 0;
+  p.rkPctPlain = parseFloat(document.getElementById('rkPctPlain').value) || 15;
   p.agencyPct = parseFloat(document.getElementById('agencyPct').value) || 25;
   p.svcFixed = parseFloat(document.getElementById('svcFixed').value) || 0;
   p.svcPct = parseFloat(document.getElementById('svcPct').value) || 0;
