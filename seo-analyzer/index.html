@@ -151,7 +151,14 @@
       Используется CORS-прокси для обхода блокировок. <a href="#" onclick="toggleProxy(event)">Настроить прокси</a>
     </div>
     <div id="proxyConfig" style="display:none;margin-top:8px;">
-      <input type="text" id="proxyUrl" style="font-family:var(--font);width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;outline:none;background:var(--bg);" placeholder="https://api.allorigins.win/raw?url=" value="https://api.allorigins.win/raw?url=">
+      <label style="font-size:0.82rem;color:var(--text-secondary);display:block;margin-bottom:6px;">Выберите CORS-прокси:</label>
+      <select id="proxySelect" style="font-family:var(--font);width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;outline:none;background:var(--bg);" onchange="updateProxy()">
+        <option value="https://api.allorigins.win/raw?url=">api.allorigins.win (не всегда работает)</option>
+        <option value="https://corsproxy.io/?" selected>corsproxy.io</option>
+        <option value="https://api.codetabs.com/v1/proxy?quest=">codetabs.com</option>
+        <option value="https://thingproxy.freeboard.io/fetch/">thingproxy.freeboard.io</option>
+        <option value="https://cors-anywhere.herokuapp.com/">cors-anywhere (требует активации)</option>
+      </select>
     </div>
   </div>
 
@@ -204,7 +211,7 @@
 </div>
 
 <script>
-var PROXY = 'https://api.allorigins.win/raw?url=';
+var PROXY = 'https://corsproxy.io/?';
 
 function toggleProxy(e) {
   e.preventDefault();
@@ -470,6 +477,11 @@ function isCmsUrl(search) {
     }
   }
   return false;
+}
+
+function updateProxy() {
+  PROXY = document.getElementById('proxySelect').value;
+  document.getElementById('proxyUrl').value = PROXY;
 }
 
 function showToast(msg) {
