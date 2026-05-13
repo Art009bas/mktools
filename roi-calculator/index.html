@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI-калькулятор — mktools</title>
+  <meta name="description" content="Расчёт окупаемости рекламных кампаний: ROI, ROMI, CAC, LTV, точка безубыточности.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fb; --surface: #fff; --text: #1a1a2e;
+      --text-secondary: #6b7280; --text-tertiary: #9ca3af;
+      --accent: #f97316; --accent-hover: #ea580c;
+      --border: #e5e7eb;
+      --radius: 16px; --radius-sm: 8px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --green: #10b981; --green-light: #ecfdf5;
+      --red: #ef4444; --red-light: #fef2f2;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-left: auto; }
+    .back-link:hover { color: var(--accent); }
+    .app { max-width: 720px; margin: 0 auto; padding: 32px 24px 80px; }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
+    .subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+    }
+    .card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 16px; }
+
+    .field-group { margin-bottom: 16px; }
+    .field-group:last-child { margin-bottom: 0; }
+    .field-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; }
+    .field-label small { font-weight: 400; color: var(--text-tertiary); }
+    .field-input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 0.95rem; font-family: var(--font);
+      outline: none; background: var(--bg); transition: border-color 0.2s;
+    }
+    .field-input:focus { border-color: var(--accent); background: var(--surface); }
+
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .calc-btn {
+      width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+      background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font); transition: background 0.2s; margin-top: 8px;
+    }
+    .calc-btn:hover { background: var(--accent-hover); }
+
+    .result-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .result-card {
+      padding: 16px; border-radius: var(--radius-sm); text-align: center;
+    }
+    .result-card.good { background: var(--green-light); }
+    .result-card.bad { background: var(--red-light); }
+    .result-card.neutral { background: var(--bg); }
+    .result-card .num { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+    .result-card.good .num { color: var(--green); }
+    .result-card.bad .num { color: var(--red); }
+    .result-card.neutral .num { color: var(--text); }
+    .result-card .lbl { font-size: 0.78rem; color: var(--text-secondary); }
+
+    .result-details { margin-top: 12px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .val { font-weight: 600; }
+    .detail-row .val.green { color: var(--green); }
+    .detail-row .val.red { color: var(--red); }
+
+    .breakdown { margin-top: 16px; }
+    .bar-wrap { margin-bottom: 10px; }
+    .bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; }
+    .bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s; }
+    .bar-fill.green { background: var(--green); }
+    .bar-fill.red { background: var(--red); }
+
+    .tip {
+      margin-top: 12px; padding: 12px; border-radius: var(--radius-sm);
+      font-size: 0.82rem; line-height: 1.5; background: #fff8f0; border: 1px solid #fed7aa;
+      color: #9a3412;
+    }
+
+    .formula { font-size: 0.78rem; color: var(--text-tertiary); text-align: center; margin-top: 8px; }
+
+    @media (max-width: 560px) {
+      .two-cols, .result-grid { grid-template-columns: 1fr; }
+      .app { padding: 20px 16px 60px; }
+      h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="/mktools/" class="logo"><span>mk</span>tools</a>
+    <a href="/mktools/" class="back-link">← Все инструменты</a>
+  </div>
+</header>
+
+<div class="app">
+  <h1>💰 ROI-калькулятор</h1>
+  <p class="subtitle">Окупаемость рекламы: ROI, ROMI, CAC, LTV.</p>
+
+  <div class="card">
+    <div class="card-title">📊 Вводные данные</div>
+    <div class="two-cols">
+      <div class="field-group">
+        <div class="field-label">Бюджет на рекламу <small>₽</small></div>
+        <input class="field-input" type="number" id="budget" placeholder="100000" value="100000">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Количество лидов</div>
+        <input class="field-input" type="number" id="leads" placeholder="50" value="50">
+      </div>
+    </div>
+    <div class="two-cols">
+      <div class="field-group">
+        <div class="field-label">Средний чек <small>₽</small></div>
+        <input class="field-input" type="number" id="avgCheck" placeholder="50000" value="50000">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Конверсия в продажу <small>%</small></div>
+        <input class="field-input" type="number" id="conversion" placeholder="5" value="5" step="0.1">
+      </div>
+    </div>
+    <div class="two-cols">
+      <div class="field-group">
+        <div class="field-label">LTV (жизненная ценность) <small>₽, опционально</small></div>
+        <input class="field-input" type="number" id="ltv" placeholder="120000" value="120000">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Доп. расходы <small>₽, зарплаты, софт</small></div>
+        <input class="field-input" type="number" id="extraCosts" placeholder="0" value="0">
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calculate()">🧮 Рассчитать</button>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <div class="card-title">📈 Результаты</div>
+    <div class="result-grid" id="resultGrid"></div>
+    <div class="breakdown" id="breakdown"></div>
+    <div class="result-details" id="details"></div>
+    <div class="tip" id="tip"></div>
+    <div class="formula" id="formula"></div>
+  </div>
+</div>
+
+<script>
+function $(id) { return document.getElementById(id); }
+
+function num(id) {
+  var v = $(id).value.replace(/\s/g, '').replace(',', '.');
+  return parseFloat(v) || 0;
+}
+
+function fmt(x) {
+  if (Math.abs(x) >= 1000000) return (x/1000000).toFixed(1) + ' млн';
+  if (Math.abs(x) >= 1000) return Math.round(x).toLocaleString('ru-RU') + ' ₽';
+  return x.toFixed(0) + ' ₽';
+}
+
+function calculate() {
+  var budget = num('budget');
+  var leads = num('leads');
+  var avgCheck = num('avgCheck');
+  var conv = num('conversion');
+  var ltv = num('ltv');
+  var extra = num('extraCosts');
+
+  if (!budget || !leads || !avgCheck) {
+    showToast('Заполните бюджет, лиды и средний чек');
+    return;
+  }
+
+  var totalCost = budget + extra;
+  var sales = Math.round(leads * conv / 100);
+  var revenue = sales * avgCheck;
+
+  // ROI = (Revenue - Cost) / Cost * 100
+  var roi = totalCost > 0 ? ((revenue - totalCost) / totalCost * 100) : 0;
+  var romi = totalCost > 0 ? ((revenue - totalCost) / totalCost * 100) : 0;
+
+  // CAC
+  var cac = sales > 0 ? totalCost / sales : 0;
+  var cacPerLead = leads > 0 ? totalCost / leads : 0;
+
+  // LTV/CAC
+  var ltvCac = cac > 0 ? ltv / cac : 0;
+
+  // Точка безубыточности (нужно продаж чтобы отбить)
+  var breakevenSales = avgCheck > 0 ? Math.ceil(totalCost / avgCheck) : 0;
+
+  // Маржинальность
+  var margin = revenue > 0 ? ((revenue - totalCost) / revenue * 100) : 0;
+
+  // Доля расходов на рекламу в выручке
+  var adShare = revenue > 0 ? (budget / revenue * 100) : 0;
+
+  // Рендер
+  var grid = $('resultGrid');
+  grid.innerHTML = '';
+
+  var roiColor = roi >= 100 ? 'good' : (roi >= 0 ? 'neutral' : 'bad');
+  var romiColor = romi >= 100 ? 'good' : (romi >= 0 ? 'neutral' : 'bad');
+  var cacColor = cac <= avgCheck * 0.2 ? 'good' : (cac <= avgCheck * 0.5 ? 'neutral' : 'bad');
+
+  grid.innerHTML += '<div class="result-card ' + roiColor + '"><div class="num">' + (roi >= 0 ? '+' : '') + roi.toFixed(0) + '%</div><div class="lbl">ROI</div></div>';
+  grid.innerHTML += '<div class="result-card ' + romiColor + '"><div class="num">' + (romi >= 0 ? '+' : '') + romi.toFixed(0) + '%</div><div class="lbl">ROMI</div></div>';
+  grid.innerHTML += '<div class="result-card ' + cacColor + '"><div class="num">' + fmt(cac) + '</div><div class="lbl">CAC / клиент</div></div>';
+  grid.innerHTML += '<div class="result-card neutral"><div class="num">' + fmt(revenue) + '</div><div class="lbl">Выручка</div></div>';
+
+  // Детали
+  var detailsHtml = '';
+  detailsHtml += '<div class="detail-row"><span>Всего расходов</span><span class="val">' + fmt(totalCost) + '</span></div>';
+  detailsHtml += '<div class="detail-row"><span>Продаж</span><span class="val">' + sales + '</span></div>';
+  detailsHtml += '<div class="detail-row"><span>CAC на лид</span><span class="val">' + fmt(cacPerLead) + '</span></div>';
+  if (ltv > 0) {
+    detailsHtml += '<div class="detail-row"><span>LTV / CAC</span><span class="val ' + (ltvCac >= 3 ? 'green' : 'red') + '">' + ltvCac.toFixed(1) + 'x' + (ltvCac >= 3 ? ' ✅' : ' ⚠️') + '</span></div>';
+  }
+  detailsHtml += '<div class="detail-row"><span>Точка безубыточности</span><span class="val">' + breakevenSales + ' продаж</span></div>';
+  detailsHtml += '<div class="detail-row"><span>Маржинальность</span><span class="val ' + (margin >= 20 ? 'green' : 'red') + '">' + margin.toFixed(1) + '%</span></div>';
+  detailsHtml += '<div class="detail-row"><span>Доля рекламы в выручке</span><span class="val ' + (adShare <= 30 ? 'green' : 'red') + '">' + adShare.toFixed(1) + '%</span></div>';
+
+  $('details').innerHTML = detailsHtml;
+
+  // Визуальные бары
+  var barHtml = '';
+  if (ltv > 0) {
+    var pct = Math.min(100, ltvCac / 5 * 100);
+    barHtml += '<div class="bar-wrap"><div class="bar-label"><span>LTV/CAC ' + ltvCac.toFixed(1) + 'x</span><span>Цель ≥ 3x</span></div><div class="bar-track"><div class="bar-fill ' + (ltvCac >= 3 ? 'green' : 'red') + '" style="width:' + pct + '%"></div></div></div>';
+  }
+  var marginPct = Math.min(100, Math.max(0, margin));
+  barHtml += '<div class="bar-wrap"><div class="bar-label"><span>Маржинальность ' + margin.toFixed(1) + '%</span><span>Цель ≥ 20%</span></div><div class="bar-track"><div class="bar-fill ' + (margin >= 20 ? 'green' : 'red') + '" style="width:' + marginPct + '%"></div></div></div>';
+  var adPct = Math.min(100, adShare);
+  barHtml += '<div class="bar-wrap"><div class="bar-label"><span>Доля рекламы ' + adShare.toFixed(1) + '%</span><span>Норма ≤ 30%</span></div><div class="bar-track"><div class="bar-fill ' + (adShare <= 30 ? 'green' : 'red') + '" style="width:' + adPct + '%"></div></div></div>';
+  $('breakdown').innerHTML = barHtml;
+
+  // Совет
+  var tipText = '';
+  if (roi < 0) tipText = '🔴 Реклама убыточна. Увеличьте конверсию или снизьте бюджет.';
+  else if (roi < 100) tipText = '🟡 Окупаемость есть, но низкая. Работайте над удержанием клиентов и доп. продажами.';
+  else tipText = '🟢 Отличная окупаемость! Можно масштабировать при стабильном LTV.';
+  $('tip').innerHTML = tipText;
+
+  // Формула
+  $('formula').innerHTML = 'ROI = (Выручка — Расходы) / Расходы × 100% | CAC = Расходы / Продажи';
+
+  $('resultCard').style.display = 'block';
+  $('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:8px;font-size:0.9rem;font-weight:500;opacity:0;transition:all 0.3s;z-index:1000;pointer-events:none;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(function() {
+    t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(80px)';
+    setTimeout(function(){ t.remove(); }, 300);
+  }, 2500);
+}
+
+// Авторасчёт при загрузке
+window.addEventListener('DOMContentLoaded', calculate);
+</script>
+</body>
+</html>
