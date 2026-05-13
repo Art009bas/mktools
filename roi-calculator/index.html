@@ -194,6 +194,8 @@
         <div class="field-group"><div class="field-label">% от РК (без НДС)</div><input class="field-input" type="number" id="rkPctPlain" value="0" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">% от РК+НДС</div><input class="field-input" type="number" id="rkPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">Агентские %</div><input class="field-input" type="number" id="agencyPct" value="25" onchange="saveCurrent()" placeholder="25"></div>
+        <div class="field-group"><div class="field-label">Услуги фикс</div><input class="field-input" type="number" id="svcFixed" value="39000" onchange="saveCurrent()" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">Услуги %</div><input class="field-input" type="number" id="svcPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" value="0" onchange="saveCurrent()" placeholder="0"></div>
       </div>
     </div>
@@ -254,7 +256,7 @@ var currentIdx = 0;
 if (projects.length === 0) {
   projects.push({
     name: 'Проект 1',
-    agencyPct: 25, ltv: 0,
+    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 0,
     months: [
       {label:'Мес 1', spend:0, leads:0, sales:0, revenue:0, extra:0}
     ]
@@ -363,6 +365,8 @@ function toggleParams() {
   document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
   document.getElementById('rkPct').value = p.rkPct || 0;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
+  document.getElementById('svcFixed').value = p.svcFixed || 0;
+  document.getElementById('svcPct').value = p.svcPct || 0;
   document.getElementById('otherCost').value = p.otherCost || 0;
 }
 
@@ -374,6 +378,8 @@ function loadProject() {
   document.getElementById('rkPctPlain').value = p.rkPctPlain || 0;
   document.getElementById('rkPct').value = p.rkPct || 0;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
+  document.getElementById('svcFixed').value = p.svcFixed || 0;
+  document.getElementById('svcPct').value = p.svcPct || 0;
   document.getElementById('otherCost').value = p.otherCost || 0;
   document.getElementById('ltvVal').value = p.ltv || '';
   renderMonths();
@@ -385,6 +391,8 @@ function saveCurrent() {
   p.rkPctPlain = parseFloat(document.getElementById('rkPctPlain').value) || 0;
   p.rkPct = parseFloat(document.getElementById('rkPct').value) || 0;
   p.agencyPct = parseFloat(document.getElementById('agencyPct').value) || 25;
+  p.svcFixed = parseFloat(document.getElementById('svcFixed').value) || 0;
+  p.svcPct = parseFloat(document.getElementById('svcPct').value) || 0;
   p.otherCost = parseFloat(document.getElementById('otherCost').value) || 0;
   p.ltv = parseFloat(document.getElementById('ltvVal').value) || 0;
   saveProjects(projects);
@@ -400,6 +408,8 @@ function calculate() {
   var ndsPct = p.ndsPct || 20;
   var rkPctPlain = p.rkPctPlain || 0;
   var rkPct = p.rkPct || 0;
+  var svcFixed = p.svcFixed || 0;
+  var svcPct = p.svcPct || 0;
   var agencyPct = p.agencyPct || 25;
   var ltv = p.ltv || 0;
   var otherCost = p.otherCost || 0
@@ -420,7 +430,8 @@ function calculate() {
     var nds = cumSpend * ndsPct / 100;
     var pctRkPlain = cumSpend * rkPctPlain / 100;
     var pctRk = (cumSpend + nds) * rkPct / 100;
-    var totalCost = cumSpend + nds + pctRkPlain + pctRk + currExtra + otherCost;
+    var svcPctAmt = cumSpend * svcPct / 100;
+    var totalCost = cumSpend + nds + pctRkPlain + pctRk + svcFixed + svcPctAmt + currExtra + otherCost;
     var netRev = cumRev * (1 - agencyPct/100);
     // Per-period (не накопленные)
     var pSpend = m.spend;
@@ -428,7 +439,11 @@ function calculate() {
     var pNds = pSpend * ndsPct / 100;
     var pPctRkPlain = pSpend * rkPctPlain / 100;
     var pPctRk = (pSpend + pNds) * rkPct / 100;
-    var pTotal = pSpend + pNds + pPctRkPlain + pPctRk + pExtra;
+    var svcPctAmt = cumSpend * svcPct / 100;
+    var monthsCnt = months.length;
+    var pSvcFixed = svcFixed / monthsCnt;
+    var pSvcPct = pSpend * svcPct / 100;
+    var pTotal = pSpend + pNds + pPctRkPlain + pPctRk + pSvcFixed + pSvcPct + pExtra;
     var pNetRev = m.revenue * (1 - agencyPct/100);
     allCum.push({
       label: m.label,
@@ -447,7 +462,8 @@ function calculate() {
   // Итоги
   var last = allCum[allCum.length - 1] || {cumRomi:0,cumNetRoi:0,cumCac:0,cumSpend:0};
   var totalRev = cumRev;
-  var totalCost = cumSpend + cumSpend*ndsPct/100 + cumSpend*rkPctPlain/100 + (cumSpend+cumSpend*ndsPct/100)*rkPct/100 + currExtra + otherCost;
+  var svcPctAmtTotal = cumSpend * svcPct / 100;
+  var totalCost = cumSpend + nds + cumSpend*rkPctPlain/100 + (cumSpend+nds)*rkPct/100 + svcFixed + svcPctAmtTotal + currExtra + otherCost;
   var totalNetRev = totalRev * (1 - agencyPct/100);
   var avgCheck = cumSales > 0 ? cumRev / cumSales : 0;
   var convAll = cumLeads > 0 ? cumSales / cumLeads * 100 : 0;
@@ -490,7 +506,10 @@ function calculate() {
   
     d.innerHTML += '<div class="detail-row"><span>НДС (' + ndsPct + '%)</span><span class="val">' + fmt(cumSpend*ndsPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>% от РК без НДС (' + rkPctPlain + '%)</span><span class="val">' + fmt(cumSpend*rkPctPlain/100) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+cumSpend*ndsPct/100)*rkPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+nds)*rkPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Услуги фикс</span><span class="val">' + fmt(svcFixed) + '</span></div>';
+  var svcPctAmtD = cumSpend * svcPct / 100;
+  d.innerHTML += '<div class="detail-row"><span>Услуги % (' + svcPct + '%)</span><span class="val">' + fmt(svcPctAmtD) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Прочее</span><span class="val">' + fmt(otherCost) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
   d.innerHTML += '<div class="detail-row"><span>Лиды / Продажи</span><span class="val">' + cumLeads + ' / ' + cumSales + '</span></div>';
