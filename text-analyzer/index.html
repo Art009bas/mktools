@@ -348,10 +348,13 @@
       var sentCount = sents.length;
 
       // Тошнота (частота повторений слов)
+      var PREPOSITIONS = ['в','без','до','за','из','к','на','над','о','об','от','по','под','пред','при','про','с','у','через','для','вне','вокруг','впереди','из-за','из-под','между','напротив','около','относительно','перед','после','посреди','ради','среди','возле','вблизи','внутри','вследствие','вроде','несмотря','благодаря','ввиду','вопреки','накануне','наподобие','напротив','навстречу','посредством','путем','вдоль','поперек','сквозь'];
       var wordFreq = {};
       words.forEach(function(w) {
         w = w.toLowerCase();
-        wordFreq[w] = (wordFreq[w] || 0) + 1;
+        if (PREPOSITIONS.indexOf(w) === -1) {
+          wordFreq[w] = (wordFreq[w] || 0) + 1;
+        }
       });
       var maxFreq = 0;
       var mostRepeated = '';
@@ -540,11 +543,34 @@
       // Ключевые слова
       var sorted = Object.keys(wordFreq).sort(function(a,b){ return wordFreq[b] - wordFreq[a]; });
       var topKeywords = sorted.slice(0, 5);
+      
+      // Фразы (уже посчитаны выше)
+      var phraseStr = topPhrases.length > 0
+        ? topPhrases.map(function(p) { return '"' + p + '" (' + phraseFreq[p] + ')'; }).join(', ')
+        : 'нет повторяющихся';
 
       seoFlags.push({ icon: '🔑', title: 'Самые частые слова',
         desc: topKeywords.map(function(w){ return w + ' (' + wordFreq[w] + ')'; }).join(', '),
         level: 'info' });
+      
+      seoFlags.push({ icon: '🔤', title: 'Самые частые фразы (2 слова)',
+        desc: phraseStr,
+        level: 'info' });
 
+      // Фразы
+      var phraseFreq = {};
+      for (var pi = 0; pi < words.length - 1; pi++) {
+        var bigram = (words[pi] + ' ' + words[pi+1]).toLowerCase();
+        var parts = bigram.split(' ');
+        if (PREPOSITIONS.indexOf(parts[0]) === -1 && PREPOSITIONS.indexOf(parts[1]) === -1) {
+          phraseFreq[bigram] = (phraseFreq[bigram] || 0) + 1;
+        }
+      }
+      var topPhrases = Object.keys(phraseFreq)
+        .filter(function(p) { return phraseFreq[p] >= 2; })
+        .sort(function(a,b) { return phraseFreq[b] - phraseFreq[a]; })
+        .slice(0, 5);
+      
       // Тошнота
       if (classicNausea > 8) {
         seoFlags.push({ icon: '🤢', title: 'Высокая тошнота (' + classicNausea.toFixed(1) + '%)',
