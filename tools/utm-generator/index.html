@@ -330,7 +330,7 @@
       if (term) params.push('utm_term=' + encodeURIComponent(term));
 
       var separator = base.indexOf('?') === -1 ? '?' : '&';
-      return base + separator + params.join('&amp;');
+      return base + separator + params.join('&');
     }
 
     function updateResult() {
@@ -408,13 +408,19 @@
       showToast('История очищена');
     }
 
-    function copyFromHistory(url) {
-      navigator.clipboard.writeText(url).then(function() {
+    function copyFromHistory(idx) {
+      var history = getHistory();
+      var item = history[parseInt(idx)];
+      if (!item) return;
+      navigator.clipboard.writeText(item.url).then(function() {
         showToast('Ссылка скопирована');
       });
     }
 
-    function loadFromHistory(item) {
+    function loadFromHistory(idx) {
+      var history = getHistory();
+      var item = history[parseInt(idx)];
+      if (!item) return;
       document.getElementById('baseUrl').value = item.url.split('?')[0];
       document.getElementById('utmSource').value = item.params.source || '';
       document.getElementById('utmMedium').value = item.params.medium || '';
@@ -445,19 +451,18 @@
       for (var i = 0; i < history.length; i++) {
         var item = history[i];
         html += '<div class="history-item">';
-        html += '  <div class="history-info" onclick="loadFromHistory(history[' + i + '])">';
+        html += '  <div class="history-info" data-idx="' + i + '" onclick="loadFromHistory(this.dataset.idx)">';
         html += '    <div class="history-name">' + escapeHtml(item.name) + '</div>';
         html += '    <div class="history-url" title="' + escapeHtml(item.url) + '">' + escapeHtml(item.url) + '</div>';
         html += '    <div class="history-date">' + formatDate(item.date) + ' · ' + escapeHtml(item.params.source) + ' / ' + escapeHtml(item.params.medium) + '</div>';
         html += '  </div>';
         html += '  <div class="history-actions">';
-        html += '    <button class="btn-icon" onclick="copyFromHistory(decodeURIComponent(\'' + encodeURIComponent(item.url) + '\'.replace(/&amp;/g,\'&\')))" title="Копировать">📋</button>';
+        html += '    <button class="btn-icon" onclick="copyFromHistory(' + i + ')" title="Копировать">📋</button>';
         html += '    <button class="btn-icon" onclick="deleteFromHistory(' + i + ')" title="Удалить">🗑️</button>';
         html += '  </div>';
         html += '</div>';
       }
-      // Сохраняем ссылку на массив в window для кликов
-      window.history = history;
+
       list.innerHTML = html;
     }
 
