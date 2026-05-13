@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор ссылок мессенджеров — mktools</title>
+  <meta name="description" content="Генератор ссылок для Telegram и WhatsApp с предустановленным текстом и параметром start для Telegram.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --surface: #fff;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-light: #fff7ed;
+      --accent-border: #fed7aa;
+      --border: #e5e7eb;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --green: #10b981;
+      --green-light: #ecfdf5;
+      --tg-blue: #0088cc;
+      --wa-green: #25d366;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner { max-width: 800px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-left: auto; }
+    .back-link:hover { color: var(--accent); }
+
+    .app { max-width: 800px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
+    .subtitle { color: var(--text-secondary); margin-bottom: 32px; font-size: 0.95rem; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 16px; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+    input, select, textarea {
+      font-family: var(--font);
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--bg);
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); background: var(--surface); }
+    textarea { resize: vertical; min-height: 44px; }
+    .helper { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 2px; }
+    .helper code { background: var(--accent-light); padding: 1px 6px; border-radius: 4px; font-size: 0.78rem; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab {
+      flex: 1;
+      padding: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+    .tab.active { border-color: var(--accent); background: var(--accent-light); }
+    .tab.tg.active { border-color: var(--tg-blue); background: #eef9ff; }
+    .tab.wa.active { border-color: var(--wa-green); background: #e8faf0; }
+    .tab .icon { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+    .tab .name { font-size: 0.85rem; font-weight: 500; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .param-row:last-child { border-bottom: none; }
+    .param-label { min-width: 80px; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+    .param-input { flex: 1; }
+    .param-input input { width: 100%; }
+    .param-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .result-section {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .result-section textarea {
+      flex: 1;
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent-border);
+      font-size: 0.85rem;
+      word-break: break-all;
+      min-height: 44px;
+      padding: 10px 14px;
+    }
+    .result-section textarea:focus { border-color: var(--accent); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-success:hover { background: #059669; }
+    .btn-tg { background: var(--tg-blue); color: #fff; }
+    .btn-tg:hover { background: #0077b3; }
+    .btn-wa { background: var(--wa-green); color: #fff; }
+    .btn-wa:hover { background: #20bd5a; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .result-actions { display: flex; gap: 8px; }
+
+    .preview-box {
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .preview-box a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.05rem;
+      padding: 8px 20px;
+      border-radius: var(--radius-sm);
+    }
+    .preview-box a.tg-link { color: var(--tg-blue); background: #eef9ff; border: 1px solid var(--tg-blue); }
+    .preview-box a.wa-link { color: #075e54; background: #e8faf0; border: 1px solid var(--wa-green); }
+    .preview-box .hint { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 8px; }
+
+    /* Switch */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--border); border-radius: 22px; transition: 0.3s; }
+    .slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    .switch input:checked + .slider { background: var(--accent); }
+    .switch input:checked + .slider:before { transform: translateX(18px); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .tabs { flex-direction: column; }
+      .result-section { flex-direction: column; }
+      .result-actions { justify-content: stretch; }
+      .result-actions .btn { flex: 1; justify-content: center; }
+      .app { padding: 20px 16px 60px; }
+      h1 { font-size: 1.4rem; }
+      .param-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/mktools/" class="logo"><span>mk</span>tools</a>
+      <a href="/mktools/" class="back-link">← Все инструменты</a>
+    </div>
+  </header>
+
+  <div class="app">
+    <h1>💬 Ссылки мессенджеров</h1>
+    <p class="subtitle">Генератор ссылок для Telegram и WhatsApp с предустановленным текстом и UTМ-метками.</p>
+
+    <!-- Вкладки -->
+    <div class="tabs">
+      <button class="tab tg active" onclick="switchTab('tg')">
+        <span class="icon">✈️</span>
+        <span class="name">Telegram</span>
+      </button>
+      <button class="tab wa" onclick="switchTab('wa')">
+        <span class="icon">💚</span>
+        <span class="name">WhatsApp</span>
+      </button>
+    </div>
+
+    <!-- Telegram -->
+    <div class="tab-content active" id="tab-tg">
+      <div class="card">
+        <div class="card-title">Параметры Telegram-ссылки</div>
+
+        <div class="form-group">
+          <label for="tgUsername">Username или номер телефона</label>
+          <input type="text" id="tgUsername" placeholder="username или 79123456789" value="">
+          <span class="helper">Без @. Пример: <code>moihottur</code> или <code>79137588607</code></span>
+        </div>
+
+        <div class="param-row">
+          <span class="param-label">Текст</span>
+          <div class="param-input">
+            <input type="text" id="tgText" placeholder="Привет! Хочу узнать про туры" oninput="generateTg()">
+          </div>
+          <label class="param-toggle">
+            <span class="switch">
+              <input type="checkbox" id="tgTextToggle" checked onchange="generateTg()">
+              <span class="slider"></span>
+            </span>
+            Включить
+          </label>
+        </div>
+
+        <div class="param-row">
+          <span class="param-label">UTM-метки</span>
+          <div class="param-input" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="tgUtmSource" placeholder="source" value="telegram" style="flex:1;min-width:80px;">
+            <input type="text" id="tgUtmMedium" placeholder="medium" value="social" style="flex:1;min-width:80px;">
+            <input type="text" id="tgUtmCampaign" placeholder="campaign" style="flex:1;min-width:100px;">
+          </div>
+          <label class="param-toggle">
+            <span class="switch">
+              <input type="checkbox" id="tgUtmToggle" onchange="generateTg()">
+              <span class="slider"></span>
+            </span>
+            UTM
+          </label>
+        </div>
+
+        <div class="param-row">
+          <span class="param-label">Параметр <code>start</code></span>
+          <div class="param-input">
+            <input type="text" id="tgStart" placeholder="Код кампании: promo2026" oninput="generateTg()">
+          </div>
+          <label class="param-toggle">
+            <span class="switch">
+              <input type="checkbox" id="tgStartToggle" onchange="generateTg()">
+              <span class="slider"></span>
+            </span>
+            Включить
+          </label>
+        </div>
+
+        <div class="helper" style="margin-top:4px;">
+          <code>start</code> — передаётся боту при старте диалога. Используйте для трекинга кампаний.
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp -->
+    <div class="tab-content" id="tab-wa">
+      <div class="card">
+        <div class="card-title">Параметры WhatsApp-ссылки</div>
+
+        <div class="form-group">
+          <label for="waPhone">Номер телефона (с кодом страны)</label>
+          <input type="text" id="waPhone" placeholder="79137588607" value="">
+          <span class="helper">В международном формате, без +. Пример: <code>79137588607</code></span>
+        </div>
+
+        <div class="param-row">
+          <span class="param-label">Текст</span>
+          <div class="param-input">
+            <input type="text" id="waText" placeholder="Здравствуйте! Интересуют туры" oninput="generateWa()">
+          </div>
+          <label class="param-toggle">
+            <span class="switch">
+              <input type="checkbox" id="waTextToggle" checked onchange="generateWa()">
+              <span class="slider"></span>
+            </span>
+            Включить
+          </label>
+        </div>
+
+        <div class="param-row">
+          <span class="param-label">UTM-метки</span>
+          <div class="param-input" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="waUtmSource" placeholder="source" value="whatsapp" style="flex:1;min-width:80px;">
+            <input type="text" id="waUtmMedium" placeholder="medium" value="social" style="flex:1;min-width:80px;">
+            <input type="text" id="waUtmCampaign" placeholder="campaign" style="flex:1;min-width:100px;">
+          </div>
+          <label class="param-toggle">
+            <span class="switch">
+              <input type="checkbox" id="waUtmToggle" onchange="generateWa()">
+              <span class="slider"></span>
+            </span>
+            UTM
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Результат -->
+    <div class="card" id="resultCard">
+      <div class="card-title">Готовая ссылка</div>
+
+      <div class="result-section">
+        <textarea id="resultUrl" rows="2" readonly></textarea>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="copyBtn" onclick="copyUrl()">📋 Копировать</button>
+          <button class="btn btn-success" id="copiedBtn" style="display:none;">✅ Скопировано</button>
+          <button class="btn btn-outline" id="openBtn" onclick="openUrl()">🔗 Открыть</button>
+        </div>
+      </div>
+
+      <div id="previewBox" class="preview-box">
+        <a id="previewLink" href="#" target="_blank" rel="noopener">✈️ Открыть в Telegram</a>
+        <div class="hint">Нажмите, чтобы проверить в браузере</div>
+      </div>
+    </div>
+
+    <!-- История -->
+    <div class="card">
+      <div class="history-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="card-title" style="margin-bottom:0;">История <span id="historyCounter" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.8rem;color:var(--text-tertiary);"></span></div>
+        <button class="btn-danger" id="clearHistoryBtn" onclick="clearHistory()" style="background:transparent;border:none;color:var(--text-tertiary);cursor:pointer;font-size:0.8rem;padding:4px 8px;border-radius:6px;">Очистить всё</button>
+      </div>
+      <div id="historyList">
+        <div class="empty-state" style="text-align:center;padding:24px 0;color:var(--text-tertiary);font-size:0.9rem;">Пока нет сохранённых ссылок</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — открытый проект
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // === Tab switching ===
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelector('.tab.' + tab).classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+      if (tab === 'tg') generateTg();
+      else generateWa();
+    }
+
+    // === Telegram ===
+    function generateTg() {
+      var username = document.getElementById('tgUsername').value.trim().replace('@', '');
+      if (!username) { return; }
+
+      var url = 'https://t.me/' + encodeURIComponent(username);
+      var params = [];
+
+      // Текст
+      var textToggle = document.getElementById('tgTextToggle').checked;
+      var text = document.getElementById('tgText').value.trim();
+      if (textToggle && text) {
+        params.push('text=' + encodeURIComponent(text));
+      }
+
+      // UTM
+      var utmToggle = document.getElementById('tgUtmToggle').checked;
+      if (utmToggle) {
+        var s = document.getElementById('tgUtmSource').value.trim();
+        var m = document.getElementById('tgUtmMedium').value.trim();
+        var c = document.getElementById('tgUtmCampaign').value.trim();
+        if (s) params.push('utm_source=' + encodeURIComponent(s));
+        if (m) params.push('utm_medium=' + encodeURIComponent(m));
+        if (c) params.push('utm_campaign=' + encodeURIComponent(c));
+      }
+
+      // start
+      var startToggle = document.getElementById('tgStartToggle').checked;
+      var start = document.getElementById('tgStart').value.trim();
+      if (startToggle && start) {
+        params.push('start=' + encodeURIComponent(start));
+      }
+
+      if (params.length) {
+        url += '?' + params.join('&');
+      }
+
+      document.getElementById('resultUrl').value = url;
+      var preview = document.getElementById('previewLink');
+      preview.href = url;
+      preview.className = 'tg-link';
+      preview.innerHTML = '✈️ Открыть в Telegram';
+      document.getElementById('previewBox').querySelector('.hint').textContent = 'Нажмите, чтобы проверить в браузере';
+      document.getElementById('resultCard').style.display = 'block';
+    }
+
+    // === WhatsApp ===
+    function generateWa() {
+      var phone = document.getElementById('waPhone').value.trim().replace(/[^0-9]/g, '');
+      if (!phone) { return; }
+
+      var url = 'https://wa.me/' + phone;
+      var params = [];
+
+      // Текст
+      var textToggle = document.getElementById('waTextToggle').checked;
+      var text = document.getElementById('waText').value.trim();
+      if (textToggle && text) {
+        params.push('text=' + encodeURIComponent(text));
+      }
+
+      // UTM
+      var utmToggle = document.getElementById('waUtmToggle').checked;
+      if (utmToggle) {
+        var s = document.getElementById('waUtmSource').value.trim();
+        var m = document.getElementById('waUtmMedium').value.trim();
+        var c = document.getElementById('waUtmCampaign').value.trim();
+        if (s) params.push('utm_source=' + encodeURIComponent(s));
+        if (m) params.push('utm_medium=' + encodeURIComponent(m));
+        if (c) params.push('utm_campaign=' + encodeURIComponent(c));
+      }
+
+      if (params.length) {
+        url += '?' + params.join('&');
+      }
+
+      document.getElementById('resultUrl').value = url;
+      var preview = document.getElementById('previewLink');
+      preview.href = url;
+      preview.className = 'wa-link';
+      preview.innerHTML = '💚 Открыть в WhatsApp';
+      document.getElementById('previewBox').querySelector('.hint').textContent = 'Нажмите, чтобы проверить в браузере';
+      document.getElementById('resultCard').style.display = 'block';
+    }
+
+    // === Copy ===
+    function copyUrl() {
+      var textarea = document.getElementById('resultUrl');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value).then(function() {
+        document.getElementById('copyBtn').style.display = 'none';
+        document.getElementById('copiedBtn').style.display = 'inline-flex';
+        setTimeout(function() {
+          document.getElementById('copyBtn').style.display = 'inline-flex';
+          document.getElementById('copiedBtn').style.display = 'none';
+        }, 2000);
+        showToast('Ссылка скопирована');
+      });
+    }
+
+    // === Open ===
+    function openUrl() {
+      var url = document.getElementById('resultUrl').value;
+      if (url) window.open(url, '_blank');
+    }
+
+    // === Live generation ===
+    document.getElementById('tgUsername').addEventListener('input', generateTg);
+    document.getElementById('tgText').addEventListener('input', generateTg);
+    document.getElementById('tgStart').addEventListener('input', generateTg);
+    document.getElementById('tgUtmSource').addEventListener('input', generateTg);
+    document.getElementById('tgUtmMedium').addEventListener('input', generateTg);
+    document.getElementById('tgUtmCampaign').addEventListener('input', generateTg);
+
+    document.getElementById('waPhone').addEventListener('input', generateWa);
+    document.getElementById('waText').addEventListener('input', generateWa);
+    document.getElementById('waUtmSource').addEventListener('input', generateWa);
+    document.getElementById('waUtmMedium').addEventListener('input', generateWa);
+    document.getElementById('waUtmCampaign').addEventListener('input', generateWa);
+
+    // init по умолчанию
+    document.getElementById('tgUsername').value = 'moihottur';
+
+    // === История ===
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('messengerHistory')) || []; } catch(e) { return []; }
+    }
+
+    function saveToHistory() {
+      var url = document.getElementById('resultUrl').value;
+      if (!url) return;
+
+      var isTg = document.querySelector('.tab.tg.active');
+      var type = isTg ? 'TG' : 'WA';
+
+      var history = getHistory();
+
+      if (history.length >= 10) {
+        showToast('\\u26A0 Лимит: 10/10. Удалите старые записи.');
+        renderHistory();
+        return;
+      }
+
+      var name = isTg
+        ? 'TG: @' + document.getElementById('tgUsername').value.trim().replace('@', '')
+        : 'WA: +' + document.getElementById('waPhone').value.trim().replace(/[^0-9]/g, '');
+
+      history.unshift({
+        u: url,
+        n: name,
+        d: Date.now(),
+        t: type
+      });
+
+      try {
+        localStorage.setItem('messengerHistory', JSON.stringify(history));
+      } catch(e) {
+        showToast('\\u26A0 Ошибка: переполнение.');
+        return;
+      }
+
+      renderHistory();
+      showToast('\\u2705 Сохранено');
+    }
+
+    function deleteFromHistory(idx) {
+      var history = getHistory();
+      history.splice(idx, 1);
+      localStorage.setItem('messengerHistory', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function clearHistory() {
+      if (!confirm('Очистить всю историю?')) return;
+      localStorage.removeItem('messengerHistory');
+      renderHistory();
+      showToast('История очищена');
+    }
+
+    function copyFromHistory(idx) {
+      var history = getHistory();
+      var item = history[idx];
+      if (!item) return;
+      navigator.clipboard.writeText(item.u).then(function() {
+        showToast('Ссылка скопирована');
+      });
+    }
+
+    function renderHistory() {
+      var list = document.getElementById('historyList');
+      var history = getHistory();
+      if (!history.length) {
+        list.innerHTML = '<div class="empty-state" style="text-align:center;padding:24px 0;color:var(--text-tertiary);font-size:0.9rem;">Пока нет сохранённых ссылок</div>';
+        var counter = document.getElementById('historyCounter');
+        if (counter) counter.textContent = '(0/10)';
+        return;
+      }
+
+      var html = '';
+      for (var i = 0; i < history.length; i++) {
+        var item = history[i];
+        var label = item.t === 'TG' ? '✈️ ' : '💚 ';
+        html += '<div class="history-item" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);">';
+        html += '  <div class="history-info" style="flex:1;min-width:0;cursor:pointer;">';
+        html += '    <div class="history-name" style="font-weight:600;font-size:0.9rem;margin-bottom:2px;">' + label + escapeHtml(item.n) + '</div>';
+        html += '    <div class="history-url" style="font-size:0.82rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(item.u) + '">' + escapeHtml(item.u) + '</div>';
+        html += '    <div class="history-date" style="font-size:0.78rem;color:var(--text-tertiary);">' + formatDate(item.d) + '</div>';
+        html += '  </div>';
+        html += '  <div class="history-actions" style="display:flex;gap:6px;flex-shrink:0;">';
+        html += '    <button class="btn-icon" onclick="copyFromHistory(' + i + ')" title="Копировать" style="padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:1rem;">📋</button>';
+        html += '    <button class="btn-icon" onclick="deleteFromHistory(' + i + ')" title="Удалить" style="padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:1rem;">🗑️</button>';
+        html += '  </div>';
+        html += '</div>';
+      }
+      list.innerHTML = html;
+      var counter = document.getElementById('historyCounter');
+      if (counter) counter.textContent = '(' + history.length + '/10)';
+    }
+
+    function formatDate(v) {
+      var d = new Date(v);
+      var day = String(d.getDate()).padStart(2, '0');
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var hours = String(d.getHours()).padStart(2, '0');
+      var mins = String(d.getMinutes()).padStart(2, '0');
+      return day + '.' + month + ' ' + hours + ':' + mins;
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // === Save button ===
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        var url = document.getElementById('resultUrl');
+        if (url.value) saveToHistory();
+      }
+    });
+
+    // === Toast ===
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+
+    // Init
+    renderHistory();
+    generateTg();
+  </script>
+</body>
+</html>
