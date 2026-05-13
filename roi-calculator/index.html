@@ -432,12 +432,11 @@ function calculate() {
     var pExtra = m.extra || 0;
     var pNds = pSpend * ndsPct / 100;
     var pPctRkPlain = pSpend * rkPctPlain / 100;
-    var pPctRk = (pSpend + pNds) * rkPct / 100;
     var svcPctAmt = cumSpend * svcPct / 100;
     var monthsCnt = months.length;
     var pSvcFixed = svcFixed / monthsCnt;
     var pSvcPct = pSpend * svcPct / 100;
-    var pTotal = pSpend + pNds + pPctRkPlain + pPctRk + pSvcFixed + pSvcPct + pExtra;
+    var pTotal = pSpend + pNds + pPctRkPlain + pSvcFixed + pSvcPct + pExtra;
     var pNetRev = m.revenue * (1 - agencyPct/100);
     allCum.push({
       label: m.label,
