@@ -124,9 +124,14 @@
     .tip.green-bg { background: var(--green-light); border-color: #a7f3d0; color: #065f46; }
 
     /* CHART */
-    .chart-box { width: 100%; height: 280px; margin-top: 12px; overflow: visible; }
+    .chart-box { width: 100%; height: 260px; margin-top: 12px; overflow: visible; position: relative; }
     .chart-svg { width: 100%; height: 100%; }
     .chart-legend { display: flex; gap: 16px; justify-content: center; font-size: 0.78rem; color: var(--text-secondary); margin-top: 8px; flex-wrap: wrap; }
+    .cac-bars { display: flex; gap: 8px; align-items: flex-end; height: 80px; }
+    .cac-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+    .cac-bar { width: 100%; max-width: 40px; border-radius: 4px 4px 0 0; transition: height 0.4s; min-height: 4px; }
+    .cac-bar-label { font-size: 0.68rem; color: var(--text-tertiary); margin-top: 3px; white-space: nowrap; }
+    .cac-bar-val { font-size: 0.72rem; font-weight: 600; color: #10b981; margin-bottom: 2px; }
 
     .insights { margin-top: 12px; }
     .insight-item { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
@@ -210,9 +215,13 @@
       <svg class="chart-svg" id="chartSvg" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="chart-legend">
-      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#f97316"/></svg> Накопленный ROMI</span>
-      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#ef4444"/></svg> Накопленный ROI</span>
-      <span><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="#10b981"/></svg> CAC</span>
+      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#f97316"/></svg> ROMI (за месяц)</span>
+      <span><svg width="14" height="4"><rect width="14" height="4" rx="2" fill="#ef4444"/></svg> ROI (за месяц)</span>
+      <span>🖱 Наведите на точку</span>
+    </div>
+    <div id="cacBlock" style="margin-top:12px;">
+      <div style="font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">📊 CAC по месяцам</div>
+      <div class="cac-bars" id="cacBars"></div>
     </div>
 
     <div class="card-accent" style="margin-top:16px;padding:16px;border-radius:var(--radius-sm);">
@@ -394,6 +403,7 @@ function calculate() {
   var cumSpend = 0, cumLeads = 0, cumSales = 0, cumRev = 0;
   var currExtra = 0;
   var allCum = [];
+  var prevSpend = 0, prevExtra = 0, prevRev = 0;
   months.forEach(function(m) {
     cumSpend += m.spend;
     cumLeads += m.leads;
@@ -404,12 +414,24 @@ function calculate() {
     var pctRk = cumSpend * rkPct / 100;
     var totalCost = cumSpend + nds + pctRk + currExtra + otherCost;
     var netRev = cumRev * (1 - agencyPct/100);
+    // Per-period (не накопленные)
+    var pSpend = m.spend;
+    var pExtra = m.extra || 0;
+    var pNds = pSpend * ndsPct / 100;
+    var pPctRk = pSpend * rkPct / 100;
+    var pTotal = pSpend + pNds + pPctRk + pExtra;
+    var pNetRev = m.revenue * (1 - agencyPct/100);
     allCum.push({
       label: m.label,
       cumRomi: cumSpend > 0 ? (cumRev - cumSpend) / cumSpend * 100 : 0,
       cumNetRoi: totalCost > 0 ? (netRev - totalCost) / totalCost * 100 : 0,
       cumCac: cumSales > 0 ? totalCost / cumSales : 0,
-      cumSpend: cumSpend
+      cumSpend: cumSpend,
+      // Per-period для графика
+      periodLabel: m.label,
+      periodRomi: pSpend > 0 ? (m.revenue - pSpend) / pSpend * 100 : 0,
+      periodNetRoi: pTotal > 0 ? (pNetRev - pTotal) / pTotal * 100 : 0,
+      periodCac: m.sales > 0 ? pTotal / m.sales : 0
     });
   });
 
@@ -433,7 +455,7 @@ function calculate() {
   grid.innerHTML += '<div class="result-card neutral"><div class="num">' + fmt(totalRev) + '</div><div class="lbl">Выручка</div><div class="sub">' + cumSales + ' продаж</div></div>';
 
   // CHART (накопленные)
-  drawCumChart(allCum);
+  drawMonthChart(allCum);
 
   // INSIGHTS
   var ins = [];
@@ -484,6 +506,16 @@ function calculate() {
   bars += '<div class="bar-wrap"><div class="bar-label"><span>Доля рекламы ' + adShare.toFixed(1) + '%</span><span>Норма ≤ 30%</span></div><div class="bar-track"><div class="bar-fill ' + (adShare<=30?'green':'red') + '" style="width:' + Math.min(100,adShare) + '%"></div></div></div>';
   document.getElementById('breakdown').innerHTML = bars;
 
+  // CAC bars (отдельно под графиком)
+  var cacHtml = '';
+  var cacs = allCum.map(function(d){return d.periodCac;});
+  var cMax = Math.max.apply(null, cacs);
+  allCum.forEach(function(d) {
+    var pct = cMax > 0 ? (d.periodCac / cMax * 100) : 0;
+    cacHtml += '<div class="cac-bar-wrap"><div class="cac-bar-val">' + fmtShort(d.periodCac) + '</div><div class="cac-bar" style="height:' + Math.max(4, pct) + '%;background:rgba(16,185,129,' + (0.3+0.7*(pct/100)) + ')"></div><div class="cac-bar-label">' + d.periodLabel + '</div></div>';
+  });
+  document.getElementById('cacBars').innerHTML = cacHtml;
+
   // TIP
   var tip = document.getElementById('tip');
   if (last.cumNetRoi < -30) { tip.className='tip'; tip.innerHTML='🔴 <b>Критично:</b> Чистый ROI ' + last.cumNetRoi.toFixed(1) + '%. Убыток.'; }
@@ -498,16 +530,16 @@ function calculate() {
 function correctedCpl() { return true; }
 
 // ====== SVG CUMULATIVE CHART ======
-function drawCumChart(data) {
+function drawMonthChart(data) {
   var svg = document.getElementById('chartSvg');
   if (data.length < 2) { svg.innerHTML = '<text x="300" y="130" text-anchor="middle" fill="#9ca3af" font-size="14">Добавьте 2+ месяца для графика</text>'; return; }
 
-  var W = 600, H = 260, pad = {top:20, right:50, bottom:45, left:50};
+  var W = 600, H = 250, pad = {top:20, right:30, bottom:45, left:50};
   var cw = W - pad.left - pad.right;
   var ch = H - pad.top - pad.bottom;
 
-  var allR = data.map(function(d){return d.cumRomi;});
-  var allN = data.map(function(d){return d.cumNetRoi;});
+  var allR = data.map(function(d){return d.periodRomi;});
+  var allN = data.map(function(d){return d.periodNetRoi;});
   var maxV = Math.max.apply(null, allR.concat(allN));
   var minV = Math.min.apply(null, allR.concat(allN));
   var range = Math.max(Math.abs(maxV), Math.abs(minV), 5);
@@ -515,13 +547,6 @@ function drawCumChart(data) {
 
   var yScale = function(v) { return pad.top + ch - (v - (-range)) / (2*range) * ch; };
   var xStep = cw / (data.length - 1);
-
-  var pointsR = '', pointsN = '';
-  data.forEach(function(d, i) {
-    var x = pad.left + i * xStep;
-    pointsR += (i===0?'M':'L') + x + ',' + yScale(d.cumRomi) + ' ';
-    pointsN += (i===0?'M':'L') + x + ',' + yScale(d.cumNetRoi) + ' ';
-  });
 
   var zeroY = yScale(0);
   var html = '';
@@ -535,49 +560,70 @@ function drawCumChart(data) {
   }
   html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3"/>';
 
-  // area
+  // ROMI line
+  var ptsR = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsR+=(i===0?'M':'L')+x+','+yScale(d.periodRomi)+' ';});
+  // Net ROI line
+  var ptsN = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsN+=(i===0?'M':'L')+x+','+yScale(d.periodNetRoi)+' ';});
+
+  // area fill ROMI
   var area = 'M' + pad.left + ',' + zeroY;
-  data.forEach(function(d,i){ var x=pad.left+i*xStep; area+=' L'+x+','+yScale(d.cumRomi); });
+  data.forEach(function(d,i){var x=pad.left+i*xStep; area+=' L'+x+','+yScale(d.periodRomi);});
   area += ' L' + (pad.left+(data.length-1)*xStep) + ',' + zeroY + ' Z';
-  html += '<path d="' + area + '" fill="rgba(249,115,22,0.1)" stroke="none"/>';
+  html += '<path d="' + area + '" fill="rgba(249,115,22,0.08)" stroke="none"/>';
 
-  // lines
-  html += '<path d="' + pointsR + '" stroke="#f97316" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
-  html += '<path d="' + pointsN + '" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
+  html += '<path d="' + ptsR + '" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  html += '<path d="' + ptsN + '" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
 
-  // points & labels
+  // Tooltip block
+  var tipHtml = '<div id="chartTip" style="display:none;position:absolute;background:#1a1a2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:0.78rem;line-height:1.5;pointer-events:none;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.2);"></div>';
+
+  // Points with hover tooltips
   data.forEach(function(d, i) {
     var x = pad.left + i * xStep;
-    // ROMI
-    html += '<circle cx="' + x + '" cy="' + yScale(d.cumRomi) + '" r="4.5" fill="#fff" stroke="#f97316" stroke-width="2.5"/>';
-    if (i === data.length-1)
-      html += '<text x="' + x + '" y="' + (yScale(d.cumRomi)-10) + '" text-anchor="middle" fill="#f97316" font-size="12" font-weight="800">ROMI ' + (d.cumRomi>=0?'+':'') + d.cumRomi.toFixed(0) + '%</text>';
-    // ROI
-    html += '<circle cx="' + x + '" cy="' + yScale(d.cumNetRoi) + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>';
-    if (i === data.length-1)
-      html += '<text x="' + x + '" y="' + (yScale(d.cumNetRoi)+14) + '" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="800">ROI ' + (d.cumNetRoi>=0?'+':'') + d.cumNetRoi.toFixed(0) + '%</text>';
-    // X label
-    html += '<text x="' + x + '" y="' + (H-8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.label + '</text>';
+    var rR = yScale(d.periodRomi);
+    var rN = yScale(d.periodNetRoi);
 
-    // CAC bar underneath
-    var cacs = data.map(function(dd){return dd.cumCac;});
-    var cMax = Math.max.apply(null, cacs);
-    var barH = cMax > 0 ? (d.cumCac/cMax*50) : 0;
-    var barY = H - pad.bottom + 18;
-    if (d.cumCac > 0) {
-      html += '<rect x="' + (x-6) + '" y="' + (barY-barH) + '" width="12" height="' + barH + '" rx="2" fill="rgba(16,185,129,' + (0.3+0.7*(barH/50)) + ')" stroke="#10b981" stroke-width="1"/>';
-      html += '<text x="' + x + '" y="' + (barY+12) + '" text-anchor="middle" fill="#10b981" font-size="9" font-weight="600">' + fmtShort(d.cumCac) + '</text>';
-    }
+    // ROMI dot (bigger, interactive)
+    html += '<circle cx="' + x + '" cy="' + rR + '" r="6" fill="rgba(249,115,22,0.15)" stroke="none" class="dot-romi" style="cursor:pointer"/>';
+    html += '<circle cx="' + x + '" cy="' + rR + '" r="4" fill="#fff" stroke="#f97316" stroke-width="2.5" class="dot-romi" style="cursor:pointer"/>';
+    // Net ROI dot
+    html += '<circle cx="' + x + '" cy="' + rN + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2.5" class="dot-roi" style="cursor:pointer"/>';
+
+    // Hover tooltips — inline onmouseover
+    var tipText = d.periodLabel + ': ROMI ' + (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%, ROI ' + (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%';
+    html += '<text x="' + x + '" y="' + (H-8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.periodLabel + '</text>';
   });
 
-  // info box
-  var last = data[data.length-1];
-  html += '<rect x="' + (W-pad.right-160) + '" y="' + pad.top + '" width="150" height="46" rx="6" fill="#f8f9fb" stroke="#e5e7eb" stroke-width="1" opacity="0.9"/>';
-  html += '<text x="' + (W-pad.right-150) + '" y="' + (pad.top+16) + '" fill="#f97316" font-size="11" font-weight="700">ROMI: ' + (last.cumRomi>=0?'+':'') + last.cumRomi.toFixed(1) + '%</text>';
-  html += '<text x="' + (W-pad.right-150) + '" y="' + (pad.top+32) + '" fill="#ef4444" font-size="11" font-weight="700">ROI: ' + (last.cumNetRoi>=0?'+':'') + last.cumNetRoi.toFixed(1) + '%</text>';
-  html += '<text x="' + (W-pad.right-150) + '" y="' + (pad.top+44) + '" fill="#6b7280" font-size="10">Расход: ' + fmtShort(last.cumSpend) + '</text>';
-
   svg.innerHTML = html;
+
+  // Add event listeners for hover tooltip
+  var tipDiv = document.getElementById('chartTip');
+  if (!tipDiv) {
+    tipDiv = document.createElement('div');
+    tipDiv.id = 'chartTip';
+    tipDiv.style.cssText = 'display:none;position:absolute;background:#1a1a2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:0.78rem;line-height:1.5;pointer-events:none;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+    document.getElementById('chartBox').appendChild(tipDiv);
+    tipDiv = document.getElementById('chartTip');
+  }
+
+  var dots = svg.querySelectorAll('.dot-romi, .dot-roi');
+  dots.forEach(function(dot) {
+    dot.addEventListener('mouseenter', function(e) {
+      var idx = Array.prototype.indexOf.call(dots, e.target);
+      var di = Math.floor(idx / 2); // 2 dots per month
+      if (di < data.length) {
+        var d = data[di];
+        tipDiv.innerHTML = '<b>' + d.periodLabel + '</b><br>ROMI: ' + (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%<br>ROI: ' + (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%<br>CAC: ' + fmt(d.periodCac);
+        tipDiv.style.display = 'block';
+        var rect = svg.getBoundingClientRect();
+        var cx = pad.left + di * xStep;
+        var svgPx = cx / W * rect.width;
+        tipDiv.style.left = (svgPx + rect.left - 60) + 'px';
+        tipDiv.style.top = (rect.top + 10) + 'px';
+      }
+    });
+    dot.addEventListener('mouseleave', function() { tipDiv.style.display = 'none'; });
+  });
 }
 
 function fmt(x) {
