@@ -4,88 +4,149 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Анализ текста — mktools</title>
-  <meta name="description" content="Проверка текста на уникальность, водность, тошноту, все признаки ИИ, SEO-анализ, грамматика.">
+  <meta name="description" content="Проверка текста на уникальность, водность, тошноту, признаки ИИ, SEO-анализ.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f8f9fb; --surface: #fff; --text: #1a1a2e;
-      --text-secondary: #6b7280; --text-tertiary: #9ca3af;
-      --accent: #f97316; --accent-hover: #ea580c;
-      --accent-light: #fff7ed; --accent-border: #fed7aa;
+      --bg: #f8f9fb;
+      --surface: #fff;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --accent-light: #fff7ed;
+      --accent-border: #fed7aa;
       --border: #e5e7eb;
-      --radius: 16px; --radius-sm: 8px;
+      --radius: 16px;
+      --radius-sm: 8px;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
-      --green: #10b981; --green-light: #ecfdf5;
-      --red: #ef4444; --red-light: #fef2f2;
-      --yellow: #d97706; --yellow-light: #fffbeb;
-      --blue-light: #eff6ff;
+      --green: #10b981;
+      --green-light: #ecfdf5;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+      --yellow: #d97706;
+      --yellow-light: #fffbeb;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
     header {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
     .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--text); }
     .logo span { color: var(--accent); }
     .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-left: auto; }
     .back-link:hover { color: var(--accent); }
+
     .app { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+
     h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
     .subtitle { color: var(--text-secondary); margin-bottom: 32px; font-size: 0.95rem; }
+
     .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
     }
     .card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 16px; }
+
     textarea {
-      font-family: var(--font); width: 100%; padding: 16px;
-      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-      font-size: 0.95rem; line-height: 1.6; outline: none;
-      transition: border-color 0.2s; background: var(--bg);
-      resize: vertical; min-height: 200px;
+      font-family: var(--font);
+      width: 100%;
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--bg);
+      resize: vertical;
+      min-height: 200px;
     }
     textarea:focus { border-color: var(--accent); background: var(--surface); }
+
     .input-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .stats-bar { font-size: 0.85rem; color: var(--text-secondary); }
     .stats-bar span { margin-left: 12px; }
+
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: var(--radius-sm);
-      font-weight: 600; font-size: 0.9rem; cursor: pointer;
-      border: none; font-family: var(--font); transition: all 0.2s; white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      transition: all 0.2s;
+      white-space: nowrap;
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: var(--accent-hover); }
+
     .btn-group { display: flex; gap: 8px; margin-top: 12px; }
 
+    /* Results */
     .result-section { display: none; }
+
     .score-card {
-      display: flex; align-items: center; gap: 24px;
-      padding: 24px; border-radius: var(--radius); margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
     }
     .score-card.good { background: var(--green-light); border: 1px solid #a7f3d0; }
     .score-card.warning { background: var(--yellow-light); border: 1px solid #fde68a; }
     .score-card.bad { background: var(--red-light); border: 1px solid #fecaca; }
+
     .score-circle {
-      width: 80px; height: 80px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; font-weight: 800; flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      flex-shrink: 0;
     }
     .score-card.good .score-circle { background: var(--green); color: #fff; }
     .score-card.warning .score-circle { background: var(--yellow); color: #fff; }
     .score-card.bad .score-circle { background: var(--red); color: #fff; }
+
     .score-text { flex: 1; }
     .score-text h3 { font-size: 1.1rem; margin-bottom: 4px; }
     .score-text p { color: var(--text-secondary); font-size: 0.9rem; }
 
-    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
     .metric {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 16px; background: var(--bg); border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
     }
     .metric-label { font-size: 0.85rem; color: var(--text-secondary); }
     .metric-value { font-weight: 700; font-size: 1rem; }
@@ -93,58 +154,42 @@
     .metric-value.yellow { color: var(--yellow); }
     .metric-value.red { color: var(--red); }
 
-    /* Флаги */
+    /* AI flags */
     .flag-list { list-style: none; }
     .flag-item {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.2s; border-radius: 6px; margin: 0 -8px; padding: 12px 8px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .flag-item:hover { background: var(--bg); }
     .flag-item:last-child { border-bottom: none; }
-    .flag-item.active { background: var(--accent-light); border-color: var(--accent-border); }
     .flag-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
     .flag-warning .flag-icon { color: var(--yellow); }
     .flag-good .flag-icon { color: var(--green); }
-    .flag-info .flag-icon { color: var(--accent); }
     .flag-text h4 { font-size: 0.9rem; margin-bottom: 2px; }
     .flag-text p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
-    .flag-text .examples { font-size: 0.78rem; color: var(--text-tertiary); font-style: italic; margin-top: 4px; }
     .flag-badge {
-      display: inline-block; padding: 2px 8px; border-radius: 4px;
-      font-size: 0.75rem; font-weight: 600; margin-left: 8px;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
     }
     .flag-badge.red { background: var(--red-light); color: var(--red); }
     .flag-badge.green { background: var(--green-light); color: var(--green); }
     .flag-badge.yellow { background: var(--yellow-light); color: var(--yellow); }
-    .flag-info .flag-badge { background: var(--blue-light); color: #2563eb; }
 
-    .freq-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;
-      cursor: pointer; transition: all 0.2s; margin: 0 4px 4px 0;
-      border: 1.5px solid var(--border);
+    .examples { font-size: 0.8rem; color: var(--text-tertiary); font-style: italic; margin-top: 4px; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
     }
-    .freq-tag:hover { border-color: var(--accent); }
-    .freq-tag.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .freq-tag .count { font-size: 0.75rem; opacity: 0.7; }
-    .freq-tag.active .count { opacity: 0.9; }
-    .freq-tags { margin: -4px; display: flex; flex-wrap: wrap; }
-
-    /* Выделения в тексте */
-    .hl { background: #fef3c7; border-radius: 3px; padding: 0 2px; cursor: pointer; }
-    .hl.active { background: var(--accent); color: #fff; }
-
-    .toast {
-      position: fixed; bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--text); color: #fff; padding: 12px 24px;
-      border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;
-      opacity: 0; transition: all 0.3s; z-index: 1000; pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; color: var(--text-tertiary); font-size: 0.85rem; }
     footer a { color: var(--accent); text-decoration: none; }
 
     @media (max-width: 640px) {
@@ -155,8 +200,6 @@
       .input-header { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
   </style>
-
-
 </head>
 <body>
   <header>
@@ -168,7 +211,7 @@
 
   <div class="app">
     <h1>📝 Анализ текста</h1>
-    <p class="subtitle">Проверка на водность, тошноту, 11 признаков ИИ, SEO, грамматику — всё без интернета.</p>
+    <p class="subtitle">Проверка на уникальность, водность, тошноту, признаки ИИ и SEO.</p>
 
     <!-- Ввод -->
     <div class="card">
@@ -180,575 +223,483 @@
           <span id="sentCount">0</span> предл.
         </div>
       </div>
-      <textarea id="textInput" placeholder="Вставьте текст для анализа..." style="display:none;"></textarea>
-      <div id="textPreview" contenteditable="true" style="font-family:var(--font);width:100%;padding:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;line-height:1.6;outline:none;transition:border-color 0.2s;background:var(--bg);resize:vertical;min-height:200px;overflow:auto;"></div>
+      <textarea id="textInput" placeholder="Вставьте текст для анализа..."></textarea>
       <div class="btn-group">
-        <button class="btn btn-primary" id="analyzeBtn">🔍 Анализировать</button>
+        <button class="btn btn-primary" onclick="analyze()">🔍 Анализировать</button>
       </div>
     </div>
 
-    <!-- Результат -->
+    <!-- Результаты -->
     <div class="result-section" id="results">
-
+      <!-- Общий скоринг -->
       <div class="score-card" id="scoreCard">
         <div class="score-circle" id="scoreCircle">0</div>
         <div class="score-text">
-          <h3 id="scoreTitle">Оценка</h3>
+          <h3 id="scoreTitle">Оценка текста</h3>
           <p id="scoreDesc">Описание</p>
         </div>
       </div>
 
+      <!-- Метрики -->
       <div class="card">
-        <div class="card-title">Метрики</div>
+        <div class="card-title">Базовые метрики</div>
         <div class="metrics-grid" id="metricsGrid"></div>
       </div>
 
-      <div class="card">
-        <div class="card-title">SEO: частые слова и фразы</div>
-        <p style="font-size:0.82rem;color:var(--text-tertiary);margin-bottom:12px;">Кликните, чтобы выделить в тексте</p>
-        <div id="seoKeywordsBlock"></div>
-      </div>
-
+      <!-- SEO -->
       <div class="card">
         <div class="card-title">SEO-анализ</div>
         <div class="flag-list" id="seoFlags"></div>
       </div>
 
+      <!-- Признаки ИИ -->
       <div class="card">
         <div class="card-title">Признаки ИИ-текста</div>
-        <p style="font-size:0.82rem;color:var(--text-tertiary);margin-bottom:12px;">Кликните на признак, чтобы выделить в тексте</p>
         <div class="flag-list" id="aiFlags"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Грамматика</div>
-        <div class="flag-list" id="grammarFlags"><div style="text-align:center;padding:16px;color:var(--text-tertiary);font-size:0.9rem;">Проверка только на клиенте (ограниченная)</div></div>
       </div>
     </div>
   </div>
 
-  <footer><a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — анализ текста без интернета</footer>
+  <footer>
+    <a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — анализ текста без интернета
+  </footer>
 
-  <div class="toast" id="toast"></div>
+  <script>
+    // ========== Словари ==========
+    var STOPWORDS = [
+      'и', 'в', 'на', 'с', 'по', 'за', 'для', 'от', 'из', 'о', 'к', 'у', 'до', 'при',
+      'а', 'но', 'что', 'как', 'это', 'чтобы', 'также', 'или', 'если', 'то', 'же',
+      'даже', 'уже', 'ещё', 'только', 'когда', 'где', 'который', 'может', 'быть',
+      'всего', 'всё', 'все', 'они', 'он', 'она', 'мы', 'вы', 'ты', 'я',
+      'так', 'его', 'её', 'их', 'нас', 'вас', 'них', 'него', 'нее',
+      'потому', 'поэтому', 'ведь', 'вот', 'уже', 'ещё', 'почти', 'совсем',
+      'очень', 'довольно', 'достаточно', 'слишком', 'например', 'кажется',
+      'является', 'можно', 'нужно', 'надо', 'необходимо', 'должен', 'может'
+    ];
 
-<script>
-// === Словари ===
-var PREPOSITIONS = ['в','без','до','за','из','к','на','над','о','об','от','по','под','пред','при','про','с','у','через','для','вне','вокруг','впереди','из-за','из-под','между','напротив','около','относительно','перед','после','посреди','ради','среди','возле','вблизи','внутри','вследствие','вроде','несмотря','благодаря','ввиду','вопреки','накануне','наподобие','напротив','навстречу','посредством','путем','вдоль','поперек','сквозь'];
-var STOPWORDS = ['и','в','на','с','по','за','для','от','из','о','к','у','до','при','а','но','что','как','это','чтобы','также','или','если','то','же','даже','уже','ещё','только','когда','где','который','может','быть','всего','всё','все','они','он','она','мы','вы','ты','я','так','его','её','их','нас','вас','них','него','нее','потому','поэтому','ведь','вот','уже','ещё','почти','совсем','очень','довольно','достаточно','слишком','например','кажется','является','можно','нужно','надо','необходимо','должен','может','нет','да','ни','не','был','была','было','были','бы','будет','будут','будто','ли','либо','нибудь','кое','тот','эта','этот','эти','этой','этом','тому','тем','тех','те','та','тот','такой','такие','такая','такого','таких'];
+    var WATER_WORDS = [
+      'является', 'представляет', 'собой', 'данный', 'данная', 'данные',
+      'данного', 'следует', 'необходимо', 'отметить', 'подчеркнуть', 'учитывать',
+      'учитывая', 'связано', 'связаны', 'связанный', 'связи', 'связь',
+      'данном', 'данной', 'настоящий', 'настоящем', 'настоящей',
+      'вышеуказанный', 'вышеупомянутый', 'нижеуказанный', 'нижеследующий',
+      'соответственно', 'соответствующий', 'соответствующем',
+      'заключается', 'заключающиеся', 'заключающийся', 'заключающееся',
+      'реализация', 'реализации', 'реализацией',
+      'обусловлено', 'обусловлен', 'обусловлена', 'обусловленный',
+      'позволяет', 'позволяющие', 'позволяющих', 'позволяющий',
+      'подразумевает', 'подразумевается', 'подразумевают'
+    ];
 
-var WATER_WORDS = ['является','представляет','собой','данный','данная','данные','данного','следует','необходимо','отметить','подчеркнуть','учитывать','учитывая','связано','связаны','связанный','связи','связь','данном','данной','настоящий','настоящем','настоящей','вышеуказанный','вышеупомянутый','нижеуказанный','нижеследующий','соответственно','соответствующий','соответствующем','заключается','заключающиеся','заключающийся','заключающееся','реализация','реализации','реализацией','обусловлено','обусловлен','обусловлена','обусловленный','позволяет','позволяющие','позволяющих','позволяющий','подразумевает','подразумевается','подразумевают'];
+    var AI_FLAGS = {
+      participle: ['ясь', 'вший', 'вшийся', 'ющий', 'ющийся', 'ающий', 'яющий', 'ивший', 'ывший'],
+      triplePatterns: [
+        /[а-яё]+[,]\s*[а-яё]+[,]\s*(и|или|а)\s+[а-яё]+/gi,
+        /[а-яё]+\s*[,]\s*[а-яё]+\s*[,]\s*[а-яё]+\s+[—\-]\s+/gi
+      ],
+      aiPhrases: [
+        /важно отметить/gi, /стоит подчеркнуть/gi, /следует учитывать/gi,
+        /нельзя не заметить/gi, /необходимо понимать/gi, /крайне важно/gi,
+        /давайте рассмотрим/gi, /стоит отметить/gi, /нельзя не отметить/gi,
+        /заслуживает внимания/gi, /хочется отметить/gi,
+        /играет ключевую роль/gi, /играют ключевую роль/gi,
+        /в заключение/gi, /на сегодняшний день/gi,
+        /нельзя переоценить/gi, /переоценить важность/gi,
+        /является важным/gi, /являются важными/gi,
+        /представляет собой/gi, /представляют собой/gi
+      ],
+      bizWords: [
+        /уникальн\w+/gi, /потрясающ\w+/gi, /ведущ\w+/gi,
+        /инновационн\w+/gi, /эффективн\w+/gi,
+        /креативн\w+/gi, /профессиональн\w+/gi,
+        /комплексн\w+/gi, /всесторонн\w+/gi,
+        /новые возможности/gi, /широкий спектр/gi,
+        /высокое качество/gi, /высочайшее качество/gi,
+        /индивидуальный подход/gi, /гибкие условия/gi
+      ],
+      transitionWords: [
+        'кроме того', 'таким образом', 'в связи с этим',
+        'в свою очередь', 'в данном контексте', 'с другой стороны',
+        'в первую очередь', 'более того', 'помимо этого',
+        'следует отметить', 'стоит отметить', 'наряду с этим',
+        'в то же время', 'прежде всего', 'вместе с тем',
+        'к слову', 'в частности', 'в целом',
+        'при этом', 'несмотря на', 'однако',
+        'кроме того', 'более того', 'кстати'
+      ]
+    };
 
-var AI_PHRASES = [/важно отметить/gi,/стоит подчеркнуть/gi,/следует учитывать/gi,/нельзя не заметить/gi,/необходимо понимать/gi,/крайне важно/gi,/давайте рассмотрим/gi,/стоит отметить/gi,/нельзя не отметить/gi,/заслуживает внимания/gi,/хочется отметить/gi,/играет ключевую роль/gi,/играют ключевую роль/gi,/в заключение/gi,/на сегодняшний день/gi,/нельзя переоценить/gi,/переоценить важность/gi,/является важным/gi,/являются важными/gi,/представляет собой/gi,/представляют собой/gi];
-var BIZ_WORDS = [/уникальн\w+/gi,/потрясающ\w+/gi,/ведущ\w+/gi,/инновационн\w+/gi,/эффективн\w+/gi,/креативн\w+/gi,/профессиональн\w+/gi,/комплексн\w+/gi,/всесторонн\w+/gi,/новые возможности/gi,/широкий спектр/gi,/высокое качество/gi,/высочайшее качество/gi,/индивидуальный подход/gi,/гибкие условия/gi];
-var TRANSITIONS = ['кроме того','таким образом','в связи с этим','в свою очередь','в данном контексте','с другой стороны','в первую очередь','более того','помимо этого','следует отметить','стоит отметить','наряду с этим','в то же время','прежде всего','вместе с тем','к слову','в частности','в целом','при этом','несмотря на','однако','кстати'];
-var DIDACTIC = ['давайте рассмотрим','необходимо понимать','крайне важно','важно помнить','следует запомнить','нужно отметить','стоит учесть','обратите внимание'];
-var ENDINGS_YAS = ['ясь','вший','ющий','ящий','ывший','ивший','вшись','вшийся','ющийся','ящийся'];
+    // ========== Анализ ==========
+    function analyze() {
+      var text = document.getElementById('textInput').value.trim();
+      if (!text || text.length < 20) {
+        showToast('Введите хотя бы 20 символов');
+        return;
+      }
 
-// === Выделение в тексте ===
-var currentHl = null;
-function clearHighlights() {
-  document.querySelectorAll('.hl').forEach(function(el) {
-    var p = el.parentNode;
-    p.replaceChild(document.createTextNode(el.textContent), el);
-    p.normalize();
-  });
-  document.querySelectorAll('.flag-item.active').forEach(function(el) { el.classList.remove('active'); });
-  document.querySelectorAll('.freq-tag.active').forEach(function(el) { el.classList.remove('active'); });
-}
+      var results = document.getElementById('results');
+      results.style.display = 'block';
 
-function highlightText(ranges, activeEl) {
-  clearHighlights();
-  if (!ranges || !ranges.length) return;
-  if (activeEl) activeEl.classList.add('active');
-  currentHl = activeEl;
+      // Метрики
+      var chars = text.length;
+      var words = text.match(/[а-яёa-z]+(?:-[а-яёa-z]+)?/gi) || [];
+      var sents = text.split(/[.!?]+/).filter(function(s) { return s.trim().length > 0; });
+      var wordCount = words.length;
+      var sentCount = sents.length;
 
-  var preview = document.getElementById('textPreview');
-  var text = preview.innerText || preview.textContent || '';
-  var highlighted = hlAllOccurrences(text, ranges);
-  preview.innerHTML = highlighted.replace(/
-/g, '<br>');
-  showToast('Выделено в тексте');
-}
-
-function hlAllOccurrences(text, ranges) {
-  // ranges: [{word: 'xxx'}]
-  var result = '';
-  var i = 0;
-  while (i < text.length) {
-    var found = false;
-    for (var r = 0; r < ranges.length; r++) {
-      var word = ranges[r].word;
-      if (text.substring(i, i + word.length).toLowerCase() === word.toLowerCase()) {
-        // Проверка границ слова
-        var before = i > 0 ? text[i-1] : ' ';
-        var after = i + word.length < text.length ? text[i+word.length] : ' ';
-        var wordChars = /[а-яёa-z0-9]/i;
-        if (!wordChars.test(before) && !wordChars.test(after)) {
-          result += '<span class="hl">' + text.substring(i, i + word.length) + '</span>';
-          i += word.length;
-          found = true;
-          break;
+      // Тошнота (частота повторений слов)
+      var wordFreq = {};
+      words.forEach(function(w) {
+        w = w.toLowerCase();
+        wordFreq[w] = (wordFreq[w] || 0) + 1;
+      });
+      var maxFreq = 0;
+      var mostRepeated = '';
+      for (var w in wordFreq) {
+        if (wordFreq[w] > maxFreq) {
+          maxFreq = wordFreq[w];
+          mostRepeated = w;
         }
       }
+      var nausea = wordCount > 0 ? Math.round(maxFreq / wordCount * 100) : 0;
+      var classicNausea = wordCount > 0 ? Math.sqrt(wordCount) / wordCount * 100 : 0;
+
+      // Водность (стоп-слова / всего)
+      var stopCount = 0;
+      words.forEach(function(w) {
+        if (STOPWORDS.indexOf(w.toLowerCase()) !== -1) stopCount++;
+      });
+      var waterPercent = wordCount > 0 ? Math.round(stopCount / wordCount * 100) : 0;
+
+      // Вода (оборототы)
+      var waterPhrases = 0;
+      WATER_WORDS.forEach(function(ww) {
+        var re = new RegExp('\\b' + ww + '\\b', 'gi');
+        var m = text.match(re);
+        if (m) waterPhrases += m.length;
+      });
+
+      // Средняя длина предложений
+      var avgSentLen = sentCount > 0 ? Math.round(wordCount / sentCount) : 0;
+
+      // ========== Признаки ИИ ==========
+      var aiSignals = [];
+
+      // 1. Деепричастия
+      var participleCount = 0;
+      var participleWords = [];
+      words.forEach(function(w) {
+        var lower = w.toLowerCase();
+        var endsYas = lower.endsWith('ясь') || lower.endsWith('вший') || lower.endsWith('ющий') ||
+                     lower.endsWith('ящий') || lower.endsWith('ывший') || lower.endsWith('ивший');
+        if (endsYas && lower.length > 5) {
+          participleCount++;
+          if (participleWords.indexOf(w) === -1) participleWords.push(w);
+        }
+      });
+      if (participleCount >= 3) {
+        aiSignals.push({ icon: '📝', title: 'Много деепричастий и причастий (' + participleCount + ')',
+          desc: 'Живой человек редко использует несколько форм на -ясь, -щий подряд.',
+          examples: participleWords.slice(0, 5).join(', '), level: 'warning' });
+      } else {
+        aiSignals.push({ icon: '✅', title: 'Деепричастий и причастий в норме (' + participleCount + ')',
+          desc: 'Хорошо.', level: 'good' });
+      }
+
+      // 2. Тройки перечислений
+      var triples = 0;
+      AI_FLAGS.triplePatterns.forEach(function(re) {
+        var m = text.match(re);
+        if (m) triples += m.length;
+      });
+      if (triples >= 3) {
+        aiSignals.push({ icon: '🔢', title: 'Заезженные тройки (' + triples + ')',
+          desc: '«быстро, удобно и эффективно» — ИИ обожает перечисления по три.',
+          level: 'warning' });
+      } else {
+        aiSignals.push({ icon: '✅', title: 'Перечислений по три в норме',
+          desc: 'Нет навязчивых троек.', level: 'good' });
+      }
+
+      // 3. Синонимы ради синонимов
+      var bizWordsCount = 0;
+      AI_FLAGS.bizWords.forEach(function(re) {
+        var m = text.match(re);
+        if (m) bizWordsCount += m.length;
+      });
+      if (bizWordsCount >= 5) {
+        aiSignals.push({ icon: '🔁', title: 'Много рекламных слов (' + bizWordsCount + ')',
+          desc: '«Уникальный», «потрясающий», «ведущий» — вместо смысла.',
+          level: 'warning' });
+      } else if (bizWordsCount >= 2) {
+        aiSignals.push({ icon: '🔁', title: 'Есть рекламные слова (' + bizWordsCount + ')',
+          desc: 'Постарайтесь заменять их фактами.', level: 'warning' });
+      }
+
+      // 4. AI-фразы
+      var aiPhraseCount = 0;
+      var aiPhrasesFound = [];
+      AI_FLAGS.aiPhrases.forEach(function(re) {
+        var m = text.match(re);
+        if (m) {
+          aiPhraseCount += m.length;
+          aiPhrasesFound.push(m[0]);
+        }
+      });
+      if (aiPhraseCount >= 3) {
+        aiSignals.push({ icon: '💬', title: 'Штампованные фразы (' + aiPhraseCount + ')',
+          desc: '«Важно отметить», «следует учитывать», «нельзя не заметить».',
+          examples: aiPhrasesFound.slice(0, 5).join(', '), level: 'warning' });
+      } else if (aiPhraseCount >= 1) {
+        aiSignals.push({ icon: '💬', title: 'Есть штампы (' + aiPhraseCount + ')',
+          desc: 'Уберите или перефразируйте.', examples: aiPhrasesFound.join(', '), level: 'warning' });
+      } else {
+        aiSignals.push({ icon: '✅', title: 'Без штампованных фраз',
+          desc: 'Хорошо, текст живой.', level: 'good' });
+      }
+
+      // 5. Переходы-связки
+      var transitionCount = 0;
+      AI_FLAGS.transitionWords.forEach(function(tw) {
+        var re = new RegExp(tw, 'gi');
+        var m = text.match(re);
+        if (m) transitionCount += m.length;
+      });
+      if (transitionCount >= 4) {
+        aiSignals.push({ icon: '🛤️', title: 'Слишком гладкие переходы (' + transitionCount + ')',
+          desc: '«Кроме того», «таким образом», «в связи с этим» — у человека мысли скачут.',
+          level: 'warning' });
+      } else if (transitionCount >= 2) {
+        aiSignals.push({ icon: '🛤️', title: 'Есть шаблонные переходы (' + transitionCount + ')',
+          desc: 'Стоит разбавить.', level: 'warning' });
+      } else {
+        aiSignals.push({ icon: '✅', title: 'Переходов-связок нет',
+          desc: 'Текст не похож на методичку.', level: 'good' });
+      }
+
+      // 6. Одинаковая длина предложений
+      var sentLens = [];
+      sents.forEach(function(s) {
+        var w = s.match(/[а-яёa-z]+/gi);
+        sentLens.push(w ? w.length : 0);
+      });
+      var maxSd = 0;
+      if (sentLens.length > 3) {
+        var avg = sentLens.reduce(function(a,b){return a+b;}, 0) / sentLens.length;
+        var variance = sentLens.reduce(function(sum, l){ return sum + Math.pow(l - avg, 2); }, 0) / sentLens.length;
+        maxSd = Math.sqrt(variance);
+      }
+      if (maxSd < 2 && sentLens.length > 3) {
+        aiSignals.push({ icon: '📏', title: 'Одинаковая длина предложений',
+          desc: 'Все предложения примерно одной длины — как под копирку. Без пауз и рывков.',
+          level: 'warning' });
+      } else {
+        aiSignals.push({ icon: '✅', title: 'Разная длина предложений',
+          desc: 'Текст дышит: есть короткие и длинные предложения.',
+          level: 'good' });
+      }
+
+      // 7. Много тире
+      var dashCount = (text.match(/—/g) || []).length;
+      var dashPerSent = sentCount > 0 ? Math.round(dashCount / sentCount * 100) / 100 : 0;
+      if (dashPerSent > 0.4) {
+        aiSignals.push({ icon: '➖', title: 'Много тире (' + dashCount + ', ' + dashPerSent.toFixed(1) + ' на предложение)',
+          desc: 'ИИ любит драму через тире. Каждое второе предложение — мини-презентация.',
+          level: 'warning' });
+      } else if (dashCount > 0) {
+        aiSignals.push({ icon: '✅', title: 'Тире в норме (' + dashCount + ')',
+          desc: 'Использование тире умеренное.', level: 'good' });
+      }
+
+      // 8. «Это не X, а Y»
+      var neA = (text.match(/это не\s+\w+[^,.!?]*,\s*[аa]\s+/gi) || []).length;
+      if (neA >= 2) {
+        aiSignals.push({ icon: '🔄', title: 'Конструкция «это не X, а Y» (' + neA + ')',
+          desc: '«Это не инструмент, а новая логика» — ИИ заездил этот приём.',
+          level: 'warning' });
+      }
+
+      // 9. Поучительный тон
+      var didacticCount = 0;
+      ['давайте рассмотрим', 'необходимо понимать', 'крайне важно',
+       'важно помнить', 'следует запомнить', 'нужно отметить',
+       'стоит учесть', 'обратите внимание'].forEach(function(p) {
+        var re = new RegExp(p, 'gi');
+        var m = text.match(re);
+        if (m) didacticCount += m.length;
+      });
+      if (didacticCount >= 2) {
+        aiSignals.push({ icon: '🎓', title: 'Поучительный тон (' + didacticCount + ')',
+          desc: '«Давайте рассмотрим», «необходимо понимать» — будто читатель на лекции.',
+          level: 'warning' });
+      }
+
+      // ========== SEO ==========
+      var seoFlags = [];
+
+      // Ключевые слова
+      var sorted = Object.keys(wordFreq).sort(function(a,b){ return wordFreq[b] - wordFreq[a]; });
+      var topKeywords = sorted.slice(0, 5);
+
+      seoFlags.push({ icon: '🔑', title: 'Самые частые слова',
+        desc: topKeywords.map(function(w){ return w + ' (' + wordFreq[w] + ')'; }).join(', '),
+        level: 'info' });
+
+      // Тошнота
+      if (classicNausea > 8) {
+        seoFlags.push({ icon: '🤢', title: 'Высокая тошнота (' + classicNausea.toFixed(1) + '%)',
+          desc: 'Текст переспамлен ключевыми словами. Рекомендуется < 7-8%.',
+          level: 'bad' });
+      } else if (classicNausea > 5) {
+        seoFlags.push({ icon: '👌', title: 'Тошнота умеренная (' + classicNausea.toFixed(1) + '%)',
+          desc: 'Приемлемо, но можно снизить.', level: 'warning' });
+      } else {
+        seoFlags.push({ icon: '✅', title: 'Тошнота в норме (' + classicNausea.toFixed(1) + '%)',
+          desc: 'Хорошо для SEO.', level: 'good' });
+      }
+
+      // Водность
+      if (waterPercent > 65) {
+        seoFlags.push({ icon: '💧', title: 'Высокая водность (' + waterPercent + '%)',
+          desc: 'Много стоп-слов. Текст может восприниматься как водянистый.',
+          level: 'bad' });
+      } else if (waterPercent > 50) {
+        seoFlags.push({ icon: '💧', title: 'Водность средняя (' + waterPercent + '%)',
+          desc: 'Нормально, но можно подсократить.', level: 'warning' });
+      } else {
+        seoFlags.push({ icon: '✅', title: 'Водность низкая (' + waterPercent + '%)',
+          desc: 'Отлично, текст плотный.', level: 'good' });
+      }
+
+      // Длина предложений
+      if (avgSentLen > 20) {
+        seoFlags.push({ icon: '📏', title: 'Длинные предложения (сред. ' + avgSentLen + ' слов)',
+          desc: 'Сложно читать. Рекомендуется 10-15 слов.',
+          level: 'warning' });
+      } else if (avgSentLen < 8) {
+        seoFlags.push({ icon: '📏', title: 'Короткие предложения (сред. ' + avgSentLen + ' слов)',
+          desc: 'Рваный ритм. Попробуйте объединить некоторые.',
+          level: 'warning' });
+      } else {
+        seoFlags.push({ icon: '✅', title: 'Оптимальная длина предложений (' + avgSentLen + ' сл.)',
+          desc: 'Хорошо для чтения.', level: 'good' });
+      }
+
+      // ========== Общий счёт ==========
+      var score = 100;
+      // штраф за водность
+      if (waterPercent > 65) score -= 15;
+      else if (waterPercent > 50) score -= 8;
+      // штраф за тошноту
+      if (classicNausea > 8) score -= 15;
+      else if (classicNausea > 5) score -= 5;
+      // штраф за длину предложений
+      if (avgSentLen > 20 || avgSentLen < 8) score -= 8;
+      // штраф за ИИ-сигналы
+      var signals = aiSignals.filter(function(s){ return s.level === 'warning'; }).length;
+      if (signals >= 5) score -= 25;
+      else if (signals >= 3) score -= 15;
+      else if (signals >= 1) score -= 5;
+
+      score = Math.max(0, Math.min(100, score));
+
+      // Отображение
+      renderScore(score, signals, aiSignals.length);
+      renderMetrics(chars, wordCount, sentCount, avgSentLen, waterPercent, waterPhrases, nausea, classicNausea, maxFreq, mostRepeated);
+      renderSeoFlags(seoFlags);
+      renderAiFlags(aiSignals);
+
+      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    if (!found) {
-      result += text[i];
-      i++;
-    }
-  }
-  return result;
-}
 
-// === Получение текста, слов, предложений ===
-function getWords(text) {
-  return text.match(/[а-яёa-z]+(?:-[а-яёa-z]+)?/gi) || [];
-}
-function getSents(text) {
-  return text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; });
-}
-function getWordFreq(text) {
-  var words = getWords(text);
-  var freq = {};
-  words.forEach(function(w) {
-    var l = w.toLowerCase();
-    freq[l] = (freq[l] || 0) + 1;
-  });
-  return {freq: freq, total: words.length};
-}
+    function renderScore(score, warnings, total) {
+      var card = document.getElementById('scoreCard');
+      var circle = document.getElementById('scoreCircle');
+      var title = document.getElementById('scoreTitle');
+      var desc = document.getElementById('scoreDesc');
 
-function getPhraseFreq(text) {
-  var words = getWords(text);
-  var freq = {};
-  var totalW = words.length;
-  for (var i = 0; i < totalW - 1; i++) {
-    // биграммы
-    var bigram = (words[i] + ' ' + words[i+1]).toLowerCase();
-    freq[bigram] = (freq[bigram] || 0) + 1;
-  }
-  return freq;
-}
+      card.className = 'score-card';
+      circle.textContent = score;
 
-// === Проверка текста на грамматику ===
-var GRAMMAR_RULES = [
-  { re: /(?:своими?|моими?|твоими?|нашими?|вашими?) глазами/gi, fix: '«своими глазами» — плеоназм (масло масляное)' },
-  { re: /(?:ценные|дорогие|золотые|драгоценные) (?:металлы|камни)\w*/gi, fix: 'Возможная избыточность' },
-  { re: /ихний/gi, fix: '«Ихний» — просторечие, правильно: «их»' },
-  { re: /евонный|ейный/gi, fix: 'Просторечие, замените' },
-  { re: /ложить|ложат|покласть/gi, fix: '«Ложить» — просторечие, правильно: «класть/положить»' },
-  { re: /ездиет|ездиют|ехайте|едь/gi, fix: 'Ошибка в глаголе «ехать»' },
-  { re: /красивше|лучше|более лучше|более хуже/gi, fix: 'Ошибка в степени сравнения' },
-  { re: /(?:мне|тебе|ему|ей|нам|вам|им) нравится/gi, fix: 'Если множественное — «нравятся»' },
-  { re: /согласно (?:приказа|указа|распоряжения|договора|контракта)/gi, fix: '«Согласно» требует дательного падежа: согласно приказу' },
-  { re: /оплатить за\s+/gi, fix: '«Оплатить проезд» (без «за») или «заплатить за проезд»' },
-];
-
-function checkGrammar(text) {
-  var found = [];
-  for (var i = 0; i < GRAMMAR_RULES.length; i++) {
-    var rule = GRAMMAR_RULES[i];
-    var match;
-    while ((match = rule.re.exec(text)) !== null) {
-      found.push({ match: match[0], fix: rule.fix, index: match.index });
-    }
-  }
-  return found;
-}
-
-// ======== АНАЛИЗ ========
-function analyze() {
-  var preview = document.getElementById('textPreview');
-  var text = (preview.innerText || preview.textContent || '').trim();
-  if (!text || text.length < 20) { showToast('Введите хотя бы 20 символов'); return; }
-
-  var results = document.getElementById('results');
-  results.style.display = 'block';
-
-  var words = getWords(text);
-  var sents = getSents(text);
-  var chars = text.length;
-  var wordCount = words.length;
-  var sentCount = sents.length;
-  var wf = getWordFreq(text);
-
-  // === Метрики ===
-  var maxFreq = 0, mostRepeated = '';
-  for (var w in wf.freq) {
-    if (PREPOSITIONS.indexOf(w) === -1 && STOPWORDS.indexOf(w) === -1) {
-      if (wf.freq[w] > maxFreq) { maxFreq = wf.freq[w]; mostRepeated = w; }
-    }
-  }
-  var nausea = wordCount > 0 ? Math.round(maxFreq / wordCount * 100) : 0;
-  var classicNausea = wordCount > 0 ? Math.sqrt(wordCount) / wordCount * 100 : 0;
-
-  var stopCount = 0;
-  words.forEach(function(w) { if (STOPWORDS.indexOf(w.toLowerCase()) !== -1) stopCount++; });
-  var waterPercent = wordCount > 0 ? Math.round(stopCount / wordCount * 100) : 0;
-
-  var waterPhrases = 0;
-  WATER_WORDS.forEach(function(ww) {
-    var m = text.match(new RegExp(ww, 'gi'));
-    if (m) waterPhrases += m.length;
-  });
-
-  var avgSentLen = sentCount > 0 ? Math.round(wordCount / sentCount) : 0;
-
-  // === Частые слова (без предлогов) ===
-  var wordList = [];
-  for (var w in wf.freq) {
-    if (PREPOSITIONS.indexOf(w) === -1 && STOPWORDS.indexOf(w) === -1) {
-      wordList.push({ word: w, count: wf.freq[w] });
-    }
-  }
-  wordList.sort(function(a,b){ return b.count - a.count; });
-  var topWords = wordList.slice(0, 5);
-
-  // === Частые фразы (биграммы, без предлогов) ===
-  var pf = getPhraseFreq(text);
-  var phraseList = [];
-  for (var p in pf) {
-    if (pf[p] >= 2) {
-      var parts = p.split(' ');
-      var hasPrep = parts.some(function(pw) { return PREPOSITIONS.indexOf(pw) !== -1; });
-      if (!hasPrep) phraseList.push({ word: p, count: pf[p] });
-    }
-  }
-  phraseList.sort(function(a,b){ return b.count - a.count; });
-  var topPhrases = phraseList.slice(0, 5);
-
-  // ========== ПРИЗНАКИ ИИ (все 11) ==========
-  var aiSignals = [];
-
-  // 1. Деепричастия и причастия
-  var participleCount = 0;
-  var participleWords = {};
-  words.forEach(function(w) {
-    var l = w.toLowerCase();
-    for (var e = 0; e < ENDINGS_YAS.length; e++) {
-      if (l.endsWith(ENDINGS_YAS[e]) && l.length > 5) {
-        participleCount++;
-        participleWords[l] = 1;
-        break;
+      if (score >= 80) {
+        card.classList.add('good');
+        title.textContent = 'Отличный текст';
+        desc.textContent = 'Низкая водность, хорошая тошнота, мало признаков ИИ. Можно публиковать.';
+      } else if (score >= 60) {
+        card.classList.add('warning');
+        title.textContent = 'Среднее качество';
+        desc.textContent = 'Рекомендуется доработать: ' + warnings + ' из ' + total + ' признаков ИИ.';
+      } else {
+        card.classList.add('bad');
+        title.textContent = 'Требует доработки';
+        desc.textContent = 'Много признаков ИИ (' + warnings + '), высокая водность или тошнота. Перепишите.';
       }
     }
-  });
-  aiSignals.push({
-    id: 'participle', icon: '📝', show: participleCount >= 2,
-    title: 'Деепричастия и причастия (' + participleCount + ')',
-    desc: participleCount >= 3 ? 'Живой человек редко говорит «развивая, улучшая, создавая».' : 'В пределах нормы.',
-    examples: Object.keys(participleWords).slice(0,5).join(', '),
-    level: participleCount >= 3 ? 'warning' : 'good',
-    ranges: participleCount >= 3 ? Object.keys(participleWords).slice(0,10).map(function(w){ return {word: w}; }) : []
-  });
 
-  // 2. Тройки перечислений
-  var triples = 0;
-  var tripleEx = [];
-  var tripleRe = /[а-яё]+\s*,\s*[а-яё]+\s*,\s*(?:и|или|а)\s+[а-яё]+/gi;
-  var m;
-  while ((m = tripleRe.exec(text)) !== null) { triples++; tripleEx.push(m[0]); }
-  aiSignals.push({
-    id: 'triples', icon: '🔢', show: triples >= 1,
-    title: 'Перечисления по три (' + triples + ')',
-    desc: triples >= 2 ? '«Быстро, удобно и эффективно» — ИИ最爱.' : 'Единичный случай.',
-    examples: tripleEx.slice(0,3).join('; '),
-    level: triples >= 2 ? 'warning' : (triples >= 1 ? 'warning' : 'good'),
-    ranges: tripleEx.slice(0,5).map(function(t){ return {word: t}; })
-  });
-
-  // 3. Синонимы ради синонимов (рекламные слова)
-  var bizCount = 0;
-  var bizFound = {};
-  BIZ_WORDS.forEach(function(re) {
-    var m;
-    while ((m = re.exec(text)) !== null) {
-      bizCount++;
-      bizFound[m[0]] = 1;
+    function renderMetrics(chars, words, sents, avgLen, water, waterPhrases, nausea, classicNausea, maxFreq, mostRepeated) {
+      var grid = document.getElementById('metricsGrid');
+      grid.innerHTML = '';
+      var items = [
+        { label: 'Символов', value: chars, cls: 'green' },
+        { label: 'Слов', value: words, cls: '' },
+        { label: 'Предложений', value: sents, cls: '' },
+        { label: 'Средняя длина предложения', value: avgLen + ' слов', cls: avgLen > 20 || avgLen < 8 ? 'yellow' : 'green' },
+        { label: 'Водность (стоп-слова)', value: water + '%', cls: water > 65 ? 'red' : water > 50 ? 'yellow' : 'green' },
+        { label: 'Вода (оборототы)', value: waterPhrases, cls: waterPhrases > 5 ? 'yellow' : 'green' },
+        { label: 'Тошнота (классическая)', value: classicNausea.toFixed(1) + '%', cls: classicNausea > 8 ? 'red' : classicNausea> 5 ? 'yellow' : 'green' },
+        { label: 'Макс. частота слова', value: '"' + mostRepeated + '" — ' + maxFreq + ' раз', cls: maxFreq > 5 ? 'red' : maxFreq > 3 ? 'yellow' : 'green' },
+        { label: 'Найдено воды-оборотов', value: waterPhrases, cls: waterPhrases > 8 ? 'red' : waterPhrases > 4 ? 'yellow' : 'green' }
+      ];
+      items.forEach(function(item) {
+        grid.innerHTML += '<div class="metric"><span class="metric-label">' + item.label + '</span><span class="metric-value ' + item.cls + '">' + item.value + '</span></div>';
+      });
     }
-  });
-  aiSignals.push({
-    id: 'bizwords', icon: '🔁', show: bizCount >= 2,
-    title: 'Рекламные слова-штампы (' + bizCount + ')',
-    desc: bizCount >= 4 ? '«Уникальный», «потрясающий», «ведущий» — трескотня без смысла.' : 'Немного, но лучше заменить фактами.',
-    examples: Object.keys(bizFound).slice(0,5).join(', '),
-    level: bizCount >= 4 ? 'warning' : (bizCount >= 2 ? 'warning' : 'good'),
-    ranges: Object.keys(bizFound).slice(0,8).map(function(w){ return {word: w}; })
-  });
 
-  // 4. Штампованные фразы
-  var aiPhrCount = 0;
-  var aiPhrFound = [];
-  AI_PHRASES.forEach(function(re) {
-    var m;
-    while ((m = re.exec(text)) !== null) { aiPhrCount++; aiPhrFound.push(m[0]); }
-  });
-  aiSignals.push({
-    id: 'aiphrases', icon: '💬', show: aiPhrCount >= 1,
-    title: 'Штампованные фразы (' + aiPhrCount + ')',
-    desc: aiPhrCount >= 2 ? '«Важно отметить», «следует учитывать» — маркер ИИ.' : 'Есть одна штампованная фраза.',
-    examples: aiPhrFound.slice(0,5).join('; '),
-    level: aiPhrCount >= 1 ? 'warning' : 'good',
-    ranges: aiPhrFound.slice(0,5).map(function(f){ return {word: f}; })
-  });
+    function renderSeoFlags(flags) {
+      var list = document.getElementById('seoFlags');
+      list.innerHTML = '';
+      flags.forEach(function(f) {
+        var cls = f.level === 'good' ? 'flag-good' : (f.level === 'bad' ? 'flag-warning' : 'flag-warning');
+        var badgeCls = f.level === 'good' ? 'green' : (f.level === 'bad' ? 'red' : 'yellow');
+        list.innerHTML += '<li class="flag-item ' + cls + '"><span class="flag-icon">' + f.icon + '</span><div class="flag-text"><h4>' + f.title + ' <span class="flag-badge ' + badgeCls + '">' + f.level + '</span></h4><p>' + f.desc + '</p></div></li>';
+      });
+    }
 
-  // 5. Гладкие переходы
-  var transCount = 0;
-  var transFound = [];
-  TRANSITIONS.forEach(function(tw) {
-    var re = new RegExp(tw, 'gi');
-    var m;
-    while ((m = re.exec(text)) !== null) { transCount++; transFound.push(m[0]); }
-  });
-  aiSignals.push({
-    id: 'transitions', icon: '🛤️', show: transCount >= 2,
-    title: 'Шаблонные переходы (' + transCount + ')',
-    desc: transCount >= 3 ? '«Кроме того», «таким образом» — у человека мысли скачут.' : 'Есть немного.',
-    examples: transFound.slice(0,5).join('; '),
-    level: transCount >= 3 ? 'warning' : (transCount >= 2 ? 'warning' : 'good'),
-    ranges: transFound.slice(0,8).map(function(f){ return {word: f}; })
-  });
+    function renderAiFlags(flags) {
+      var list = document.getElementById('aiFlags');
+      list.innerHTML = '';
+      flags.forEach(function(f) {
+        var cls = f.level === 'good' ? 'flag-good' : 'flag-warning';
+        var badgeCls = f.level === 'good' ? 'green' : 'red';
+        var ex = f.examples ? '<div class="examples">Примеры: ' + f.examples + '</div>' : '';
+        list.innerHTML += '<li class="flag-item ' + cls + '"><span class="flag-icon">' + f.icon + '</span><div class="flag-text"><h4>' + f.title + ' <span class="flag-badge ' + badgeCls + '">' + (f.level === 'good' ? 'OK' : 'внимание') + '</span></h4><p>' + f.desc + '</p>' + ex + '</div></li>';
+      });
+    }
 
-  // 6. Одинаковая длина предложений
-  var sentLens = [];
-  sents.forEach(function(s) {
-    var w = s.match(/[а-яёa-z]+/gi);
-    sentLens.push(w ? w.length : 0);
-  });
-  var sd = 0;
-  if (sentLens.length > 3) {
-    var avgSL = sentLens.reduce(function(a,b){return a+b;},0)/sentLens.length;
-    sd = Math.sqrt(sentLens.reduce(function(s,l){ return s+Math.pow(l-avgSL,2);},0)/sentLens.length);
-  }
-  aiSignals.push({
-    id: 'samelength', icon: '📏', show: sd < 2 && sentLens.length > 3,
-    title: 'Одинаковая длина предложений (σ=' + sd.toFixed(1) + ')',
-    desc: sd < 2 ? 'Все предложения под копирку — без пауз и дыхания.' : 'Ритм текста нормальный.',
-    level: sd < 2 && sentLens.length > 3 ? 'warning' : 'good',
-    ranges: []
-  });
-
-  // 7. Много тире
-  var dashCount = (text.match(/—/g) || []).length;
-  var dashPerSent = sentCount > 0 ? dashCount / sentCount : 0;
-  aiSignals.push({
-    id: 'dashes', icon: '➖', show: dashPerSent > 0.3,
-    title: 'Много тире (' + dashCount + ', ' + dashPerSent.toFixed(1) + '/предл.)',
-    desc: dashPerSent > 0.3 ? 'Каждое второе предложение — драма через тире.' : 'В норме.',
-    level: dashPerSent > 0.3 ? 'warning' : 'good',
-    ranges: dashPerSent > 0.3 ? [{word: '—'}] : []
-  });
-
-  // 8. «Это не X, а Y»
-  var neA = 0;
-  var neAEx = [];
-  var neARe = /это не\s+\w+[^,.!?]*,\s*[аa]\s+/gi;
-  while ((m = neARe.exec(text)) !== null) { neA++; neAEx.push(m[0].substring(0,40)+'...'); }
-  aiSignals.push({
-    id: 'neay', icon: '🔄', show: neA >= 1,
-    title: '«Это не X, а Y» (' + neA + ')',
-    desc: neA >= 2 ? 'ИИ заездил этот приём до дыр.' : 'Единичный случай.',
-    examples: neAEx.slice(0,3).join('; '),
-    level: neA >= 2 ? 'warning' : (neA >= 1 ? 'warning' : 'good'),
-    ranges: neA >= 1 ? [{word: 'это не'}] : []
-  });
-
-  // 9. Всегда одна длина (дубль с 6)
-  // Уже посчитано в sd
-
-  // 10. Гладкие переходы — уже проверено (5)
-
-  // 11. Поучительный тон
-  var didCount = 0;
-  var didFound = [];
-  DIDACTIC.forEach(function(p) {
-    var re = new RegExp(p, 'gi');
-    while ((m = re.exec(text)) !== null) { didCount++; didFound.push(m[0]); }
-  });
-  aiSignals.push({
-    id: 'didactic', icon: '🎓', show: didCount >= 1,
-    title: 'Поучительный тон (' + didCount + ')',
-    desc: didCount >= 2 ? 'Как лекция для первокурсников.' : 'Есть нотка назидания.',
-    examples: didFound.slice(0,3).join('; '),
-    level: didCount >= 2 ? 'warning' : (didCount >= 1 ? 'warning' : 'good'),
-    ranges: didFound.slice(0,5).map(function(f){ return {word: f}; })
-  });
-
-  // ========== SEO ==========
-  var seoFlags = [];
-
-  if (classicNausea > 8) seoFlags.push({ icon: '🤢', title: 'Тошнота ' + classicNausea.toFixed(1) + '% (высокая)', desc: 'Рекомендуется < 7-8%.', level: 'bad' , id: 'nausea'});
-  else if (classicNausea > 5) seoFlags.push({ icon: '👌', title: 'Тошнота ' + classicNausea.toFixed(1) + '% (умеренная)', desc: 'Можно снизить.', level: 'warning', id: 'nausea' });
-  else seoFlags.push({ icon: '✅', title: 'Тошнота ' + classicNausea.toFixed(1) + '% (норма)', desc: 'Хорошо.', level: 'good', id: 'nausea' });
-
-  if (waterPercent > 65) seoFlags.push({ icon: '💧', title: 'Водность ' + waterPercent + '% (высокая)', desc: 'Много стоп-слов.', level: 'bad', id: 'water' });
-  else if (waterPercent > 50) seoFlags.push({ icon: '💧', title: 'Водность ' + waterPercent + '% (средняя)', desc: 'Нормально.', level: 'warning', id: 'water' });
-  else seoFlags.push({ icon: '✅', title: 'Водность ' + waterPercent + '% (низкая)', desc: 'Плотный текст.', level: 'good', id: 'water' });
-
-  seoFlags.push({ icon: '📏', title: avgSentLen > 20 ? 'Длинные предложения (сред. ' + avgSentLen + ' сл.)' : avgSentLen < 8 ? 'Короткие предложения (сред. ' + avgSentLen + ' сл.)' : 'Оптимальная длина предложений (' + avgSentLen + ' сл.)', desc: avgSentLen > 20 ? 'Тяжело читать.' : avgSentLen < 8 ? 'Рваный ритм.' : 'Хорошо.', level: avgSentLen > 20 || avgSentLen < 8 ? 'warning' : 'good', id: 'sentlen' });
-
-  // ========== Грамматика ==========
-  var grammarIssues = checkGrammar(text);
-
-  // ========== Общий счёт ==========
-  var score = 100;
-  if (waterPercent > 65) score -= 15;
-  else if (waterPercent > 50) score -= 8;
-  if (classicNausea > 8) score -= 15;
-  else if (classicNausea > 5) score -= 5;
-  if (avgSentLen > 20 || avgSentLen < 8) score -= 8;
-  var warnings = aiSignals.filter(function(s){ return s.level === 'warning'; }).length;
-  if (warnings >= 5) score -= 25;
-  else if (warnings >= 3) score -= 15;
-  else if (warnings >= 1) score -= 5;
-  if (grammarIssues.length > 0) score -= grammarIssues.length * 3;
-  score = Math.max(0, Math.min(100, score));
-
-  // ========== Рендер ==========
-  renderScore(score, warnings, aiSignals.length);
-  renderMetrics(chars, wordCount, sentCount, avgSentLen, waterPercent, waterPhrases, nausea, classicNausea, maxFreq, mostRepeated);
-  renderKeywords(topWords, topPhrases);
-  renderSeoFlags(seoFlags);
-  renderAiFlags(aiSignals);
-  renderGrammar(grammarIssues);
-
-  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ========== Render funсtions ==========
-function renderScore(score, warnings, total) {
-  var card = document.getElementById('scoreCard');
-  var circle = document.getElementById('scoreCircle');
-  var title = document.getElementById('scoreTitle');
-  var desc = document.getElementById('scoreDesc');
-  card.className = 'score-card';
-  circle.textContent = score;
-  if (score >= 80) { card.classList.add('good'); title.textContent = 'Отличный текст'; desc.textContent = 'Можно публиковать.'; }
-  else if (score >= 60) { card.classList.add('warning'); title.textContent = 'Среднее качество'; desc.textContent = 'Рекомендуется доработать: ' + warnings + ' признаков ИИ.'; }
-  else { card.classList.add('bad'); title.textContent = 'Требует доработки'; desc.textContent = 'Много проблем. Перепишите.'; }
-}
-
-function renderMetrics(chars, words, sents, avgLen, water, waterPhrases, nausea, classicNausea, maxFreq, mostRepeated) {
-  var grid = document.getElementById('metricsGrid');
-  grid.innerHTML = '';
-  var items = [
-    { label: 'Символов', value: chars, cls: 'green' },
-    { label: 'Слов', value: words, cls: '' },
-    { label: 'Предложений', value: sents, cls: '' },
-    { label: 'Средняя длина предложения', value: avgLen + ' слов', cls: avgLen > 20 || avgLen < 8 ? 'yellow' : 'green' },
-    { label: 'Водность (стоп-слова)', value: water + '%', cls: water > 65 ? 'red' : water > 50 ? 'yellow' : 'green' },
-    { label: 'Вода-обороты', value: waterPhrases, cls: waterPhrases > 5 ? 'yellow' : 'green' },
-    { label: 'Тошнота (классическая)', value: classicNausea.toFixed(1) + '%', cls: classicNausea > 8 ? 'red' : classicNausea > 5 ? 'yellow' : 'green' },
-    { label: 'Макс. частота слова', value: '"' + mostRepeated + '" — ' + maxFreq + ' раз', cls: maxFreq > 5 ? 'red' : maxFreq > 3 ? 'yellow' : 'green' },
-  ];
-  items.forEach(function(item) {
-    grid.innerHTML += '<div class="metric"><span class="metric-label">' + item.label + '</span><span class="metric-value ' + item.cls + '">' + item.value + '</span></div>';
-  });
-}
-
-function renderKeywords(topWords, topPhrases) {
-  var block = document.getElementById('seoKeywordsBlock');
-  var html = '<div style="margin-bottom:12px;"><strong>Слова:</strong><br><div class="freq-tags">';
-  topWords.forEach(function(w, i) {
-    html += '<span class="freq-tag" onclick="highlightWord(\'' + w.word + '\', this)">' + w.word + ' <span class="count">×' + w.count + '</span></span>';
-  });
-  html += '</div></div><div><strong>Фразы (2 слова):</strong><br><div class="freq-tags">';
-  if (topPhrases.length === 0) html += '<span style="color:var(--text-tertiary);font-size:0.85rem;">Нет повторяющихся фраз</span>';
-  else {
-    topPhrases.forEach(function(p) {
-      html += '<span class="freq-tag" onclick="highlightWord(\'' + p.word + '\', this)">' + p.word + ' <span class="count">×' + p.count + '</span></span>';
+    // ========== Live stats ==========
+    document.getElementById('textInput').addEventListener('input', function() {
+      var text = this.value;
+      var chars = text.length;
+      var words = (text.match(/[а-яёa-z]+/gi) || []).length;
+      var sents = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
+      document.getElementById('charCount').textContent = chars;
+      document.getElementById('wordCount').textContent = words;
+      document.getElementById('sentCount').textContent = sents;
     });
-  }
-  html += '</div></div>';
-  block.innerHTML = html;
-}
 
-function highlightWord(word, el) {
-  clearHighlights();
-  el.classList.add('active');
-  var preview = document.getElementById('textPreview');
-  var text = preview.innerText || preview.textContent || '';
-  preview.innerHTML = hlAllOccurrences(text, [{word: word}]).replace(/
-/g, '<br>');
-  showToast('Выделено: ' + word);
-}
-
-function renderSeoFlags(flags) {
-  var list = document.getElementById('seoFlags');
-  list.innerHTML = '';
-  flags.forEach(function(f) {
-    var cls = f.level === 'good' ? 'flag-good' : (f.level === 'bad' ? 'flag-warning' : 'flag-info');
-    var badgeCls = f.level === 'good' ? 'green' : (f.level === 'bad' ? 'red' : 'yellow');
-    list.innerHTML += '<li class="flag-item ' + cls + '"><span class="flag-icon">' + f.icon + '</span><div class="flag-text"><h4>' + f.title + ' <span class="flag-badge ' + badgeCls + '">' + f.level + '</span></h4><p>' + f.desc + '</p></div></li>';
-  });
-}
-
-function renderAiFlags(flags) {
-  var list = document.getElementById('aiFlags');
-  list.innerHTML = '';
-  flags.forEach(function(f, idx) {
-    var cls = f.level === 'good' ? 'flag-good' : 'flag-warning';
-    var badgeCls = f.level === 'good' ? 'green' : 'red';
-    var hasClick = f.ranges && f.ranges.length > 0;
-    var onclick = hasClick ? 'onclick="onAiFlagClick(' + idx + ', this)"' : '';
-    var activeCls = hasClick && f.show ? '' : '';
-    var ex = f.examples ? '<div class="examples">' + f.examples + '</div>' : '';
-    list.innerHTML += '<li class="flag-item ' + cls + '" ' + onclick + ' data-idx="' + idx + '"><span class="flag-icon">' + f.icon + '</span><div class="flag-text"><h4>' + f.title + ' <span class="flag-badge ' + badgeCls + '">' + (f.level === 'good' ? 'OK' : 'внимание') + '</span></h4><p>' + f.desc + '</p>' + ex + '</div></li>';
-  });
-  // Сохраняем флаги для кликов
-  window._aiFlags = flags;
-}
-
-function onAiFlagClick(idx, el) {
-  var flags = window._aiFlags;
-  var f = flags[idx];
-  if (!f || !f.ranges || !f.ranges.length) return;
-  highlightText(f.ranges, el);
-}
-
-function renderGrammar(issues) {
-  var list = document.getElementById('grammarFlags');
-  if (!issues.length) {
-    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--green);font-size:0.9rem;">✅ Грамматических ошибок не найдено (базовая проверка)</div>';
-    return;
-  }
-  var html = '<div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px;">Найдено: ' + issues.length + '</div>';
-  issues.forEach(function(issue) {
-    html += '<li class="flag-item flag-warning"><span class="flag-icon">⚠️</span><div class="flag-text"><h4>«' + escapeHtml(issue.match) + '»</h4><p>' + issue.fix + '</p></div></li>';
-  });
-  list.innerHTML = html;
-}
-
-function escapeHtml(s) { if (!s) return ''; return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-// ========== Live stats ==========
-function syncTextarea() {
-  var preview = document.getElementById('textPreview');
-  var textarea = document.getElementById('textInput');
-  var text = preview.innerText || preview.textContent || '';
-  textarea.value = text;
-  // live stats
-  document.getElementById('charCount').textContent = text.length;
-  document.getElementById('wordCount').textContent = (text.match(/[а-яёa-z]+/gi) || []).length;
-  document.getElementById('sentCount').textContent = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
-}
-
-document.getElementById('textPreview').addEventListener('input', function() {
-  var text = this.innerText || this.textContent || '';
-  document.getElementById('charCount').textContent = text.length;
-  document.getElementById('wordCount').textContent = (text.match(/[а-яёa-z]+/gi) || []).length;
-  document.getElementById('sentCount').textContent = text.split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
-});
-
-// ========== Toast ==========
-function showToast(msg) {
-  var toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 2500);
-}
-// Init
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('textPreview').innerHTML = '';
-  document.getElementById('analyzeBtn').addEventListener('click', analyze);
-  syncTextarea();
-});
-</script>
+    // ========== Toast ==========
+    function showToast(msg) {
+      var t = document.createElement('div');
+      t.className = 'toast';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:8px;font-size:0.9rem;font-weight:500;opacity:0;transition:all 0.3s;z-index:1000;pointer-events:none;';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      requestAnimationFrame(function(){ t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+      setTimeout(function() {
+        t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(80px)';
+        setTimeout(function(){ t.remove(); }, 300);
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
