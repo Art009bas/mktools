@@ -153,7 +153,6 @@ svgChart('romiChart', allWeeks, {width:800,height:250,lines:[{key:'romi',color:'
 // Revenue vs cost chart (monthly)
 svgChart('revChart', DATA.map(m => ({name:m.name,revenue:m.totals.income,cost:m.totals.rk_plus})), {width:500,height:220,lines:[{key:'revenue',color:'#10b981'},{key:'cost',color:'#ef4444'}]});
 // Make month data available for dyn chart
-const monthData = DATA.map(m => ({name:m.name, romi:m.totals.romi, roi:m.totals.roi, leads:m.totals.leads, sales:m.totals.sales, revenue:m.totals.income, cost:m.totals.rk}));
 
 // Leads & sales chart
 const lsData = DATA.map(m => ({name:m.name,leads:m.totals.leads,sales:m.totals.sales,conv:m.totals.sales/m.totals.leads*100||0}));
@@ -231,7 +230,8 @@ function drawDynChart() {
     const x = pad.l+i*xStep, y = yScale(d.value);
     svg += '<circle cx="'+x+'" cy="'+y+'" r="4" fill="'+color+'" stroke="#fff" stroke-width="2"/>';
     // invisible hover zone
-    svg += '<rect x="'+(x-14)+'" y="0" width="28" height="'+H+'" fill="transparent" style="cursor:pointer" onmouseenter="this.parentElement.querySelector('.ht').setAttribute('display','block');this.parentElement.querySelector('.ht').setAttribute('transform','translate('+x+','+y+')');this.parentElement.querySelector('.ht text').textContent=''+d.label+': '+'+(d.value.toFixed(1))+'" onmouseleave="this.parentElement.querySelector('.ht').setAttribute('display','none')"/>';
+    var x2=x,y2=y,lbl=d.label,vl=d.value.toFixed(1);
+    svg += '<rect x="'+(x-14)+'" y="0" width="28" height="'+H+'" fill="transparent" style="cursor:pointer" ';
   });
 
   // Tooltip group
