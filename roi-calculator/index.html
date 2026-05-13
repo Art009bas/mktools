@@ -190,12 +190,11 @@
 
     <div id="paramsBlock" style="display:none;margin-top:10px;">
       <div class="four-cols">
-        <div class="field-group"><div class="field-label">НДС %</div><input class="field-input" type="number" id="ndsPct" value="20" onchange="saveCurrent()" placeholder="20"></div>
-        <div class="field-group"><div class="field-label">% от РК (без НДС)</div><input class="field-input" type="number" id="rkPctPlain" value="0" onchange="saveCurrent()" placeholder="0"></div>
-        <div class="field-group"><div class="field-label">% от РК+НДС</div><input class="field-input" type="number" id="rkPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">НДС %</div><input class="field-input" type="number" id="ndsPct" value="22" onchange="saveCurrent()" placeholder="22"></div>
+        <div class="field-group"><div class="field-label">% от РК</div><input class="field-input" type="number" id="rkPctPlain" value="15" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">Агентские %</div><input class="field-input" type="number" id="agencyPct" value="25" onchange="saveCurrent()" placeholder="25"></div>
         <div class="field-group"><div class="field-label">Услуги фикс</div><input class="field-input" type="number" id="svcFixed" value="39000" onchange="saveCurrent()" placeholder="0"></div>
-        <div class="field-group"><div class="field-label">Услуги %</div><input class="field-input" type="number" id="svcPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">Услуги %</div><input class="field-input" type="number" id="svcPct" value="15" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" value="0" onchange="saveCurrent()" placeholder="0"></div>
       </div>
     </div>
@@ -507,7 +506,6 @@ function calculate() {
   
     d.innerHTML += '<div class="detail-row"><span>НДС (' + ndsPct + '%)</span><span class="val">' + fmt(cumSpend*ndsPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>% от РК без НДС (' + rkPctPlain + '%)</span><span class="val">' + fmt(cumSpend*rkPctPlain/100) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+cumSpend*ndsPct/100)*rkPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Услуги фикс</span><span class="val">' + fmt(svcFixed) + '</span></div>';
   var svcPctAmtD = cumSpend * svcPct / 100;
   d.innerHTML += '<div class="detail-row"><span>Услуги % (' + svcPct + '%)</span><span class="val">' + fmt(svcPctAmtD) + '</span></div>';
