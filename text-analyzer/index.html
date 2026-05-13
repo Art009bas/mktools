@@ -540,6 +540,19 @@
       // ========== SEO ==========
       var seoFlags = [];
 
+      var phraseFreq = {};
+      for (var pi = 0; pi < words.length - 1; pi++) {
+        var bigram = (words[pi] + ' ' + words[pi+1]).toLowerCase();
+        var parts = bigram.split(' ');
+        if (PREPOSITIONS.indexOf(parts[0]) === -1 && PREPOSITIONS.indexOf(parts[1]) === -1) {
+          phraseFreq[bigram] = (phraseFreq[bigram] || 0) + 1;
+        }
+      }
+      var topPhrases = Object.keys(phraseFreq)
+        .filter(function(p) { return phraseFreq[p] >= 2; })
+        .sort(function(a,b) { return phraseFreq[b] - phraseFreq[a]; })
+        .slice(0, 5);
+      
       // Ключевые слова
       var sorted = Object.keys(wordFreq).sort(function(a,b){ return wordFreq[b] - wordFreq[a]; });
       var topKeywords = sorted.slice(0, 5);
@@ -557,19 +570,7 @@
         desc: phraseStr,
         level: 'info' });
 
-      // Фразы
-      var phraseFreq = {};
-      for (var pi = 0; pi < words.length - 1; pi++) {
-        var bigram = (words[pi] + ' ' + words[pi+1]).toLowerCase();
-        var parts = bigram.split(' ');
-        if (PREPOSITIONS.indexOf(parts[0]) === -1 && PREPOSITIONS.indexOf(parts[1]) === -1) {
-          phraseFreq[bigram] = (phraseFreq[bigram] || 0) + 1;
-        }
-      }
-      var topPhrases = Object.keys(phraseFreq)
-        .filter(function(p) { return phraseFreq[p] >= 2; })
-        .sort(function(a,b) { return phraseFreq[b] - phraseFreq[a]; })
-        .slice(0, 5);
+      
       
       // Тошнота
       if (classicNausea > 8) {
