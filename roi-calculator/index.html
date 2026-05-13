@@ -84,6 +84,10 @@
     .project-tab:hover:not(.active) { border-color: var(--accent); }
 
     /* MONTHS */
+    .month-label-row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; padding: 0 4px; }
+    .month-label-row .mlr-m { width: 90px; flex-shrink: 0; }
+    .month-label-row .mlr-h { flex: 1; font-size: 0.72rem; color: var(--text-tertiary); text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .month-label-row .mlr-h:last-child { width: 20px; flex: none; }
     .month-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
     .month-row .mr-name { width: 90px; flex-shrink: 0; font-size: 0.78rem; font-weight: 500; }
     .month-row input { flex: 1; min-width: 0; }
@@ -165,6 +169,15 @@
 
   <div class="card">
     <div class="card-title">📅 Месяцы</div>
+    <div class="month-label-row">
+      <span class="mlr-m"></span>
+      <span class="mlr-h">Реклама ₽</span>
+      <span class="mlr-h">Лиды</span>
+      <span class="mlr-h">Продажи</span>
+      <span class="mlr-h">Доход ₽</span>
+      <span class="mlr-h">Доп.₽</span>
+      <span class="mlr-h"></span>
+    </div>
     <div class="month-list" id="monthList"></div>
     <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-secondary btn-sm" onclick="addMonth()">+ Месяц</button>
@@ -236,7 +249,7 @@ if (projects.length === 0) {
       {label:'Янв 2026', spend:0, leads:0, sales:0, revenue:0},
       {label:'Фев 2026', spend:0, leads:0, sales:0, revenue:0},
       {label:'Мар 2026', spend:0, leads:0, sales:0, revenue:0},
-      {label:'Апр 2026', spend:28883.38, leads:68, sales:8, revenue:44630.82},
+      {label:'Апр 2026', spend:28883.38, leads:68, sales:8, revenue:44630.82, extra:0},
     ]
   });
   saveProjects(projects);
@@ -272,7 +285,7 @@ function newProject() {
   projects.push({
     name: name.trim(), agencyPct: 25, ltv: 0,
     extra: {rk:0, svcFixed:0, svcPct:0, other:0},
-    months: [{label:'Мес 1', spend:0, leads:0, sales:0, revenue:0}]
+    months: [{label:'Мес 1', spend:0, leads:0, sales:0, revenue:0, extra:0}]
   });
   currentIdx = projects.length - 1;
   saveProjects(projects);
@@ -320,7 +333,7 @@ function updM(i, key, val) {
 function addMonth() {
   var p = cp();
   var n = p.months.length + 1;
-  p.months.push({label:'Мес ' + n, spend:0, leads:0, sales:0, revenue:0});
+  p.months.push({label:'Мес ' + n, spend:0, leads:0, sales:0, revenue:0, extra:0});
   saveProjects(projects);
   renderMonths();
 }
@@ -375,22 +388,21 @@ function calculate() {
   var months = p.months;
   var agencyPct = p.agencyPct;
   var ltv = p.ltv;
-  var extRk = p.extra.rk || 0;
-  var extSvc = p.extra.svcFixed || 0;
-  var extOther = p.extra.other || 0;
-  var fixedExtra = extRk + extSvc + extOther;
+  var fixedExtra = 0; // per-month extra now
 
   document.getElementById('projectTitle').textContent = p.name;
 
   // Кумулятивный расчёт
   var cumSpend = 0, cumLeads = 0, cumSales = 0, cumRev = 0;
+  var currExtra = 0;
   var allCum = [];
   months.forEach(function(m) {
     cumSpend += m.spend;
     cumLeads += m.leads;
     cumSales += m.sales;
     cumRev += m.revenue;
-    var totalCost = cumSpend + fixedExtra;
+    currExtra += (m.extra || 0);
+    var totalCost = cumSpend + currExtra;
     var netRev = cumRev * (1 - agencyPct/100);
     allCum.push({
       label: m.label,
