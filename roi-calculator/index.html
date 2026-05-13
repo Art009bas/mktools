@@ -541,7 +541,9 @@ function drawMonthChart(data) {
   var allR = data.map(function(d){return d.periodRomi;});
   var allN = data.map(function(d){return d.periodNetRoi;});
   var maxV = Math.max.apply(null, allR.concat(allN));
-  var minV = Math.min.apply(null, allR.concat(allN));
+  var minV = Math.max.apply(null, allR.concat(allN));
+  // Fix: also get min of negatives
+  allR.concat(allN).forEach(function(v){if(v<minV)minV=v;});
   var range = Math.max(Math.abs(maxV), Math.abs(minV), 5);
   range = Math.ceil(range / 10) * 10 + 10;
 
@@ -560,12 +562,11 @@ function drawMonthChart(data) {
   }
   html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3"/>';
 
-  // ROMI line
+  // lines
   var ptsR = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsR+=(i===0?'M':'L')+x+','+yScale(d.periodRomi)+' ';});
-  // Net ROI line
   var ptsN = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsN+=(i===0?'M':'L')+x+','+yScale(d.periodNetRoi)+' ';});
 
-  // area fill ROMI
+  // area
   var area = 'M' + pad.left + ',' + zeroY;
   data.forEach(function(d,i){var x=pad.left+i*xStep; area+=' L'+x+','+yScale(d.periodRomi);});
   area += ' L' + (pad.left+(data.length-1)*xStep) + ',' + zeroY + ' Z';
@@ -574,55 +575,66 @@ function drawMonthChart(data) {
   html += '<path d="' + ptsR + '" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
   html += '<path d="' + ptsN + '" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
 
-  // Tooltip block
-  var tipHtml = '<div id="chartTip" style="display:none;position:absolute;background:#1a1a2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:0.78rem;line-height:1.5;pointer-events:none;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.2);"></div>';
+  // SVG-native tooltip group (hidden, shows on hover)
+  var tooltipGroup = '<g id="chartTooltip" style="display:none">';
 
-  // Points with hover tooltips
+  // Points with hover
   data.forEach(function(d, i) {
     var x = pad.left + i * xStep;
     var rR = yScale(d.periodRomi);
     var rN = yScale(d.periodNetRoi);
 
-    // ROMI dot (bigger, interactive)
-    html += '<circle cx="' + x + '" cy="' + rR + '" r="6" fill="rgba(249,115,22,0.15)" stroke="none" class="dot-romi" style="cursor:pointer"/>';
-    html += '<circle cx="' + x + '" cy="' + rR + '" r="4" fill="#fff" stroke="#f97316" stroke-width="2.5" class="dot-romi" style="cursor:pointer"/>';
-    // Net ROI dot
-    html += '<circle cx="' + x + '" cy="' + rN + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2.5" class="dot-roi" style="cursor:pointer"/>';
+    // Invisible large hit area
+    html += '<rect x="' + (x-14) + '" y="0" width="28" height="' + H + '" fill="transparent" class="dot-area" data-idx="' + i + '" style="cursor:pointer"/>';
 
-    // Hover tooltips — inline onmouseover
-    var tipText = d.periodLabel + ': ROMI ' + (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%, ROI ' + (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%';
+    // ROMI dot
+    html += '<circle cx="' + x + '" cy="' + rR + '" r="5" fill="#fff" stroke="#f97316" stroke-width="2.5" class="dot-m" data-idx="' + i + '" style="cursor:pointer"/>';
+    // Net ROI dot
+    html += '<circle cx="' + x + '" cy="' + rN + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2" class="dot-m" data-idx="' + i + '" style="cursor:pointer"/>';
+
+    // Tooltip per-point hidden by default — positioned just below dots
+    var tipY = Math.max(rR, rN) + 10;
+    var tipW = 155, tipH = 58;
+    var tipX = x - tipW/2;
+    if (tipX < 5) tipX = 5;
+    if (tipX + tipW > W - 5) tipX = W - tipW - 5;
+
+    tooltipGroup += '<g class="tip-g" data-idx="' + i + '">';
+    tooltipGroup += '<rect x="' + tipX + '" y="' + tipY + '" width="' + tipW + '" height="' + tipH + '" rx="6" fill="#1a1a2e" opacity="0.95"/>';
+    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+16) + '" fill="#fff" font-size="11" font-weight="700">' + d.periodLabel + '</text>';
+    var romiStr = (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%';
+    var roiStr = (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%';
+    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+30) + '" fill="#f97316" font-size="10">ROMI ' + romiStr + '</text>';
+    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+42) + '" fill="#ef4444" font-size="10">ROI ' + roiStr + '</text>';
+    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+54) + '" fill="#10b981" font-size="10">CAC ' + fmt(d.periodCac) + '</text>';
+    tooltipGroup += '</g>';
+
+    // X label
     html += '<text x="' + x + '" y="' + (H-8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.periodLabel + '</text>';
   });
 
+  tooltipGroup += '</g>';
+  html += tooltipGroup;
   svg.innerHTML = html;
 
-  // Add event listeners for hover tooltip
-  var tipDiv = document.getElementById('chartTip');
-  if (!tipDiv) {
-    tipDiv = document.createElement('div');
-    tipDiv.id = 'chartTip';
-    tipDiv.style.cssText = 'display:none;position:absolute;background:#1a1a2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:0.78rem;line-height:1.5;pointer-events:none;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
-    document.getElementById('chartBox').appendChild(tipDiv);
-    tipDiv = document.getElementById('chartTip');
-  }
-
-  var dots = svg.querySelectorAll('.dot-romi, .dot-roi');
-  dots.forEach(function(dot) {
-    dot.addEventListener('mouseenter', function(e) {
-      var idx = Array.prototype.indexOf.call(dots, e.target);
-      var di = Math.floor(idx / 2); // 2 dots per month
-      if (di < data.length) {
-        var d = data[di];
-        tipDiv.innerHTML = '<b>' + d.periodLabel + '</b><br>ROMI: ' + (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%<br>ROI: ' + (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%<br>CAC: ' + fmt(d.periodCac);
-        tipDiv.style.display = 'block';
-        var rect = svg.getBoundingClientRect();
-        var cx = pad.left + di * xStep;
-        var svgPx = cx / W * rect.width;
-        tipDiv.style.left = (svgPx + rect.left - 60) + 'px';
-        tipDiv.style.top = (rect.top + 10) + 'px';
-      }
+  // Hover listeners (SVG-native, stable)
+  var items = svg.querySelectorAll('.dot-area, .dot-m');
+  var tips = svg.querySelectorAll('.tip-g');
+  var lastIdx = -1;
+  items.forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      var idx = parseInt(el.getAttribute('data-idx'));
+      if (idx === lastIdx) return;
+      lastIdx = idx;
+      tips.forEach(function(t, ti) {
+        t.setAttribute('style', ti === idx ? 'display:block' : 'display:none');
+      });
     });
-    dot.addEventListener('mouseleave', function() { tipDiv.style.display = 'none'; });
+  });
+  var chartBox = document.getElementById('chartBox');
+  chartBox.addEventListener('mouseleave', function() {
+    tips.forEach(function(t){ t.setAttribute('style','display:none'); });
+    lastIdx = -1;
   });
 }
 
