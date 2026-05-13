@@ -283,6 +283,14 @@ function el(sel, ctx) { var e = qs(sel, ctx); return e ? e.textContent.trim() : 
 function analyzePage(url, html) {
   var doc = new DOMParser().parseFromString(html, 'text/html');
 
+  // DEBUG: проверим что получили с прокси
+  var debugHtml = html.substring(0, 500);
+  console.log('HTML starts:', debugHtml);
+  var debugDoc = doc.querySelector('title');
+  console.log('title from doc:', debugDoc ? debugDoc.textContent : 'null');
+  var debugCan = doc.querySelector('link[rel="canonical"]');
+  console.log('canonical from doc:', debugCan ? debugCan.href : 'null');
+
   var issues = [];
   var fixes = [];
   var score = 100;
@@ -362,8 +370,9 @@ function analyzePage(url, html) {
   issues.push({i:tc?'✅':'ℹ️',t:'Twitter Card' + (tc?': ' + tc:': не указана'),d:tc?'':'Необязательно, но желательно для шеринга',l:tc?'good':'info'});
 
   // Favicon
-  var favicon = qs('link[rel*="icon"]');
-  issues.push({i:favicon?'✅':'⚠️',t:'Favicon' + (favicon?' найден':' не найден'),d:favicon?favicon.href:'Добавьте иконку сайта',l:favicon?'good':'warn'});
+  var faviconEl = qs('link[rel*="icon"]', doc);
+  m.favicon = faviconEl ? (faviconEl.href || '') : '';
+  issues.push({i:m.favicon?'✅':'⚠️',t:'Favicon' + (m.favicon?' найден':' не найден'),d:m.favicon||'Добавьте иконку сайта',l:m.favicon?'good':'warn'});
 
   renderMeta(m, og);
 
