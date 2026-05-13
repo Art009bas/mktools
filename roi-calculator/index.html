@@ -191,7 +191,7 @@
     <div id="paramsBlock" style="display:none;margin-top:10px;">
       <div class="four-cols">
         <div class="field-group"><div class="field-label">НДС %</div><input class="field-input" type="number" id="ndsPct" value="20" onchange="saveCurrent()" placeholder="20"></div>
-        <div class="field-group"><div class="field-label">% от РК</div><input class="field-input" type="number" id="rkPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">% от РК+НДС</div><input class="field-input" type="number" id="rkPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
         <div class="field-group"><div class="field-label">Агентские %</div><input class="field-input" type="number" id="agencyPct" value="25" onchange="saveCurrent()" placeholder="25"></div>
         <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" value="0" onchange="saveCurrent()" placeholder="0"></div>
       </div>
@@ -411,14 +411,14 @@ function calculate() {
     cumRev += m.revenue;
     currExtra += (m.extra || 0);
     var nds = cumSpend * ndsPct / 100;
-    var pctRk = cumSpend * rkPct / 100;
+    var pctRk = (cumSpend + nds) * rkPct / 100;
     var totalCost = cumSpend + nds + pctRk + currExtra + otherCost;
     var netRev = cumRev * (1 - agencyPct/100);
     // Per-period (не накопленные)
     var pSpend = m.spend;
     var pExtra = m.extra || 0;
     var pNds = pSpend * ndsPct / 100;
-    var pPctRk = pSpend * rkPct / 100;
+    var pPctRk = (pSpend + pNds) * rkPct / 100;
     var pTotal = pSpend + pNds + pPctRk + pExtra;
     var pNetRev = m.revenue * (1 - agencyPct/100);
     allCum.push({
@@ -438,7 +438,7 @@ function calculate() {
   // Итоги
   var last = allCum[allCum.length - 1] || {cumRomi:0,cumNetRoi:0,cumCac:0,cumSpend:0};
   var totalRev = cumRev;
-  var totalCost = cumSpend + cumSpend*ndsPct/100 + cumSpend*rkPct/100 + currExtra + otherCost;
+  var totalCost = cumSpend + cumSpend*ndsPct/100 + (cumSpend+cumSpend*ndsPct/100)*rkPct/100 + currExtra + otherCost;
   var totalNetRev = totalRev * (1 - agencyPct/100);
   var avgCheck = cumSales > 0 ? cumRev / cumSales : 0;
   var convAll = cumLeads > 0 ? cumSales / cumLeads * 100 : 0;
@@ -480,7 +480,7 @@ function calculate() {
   d.innerHTML += '<div class="detail-row"><span>Всего реклама</span><span class="val">' + fmt(cumSpend) + '</span></div>';
   
     d.innerHTML += '<div class="detail-row"><span>НДС (' + ndsPct + '%)</span><span class="val">' + fmt(cumSpend*ndsPct/100) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>% от РК (' + rkPct + '%)</span><span class="val">' + fmt(cumSpend*rkPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+cumSpend*ndsPct/100)*rkPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Прочее</span><span class="val">' + fmt(otherCost) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
   d.innerHTML += '<div class="detail-row"><span>Лиды / Продажи</span><span class="val">' + cumLeads + ' / ' + cumSales + '</span></div>';
