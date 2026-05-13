@@ -272,8 +272,8 @@
 
         <div class="form-group">
           <label for="tgUsername">Username или номер телефона</label>
-          <input type="text" id="tgUsername" placeholder="username или 79123456789" value="">
-          <span class="helper">Без @. Пример: <code>yandex</code> или <code>79137588607</code></span>
+          <input type="text" id="tgUsername" placeholder="username или номер телефона" value="">
+          <span class="helper">Без @. Например: <code>username</code> или <code>79123456789</code></span>
         </div>
 
 
@@ -316,28 +316,14 @@
           </div>
           <label class="param-toggle">
             <span class="switch">
-              <input type="checkbox" id="waTextToggle" checked onchange="generateWa()">
+              <input type="checkbox" id="waTextToggle" onchange="generateWa()">
               <span class="slider"></span>
             </span>
             Включить
           </label>
         </div>
 
-        <div class="param-row">
-          <span class="param-label">UTM-метки</span>
-          <div class="param-input" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input type="text" id="waUtmSource" placeholder="source" value="whatsapp" style="flex:1;min-width:80px;">
-            <input type="text" id="waUtmMedium" placeholder="medium" value="social" style="flex:1;min-width:80px;">
-            <input type="text" id="waUtmCampaign" placeholder="campaign" style="flex:1;min-width:100px;">
-          </div>
-          <label class="param-toggle">
-            <span class="switch">
-              <input type="checkbox" id="waUtmToggle" onchange="generateWa()">
-              <span class="slider"></span>
-            </span>
-            UTM
-          </label>
-        </div>
+
       </div>
     </div>
 
@@ -351,7 +337,6 @@
           <button class="btn btn-primary" id="copyBtn" onclick="copyUrl()">📋 Копировать</button>
           <button class="btn btn-success" id="copiedBtn" style="display:none;">✅ Скопировано</button>
           <button class="btn btn-outline" onclick="saveToHistory()">💾 Сохранить</button>
-          <button class="btn btn-outline" id="openBtn" onclick="openUrl()">🔗 Открыть</button>
         </div>
       </div>
 
@@ -428,16 +413,7 @@
         params.push('text=' + encodeURIComponent(text));
       }
 
-      // UTM
-      var utmToggle = document.getElementById('waUtmToggle').checked;
-      if (utmToggle) {
-        var s = document.getElementById('waUtmSource').value.trim();
-        var m = document.getElementById('waUtmMedium').value.trim();
-        var c = document.getElementById('waUtmCampaign').value.trim();
-        if (s) params.push('utm_source=' + encodeURIComponent(s));
-        if (m) params.push('utm_medium=' + encodeURIComponent(m));
-        if (c) params.push('utm_campaign=' + encodeURIComponent(c));
-      }
+
 
       if (params.length) {
         url += '?' + params.join('&');
@@ -468,10 +444,7 @@
     }
 
     // === Open ===
-    function openUrl() {
-      var url = document.getElementById('resultUrl').value;
-      if (url) window.open(url, '_blank');
-    }
+
 
     // === Live generation ===
     document.getElementById('tgUsername').addEventListener('input', generateTg);
@@ -479,12 +452,10 @@
 
     document.getElementById('waPhone').addEventListener('input', generateWa);
     document.getElementById('waText').addEventListener('input', generateWa);
-    document.getElementById('waUtmSource').addEventListener('input', generateWa);
-    document.getElementById('waUtmMedium').addEventListener('input', generateWa);
-    document.getElementById('waUtmCampaign').addEventListener('input', generateWa);
+
 
     // init по умолчанию
-    document.getElementById('tgUsername').value = 'yandex';
+    
 
     // === История ===
     function getHistory() {
