@@ -462,8 +462,9 @@ function calculate() {
   // Итоги
   var last = allCum[allCum.length - 1] || {cumRomi:0,cumNetRoi:0,cumCac:0,cumSpend:0};
   var totalRev = cumRev;
+  var ndsCalc = cumSpend * ndsPct / 100;
   var svcPctAmtTotal = cumSpend * svcPct / 100;
-  var totalCost = cumSpend + nds + cumSpend*rkPctPlain/100 + (cumSpend+nds)*rkPct/100 + svcFixed + svcPctAmtTotal + currExtra + otherCost;
+  var totalCost = cumSpend + ndsCalc + cumSpend*rkPctPlain/100 + (cumSpend+ndsCalc)*rkPct/100 + svcFixed + svcPctAmtTotal + currExtra + otherCost;
   var totalNetRev = totalRev * (1 - agencyPct/100);
   var avgCheck = cumSales > 0 ? cumRev / cumSales : 0;
   var convAll = cumLeads > 0 ? cumSales / cumLeads * 100 : 0;
@@ -506,7 +507,7 @@ function calculate() {
   
     d.innerHTML += '<div class="detail-row"><span>НДС (' + ndsPct + '%)</span><span class="val">' + fmt(cumSpend*ndsPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>% от РК без НДС (' + rkPctPlain + '%)</span><span class="val">' + fmt(cumSpend*rkPctPlain/100) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+nds)*rkPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>% от РК+НДС (' + rkPct + '%)</span><span class="val">' + fmt((cumSpend+cumSpend*ndsPct/100)*rkPct/100) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Услуги фикс</span><span class="val">' + fmt(svcFixed) + '</span></div>';
   var svcPctAmtD = cumSpend * svcPct / 100;
   d.innerHTML += '<div class="detail-row"><span>Услуги % (' + svcPct + '%)</span><span class="val">' + fmt(svcPctAmtD) + '</span></div>';
