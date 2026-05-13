@@ -171,31 +171,33 @@
     <div class="card-title">📅 Месяцы</div>
     <div class="month-label-row">
       <span class="mlr-m"></span>
-      <span class="mlr-h">Реклама ₽</span>
+      <span class="mlr-h" style="min-width:0">Расход РК ₽</span>
       <span class="mlr-h">Лиды</span>
       <span class="mlr-h">Продажи</span>
       <span class="mlr-h">Доход ₽</span>
-      <span class="mlr-h">Доп.₽</span>
+      <span class="mlr-h" style="min-width:0">Доп.расх.₽</span>
       <span class="mlr-h"></span>
     </div>
     <div class="month-list" id="monthList"></div>
     <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-secondary btn-sm" onclick="addMonth()">+ Месяц</button>
-      <button class="btn btn-secondary btn-sm" onclick="showExtra()">➕ Доп. расходы</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleParams()">⚙️ Параметры</button>
     </div>
 
-    <div id="extraBlock" style="display:none;margin-top:10px;">
+    <div id="paramsBlock" style="display:none;margin-top:10px;">
       <div class="four-cols">
-        <div class="field-group"><div class="field-label">РК (+%)</div><input class="field-input" type="number" id="rkCost" onchange="saveCurrent()"></div>
-        <div class="field-group"><div class="field-label">Услуги фикс</div><input class="field-input" type="number" id="servicesFixed" onchange="saveCurrent()"></div>
-        <div class="field-group"><div class="field-label">Агентские %</div><input class="field-input" type="number" id="agencyPct" value="25" onchange="saveCurrent()"></div>
-        <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" onchange="saveCurrent()"></div>
+        <div class="field-group"><div class="field-label">НДС %</div><input class="field-input" type="number" id="ndsPct" value="20" onchange="saveCurrent()" placeholder="20"></div>
+        <div class="field-group"><div class="field-label">% от РК</div><input class="field-input" type="number" id="rkPct" value="0" onchange="saveCurrent()" placeholder="0"></div>
+        <div class="field-group"><div class="field-label">Агентские %</div><input class="field-input" type="number" id="agencyPct" value="25" onchange="saveCurrent()" placeholder="25"></div>
+        <div class="field-group"><div class="field-label">Прочее</div><input class="field-input" type="number" id="otherCost" value="0" onchange="saveCurrent()" placeholder="0"></div>
       </div>
     </div>
 
     <div class="field-group" style="margin-top:10px;">
-      <div class="field-label">LTV <small>₽, опционально</small></div>
-      <input class="field-input" type="number" id="ltvVal" placeholder="120000" onchange="saveCurrent()">
+      <div class="field-label"><button class="btn btn-secondary btn-sm" onclick="toggleLtv()" type="button">📊 LTV</button></div>
+      <div id="ltvBlock" style="display:none;">
+        <input class="field-input" type="number" id="ltvVal" placeholder="120000" onchange="saveCurrent()">
+      </div>
     </div>
 
     <button class="calc-btn" onclick="calculate()">🧮 Рассчитать</button>
@@ -242,14 +244,10 @@ var currentIdx = 0;
 
 if (projects.length === 0) {
   projects.push({
-    name: 'Мой горящий тур',
-    agencyPct: 25, ltv: 120000,
-    extra: {rk:0, svcFixed:0, svcPct:0, other:0},
+    name: 'Проект 1',
+    agencyPct: 25, ltv: 0,
     months: [
-      {label:'Янв 2026', spend:0, leads:0, sales:0, revenue:0},
-      {label:'Фев 2026', spend:0, leads:0, sales:0, revenue:0},
-      {label:'Мар 2026', spend:0, leads:0, sales:0, revenue:0},
-      {label:'Апр 2026', spend:28883.38, leads:68, sales:8, revenue:44630.82, extra:0},
+      {label:'Мес 1', spend:0, leads:0, sales:0, revenue:0, extra:0}
     ]
   });
   saveProjects(projects);
@@ -347,35 +345,34 @@ function rmM(i) {
   autoCalc();
 }
 
-function showExtra() {
-  var b = document.getElementById('extraBlock');
+function toggleParams() {
+  var b = document.getElementById('paramsBlock');
   b.style.display = b.style.display === 'none' ? 'block' : 'none';
   var p = cp();
-  document.getElementById('rkCost').value = p.extra.rk || 0;
-  document.getElementById('servicesFixed').value = p.extra.svcFixed || 0;
+  document.getElementById('ndsPct').value = p.ndsPct || 20;
+  document.getElementById('rkPct').value = p.rkPct || 0;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
-  document.getElementById('otherCost').value = p.extra.other || 0;
+  document.getElementById('otherCost').value = p.otherCost || 0;
 }
 
 // ====== LOAD/SAVE ======
 function loadProject() {
   var p = cp();
+  document.getElementById('ndsPct').value = p.ndsPct || 20;
+  document.getElementById('rkPct').value = p.rkPct || 0;
   document.getElementById('agencyPct').value = p.agencyPct || 25;
+  document.getElementById('otherCost').value = p.otherCost || 0;
   document.getElementById('ltvVal').value = p.ltv || '';
-  document.getElementById('rkCost').value = p.extra.rk || 0;
-  document.getElementById('servicesFixed').value = p.extra.svcFixed || 0;
-  document.getElementById('otherCost').value = p.extra.other || 0;
   renderMonths();
 }
 
 function saveCurrent() {
   var p = cp();
+  p.ndsPct = parseFloat(document.getElementById('ndsPct').value) || 20;
+  p.rkPct = parseFloat(document.getElementById('rkPct').value) || 0;
   p.agencyPct = parseFloat(document.getElementById('agencyPct').value) || 25;
+  p.otherCost = parseFloat(document.getElementById('otherCost').value) || 0;
   p.ltv = parseFloat(document.getElementById('ltvVal').value) || 0;
-  p.extra.rk = parseFloat(document.getElementById('rkCost').value) || 0;
-  p.extra.svcFixed = parseFloat(document.getElementById('servicesFixed').value) || 0;
-  // svcPct removed — not needed
-  p.extra.other = parseFloat(document.getElementById('otherCost').value) || 0;
   saveProjects(projects);
 }
 
@@ -386,9 +383,11 @@ function calculate() {
   saveCurrent();
   var p = cp();
   var months = p.months;
-  var agencyPct = p.agencyPct;
-  var ltv = p.ltv;
-  var fixedExtra = 0; // per-month extra now
+  var ndsPct = p.ndsPct || 20;
+  var rkPct = p.rkPct || 0;
+  var agencyPct = p.agencyPct || 25;
+  var ltv = p.ltv || 0;
+  var otherCost = p.otherCost || 0
 
   document.getElementById('projectTitle').textContent = p.name;
 
@@ -402,7 +401,9 @@ function calculate() {
     cumSales += m.sales;
     cumRev += m.revenue;
     currExtra += (m.extra || 0);
-    var totalCost = cumSpend + currExtra;
+    var nds = cumSpend * ndsPct / 100;
+    var pctRk = cumSpend * rkPct / 100;
+    var totalCost = cumSpend + nds + pctRk + currExtra + otherCost;
     var netRev = cumRev * (1 - agencyPct/100);
     allCum.push({
       label: m.label,
@@ -416,7 +417,7 @@ function calculate() {
   // Итоги
   var last = allCum[allCum.length - 1] || {cumRomi:0,cumNetRoi:0,cumCac:0,cumSpend:0};
   var totalRev = cumRev;
-  var totalCost = cumSpend + fixedExtra;
+  var totalCost = cumSpend + cumSpend*ndsPct/100 + cumSpend*rkPct/100 + currExtra + otherCost;
   var totalNetRev = totalRev * (1 - agencyPct/100);
   var avgCheck = cumSales > 0 ? cumRev / cumSales : 0;
   var convAll = cumLeads > 0 ? cumSales / cumLeads * 100 : 0;
@@ -456,7 +457,10 @@ function calculate() {
   var d = document.getElementById('details');
   d.innerHTML = '';
   d.innerHTML += '<div class="detail-row"><span>Всего реклама</span><span class="val">' + fmt(cumSpend) + '</span></div>';
-  d.innerHTML += '<div class="detail-row"><span>Доп. расходы (фикс)</span><span class="val">' + fmt(fixedExtra) + '</span></div>';
+  
+    d.innerHTML += '<div class="detail-row"><span>НДС (' + ndsPct + '%)</span><span class="val">' + fmt(cumSpend*ndsPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>% от РК (' + rkPct + '%)</span><span class="val">' + fmt(cumSpend*rkPct/100) + '</span></div>';
+  d.innerHTML += '<div class="detail-row"><span>Прочее</span><span class="val">' + fmt(otherCost) + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span><b>Всего расходов</b></span><span class="val"><b>' + fmt(totalCost) + '</b></span></div>';
   d.innerHTML += '<div class="detail-row"><span>Лиды / Продажи</span><span class="val">' + cumLeads + ' / ' + cumSales + '</span></div>';
   d.innerHTML += '<div class="detail-row"><span>Конверсия</span><span class="val ' + (convAll>=10?'green':'red') + '">' + convAll.toFixed(1) + '%</span></div>';
@@ -585,6 +589,11 @@ function fmt(x) {
 function fmtShort(x) {
   if (x >= 1000) return (x/1000).toFixed(x>=10000?0:1) + 'K';
   return x.toFixed(0);
+}
+
+function toggleLtv() {
+  var b = document.getElementById('ltvBlock');
+  b.style.display = b.style.display === 'none' ? 'block' : 'none';
 }
 
 function showToast(msg) {
