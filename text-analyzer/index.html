@@ -352,7 +352,7 @@
       var wordFreq = {};
       words.forEach(function(w) {
         w = w.toLowerCase();
-        if (PREPOSITIONS.indexOf(w) === -1) {
+        if (STOPWORDS.indexOf(w) === -1) {
           wordFreq[w] = (wordFreq[w] || 0) + 1;
         }
       });
@@ -544,7 +544,7 @@
       for (var pi = 0; pi < words.length - 1; pi++) {
         var bigram = (words[pi] + ' ' + words[pi+1]).toLowerCase();
         var parts = bigram.split(' ');
-        if (PREPOSITIONS.indexOf(parts[0]) === -1 && PREPOSITIONS.indexOf(parts[1]) === -1) {
+        if (STOPWORDS.indexOf(parts[0]) === -1 && STOPWORDS.indexOf(parts[1]) === -1) {
           phraseFreq[bigram] = (phraseFreq[bigram] || 0) + 1;
         }
       }
@@ -672,10 +672,9 @@
         { label: 'Предложений', value: sents, cls: '' },
         { label: 'Средняя длина предложения', value: avgLen + ' слов', cls: avgLen > 20 || avgLen < 8 ? 'yellow' : 'green' },
         { label: 'Водность (стоп-слова)', value: water + '%', cls: water > 65 ? 'red' : water > 50 ? 'yellow' : 'green' },
-        { label: 'Вода (оборототы)', value: waterPhrases, cls: waterPhrases > 5 ? 'yellow' : 'green' },
         { label: 'Тошнота (классическая)', value: classicNausea.toFixed(1) + '%', cls: classicNausea > 8 ? 'red' : classicNausea> 5 ? 'yellow' : 'green' },
         { label: 'Макс. частота слова', value: '"' + mostRepeated + '" — ' + maxFreq + ' раз', cls: maxFreq > 5 ? 'red' : maxFreq > 3 ? 'yellow' : 'green' },
-        { label: 'Найдено воды-оборотов', value: waterPhrases, cls: waterPhrases > 8 ? 'red' : waterPhrases > 4 ? 'yellow' : 'green' }
+        { label: 'Вода-обороты', value: waterPhrases, cls: waterPhrases > 5 ? 'yellow' : 'green' }
       ];
       items.forEach(function(item) {
         grid.innerHTML += '<div class="metric"><span class="metric-label">' + item.label + '</span><span class="metric-value ' + item.cls + '">' + item.value + '</span></div>';
