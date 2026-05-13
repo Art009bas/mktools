@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO-анализатор — mktools</title>
+  <meta name="description" content="Бесплатный SEO-анализ страницы: мета-теги, заголовки, структура URL, изображения, скорость.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fb; --surface: #fff; --text: #1a1a2e;
+      --text-secondary: #6b7280; --text-tertiary: #9ca3af;
+      --accent: #f97316; --accent-hover: #ea580c;
+      --border: #e5e7eb;
+      --radius: 16px; --radius-sm: 8px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --green: #10b981; --green-light: #ecfdf5;
+      --red: #ef4444; --red-light: #fef2f2;
+      --yellow: #d97706; --yellow-light: #fffbeb;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .back-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-left: auto; }
+    .back-link:hover { color: var(--accent); }
+    .app { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+    h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 4px; }
+    .subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+    }
+    .card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 16px; }
+
+    .url-input-wrap { display: flex; gap: 8px; }
+    .url-input-wrap input {
+      font-family: var(--font); flex: 1; padding: 12px 16px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 1rem; outline: none; transition: border-color 0.2s; background: var(--bg);
+    }
+    .url-input-wrap input:focus { border-color: var(--accent); background: var(--surface); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: var(--radius-sm);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      border: none; font-family: var(--font); transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+
+    .result-section { display: none; }
+    .loading { text-align: center; padding: 48px; color: var(--text-secondary); }
+    .loading .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-block { text-align: center; padding: 32px; background: var(--red-light); border-radius: var(--radius-sm); }
+    .error-block .icon { font-size: 2rem; margin-bottom: 8px; }
+    .error-block p { color: var(--red); }
+
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; margin-left: 6px; }
+    .badge--good { background: var(--green-light); color: var(--green); }
+    .badge--warn { background: var(--yellow-light); color: var(--yellow); }
+    .badge--bad { background: var(--red-light); color: var(--red); }
+    .badge--info { background: #eff6ff; color: #2563eb; }
+
+    .seo-list { list-style: none; }
+    .seo-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .seo-item:last-child { border-bottom: none; }
+    .seo-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .seo-text { flex: 1; }
+    .seo-text h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+    .seo-text p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; word-break: break-all; }
+
+    .summary-score {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px; border-radius: var(--radius); margin-bottom: 20px;
+    }
+    .summary-score.good { background: var(--green-light); border: 1px solid #a7f3d0; }
+    .summary-score.warn { background: var(--yellow-light); border: 1px solid #fde68a; }
+    .summary-score.bad { background: var(--red-light); border: 1px solid #fecaca; }
+    .score-circle {
+      width: 64px; height: 64px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 800; flex-shrink: 0;
+    }
+    .summary-score.good .score-circle { background: var(--green); color: #fff; }
+    .summary-score.warn .score-circle { background: var(--yellow); color: #fff; }
+    .summary-score.bad .score-circle { background: var(--red); color: #fff; }
+    .score-text h3 { font-size: 1rem; margin-bottom: 2px; }
+    .score-text p { font-size: 0.85rem; color: var(--text-secondary); }
+
+    .proxy-info {
+      font-size: 0.78rem; color: var(--text-tertiary);
+      background: var(--bg); padding: 8px 12px; border-radius: var(--radius-sm);
+      margin-top: 8px;
+    }
+    .proxy-info a { color: var(--accent); }
+
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+    }
+    .meta-item {
+      padding: 12px; background: var(--bg); border-radius: var(--radius-sm);
+    }
+    .meta-label { font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+    .meta-value { font-size: 0.88rem; word-break: break-all; line-height: 1.4; }
+    .meta-value.empty { color: var(--text-tertiary); font-style: italic; }
+    .meta-value .hl-missing { color: var(--red); }
+
+    @media (max-width: 640px) {
+      .app { padding: 20px 16px 60px; }
+      h1 { font-size: 1.4rem; }
+      .url-input-wrap { flex-direction: column; }
+      .meta-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="/mktools/" class="logo"><span>mk</span>tools</a>
+    <a href="/mktools/" class="back-link">← Все инструменты</a>
+  </div>
+</header>
+
+<div class="app">
+  <h1>🔍 SEO-анализатор</h1>
+  <p class="subtitle">Проверка мета-тегов, заголовков, структуры URL, изображений и индексации — бесплатно.</p>
+
+  <div class="card" style="padding:16px;">
+    <div class="url-input-wrap">
+      <input type="url" id="urlInput" placeholder="https://example.com/page" value="https://moihottur.ru" onkeydown="if(event.key==='Enter') analyze()">
+      <button class="btn btn-primary" id="analyzeBtn" onclick="analyze()">🔍 Анализировать</button>
+    </div>
+    <div class="proxy-info">
+      Используется CORS-прокси для обхода блокировок. <a href="#" onclick="toggleProxy(event)">Настроить прокси</a>
+    </div>
+    <div id="proxyConfig" style="display:none;margin-top:8px;">
+      <input type="text" id="proxyUrl" style="font-family:var(--font);width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;outline:none;background:var(--bg);" placeholder="https://api.allorigins.win/raw?url=" value="https://api.allorigins.win/raw?url=">
+    </div>
+  </div>
+
+  <div class="result-section" id="results">
+    <div id="loadingIndicator" class="loading" style="display:none;">
+      <div class="spinner"></div>
+      <p>Анализирую страницу...</p>
+    </div>
+    <div id="errorBlock" class="card" style="display:none;">
+      <div class="error-block">
+        <div class="icon">⚠️</div>
+        <p id="errorText">Ошибка загрузки</p>
+      </div>
+    </div>
+    <div id="resultContent">
+      <div class="summary-score" id="scoreCard">
+        <div class="score-circle" id="scoreCircle">0</div>
+        <div class="score-text">
+          <h3 id="scoreTitle">Оценка</h3>
+          <p id="scoreDesc">Описание</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Мета-теги</div>
+        <div class="meta-grid" id="metaGrid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🏗️ Заголовки (H1–H6)</div>
+        <div id="headingsSection"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔗 Структура URL</div>
+        <div id="urlSection"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🖼️ Изображения</div>
+        <div id="imagesSection"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Производительность</div>
+        <div id="perfSection"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var PROXY = 'https://api.allorigins.win/raw?url=';
+
+function toggleProxy(e) {
+  e.preventDefault();
+  var cfg = document.getElementById('proxyConfig');
+  cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
+}
+
+async function analyze() {
+  var url = document.getElementById('urlInput').value.trim();
+  if (!url) { showToast('Введите URL'); return; }
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+
+  var proxyInput = document.getElementById('proxyUrl');
+  PROXY = proxyInput.value.trim() || PROXY;
+
+  var results = document.getElementById('results');
+  results.style.display = 'block';
+  document.getElementById('resultContent').style.display = 'none';
+  document.getElementById('errorBlock').style.display = 'none';
+  document.getElementById('loadingIndicator').style.display = 'block';
+  document.getElementById('analyzeBtn').disabled = true;
+
+  try {
+    var html = await fetchPage(url);
+    document.getElementById('loadingIndicator').style.display = 'none';
+    document.getElementById('resultContent').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = false;
+    analyzePage(url, html);
+  } catch (e) {
+    document.getElementById('loadingIndicator').style.display = 'none';
+    document.getElementById('errorBlock').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('errorText').textContent = 'Ошибка: ' + e.message;
+  }
+}
+
+async function fetchPage(url) {
+  var proxyUrl = PROXY + encodeURIComponent(url);
+  var resp = await fetch(proxyUrl);
+  if (!resp.ok) throw new Error('Прокси вернул ' + resp.status);
+  var text = await resp.text();
+  if (!text || text.length < 50) throw new Error('Пустой ответ');
+  return text;
+}
+
+function analyzePage(url, html) {
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(html, 'text/html');
+
+  var issues = [];
+  var score = 100;
+
+  // === МЕТА-ТЕГИ ===
+  var title = (doc.querySelector('title') || {}).textContent || '';
+  var desc = (doc.querySelector('meta[name="description"]') || {}).content || '';
+  var keywords = (doc.querySelector('meta[name="keywords"]') || {}).content || '';
+  var canonical = (doc.querySelector('link[rel="canonical"]') || {}).href || '';
+  var robots = (doc.querySelector('meta[name="robots"]') || {}).content || '';
+  var viewport = (doc.querySelector('meta[name="viewport"]') || {}).content || '';
+  var charset = doc.characterSet || (document.querySelector('meta[charset]') || {}).getAttribute('charset') || '';
+  
+  var ogTags = doc.querySelectorAll('meta[property^="og:"]');
+  var og = {};
+  ogTags.forEach(function(t) { og[t.getAttribute('property')] = t.content; });
+
+  if (!title) { issues.push({icon:'❌', title:'Title отсутствует', desc:'Критично для SEO', level:'bad'}); score -= 20; }
+  else if (title.length > 60) { issues.push({icon:'⚠️', title:'Title слишком длинный (' + title.length + ' зн.)', desc:'Оптимально до 60 символов', level:'warn'}); score -= 5; }
+  else { issues.push({icon:'✅', title:'Title: ' + title.length + ' зн.', desc: title, level:'good'}); }
+
+  if (!desc) { issues.push({icon:'❌', title:'Description отсутствует', desc:'Критично', level:'bad'}); score -= 15; }
+  else if (desc.length > 160) { issues.push({icon:'⚠️', title:'Description слишком длинный (' + desc.length + ' зн.)', desc:'Оптимально ~160', level:'warn'}); score -= 5; }
+  else { issues.push({icon:'✅', title:'Description: ' + desc.length + ' зн.', desc: desc.substring(0, 150) + (desc.length > 150 ? '...' : ''), level:'good'}); }
+
+  if (keywords) issues.push({icon:'ℹ️', title:'Keywords: ' + keywords.substring(0, 100) + (keywords.length > 100 ? '...' : ''), desc:'Мета-тег устарел, но не вредит', level:'info'});
+  else issues.push({icon:'ℹ️', title:'Keywords не указаны', desc:'Не критично, мета-тег устарел', level:'info'});
+
+  if (canonical) issues.push({icon:'✅', title:'Каноническая ссылка', desc: canonical, level:'good'});
+  else issues.push({icon:'⚠️', title:'Нет канонической ссылки', desc:'Желательно указать', level:'warn'});
+
+  if (robots) {
+    var noindex = robots.indexOf('noindex') !== -1;
+    issues.push({icon: noindex ? '⚠️' : '✅', title:'Robots: ' + robots, desc: noindex ? 'Страница закрыта от индексации' : 'Индексация разрешена', level: noindex ? 'warn' : 'good'});
+  } else {
+    issues.push({icon:'✅', title:'Robots не указан', desc:'По умолчанию — индексация разрешена', level:'good'});
+  }
+
+  // OG
+  var ogOk = og['og:title'] && og['og:description'] && og['og:image'];
+  if (ogOk) issues.push({icon:'✅', title:'Open Graph заполнен', desc:'og:title, og:description, og:image есть', level:'good'});
+  else {
+    var missing = [];
+    if (!og['og:title']) missing.push('og:title');
+    if (!og['og:description']) missing.push('og:description');
+    if (!og['og:image']) missing.push('og:image');
+    issues.push({icon:'⚠️', title:'Open Graph неполный', desc:'Нет: ' + missing.join(', '), level:'warn'});
+    score -= 5;
+  }
+
+  // viewport
+  if (viewport) issues.push({icon:'✅', title:'Viewport задан', desc: viewport, level:'good'});
+  else { issues.push({icon:'❌', title:'Viewport не задан', desc:'Критично для мобильных', level:'bad'}); score -= 10; }
+
+  renderMeta(title, desc, keywords, canonical, robots, og);
+
+  // === ЗАГОЛОВКИ ===
+  var hTags = ['h1','h2','h3','h4','h5','h6'];
+  var hCounts = {};
+  var hTexts = {};
+  hTags.forEach(function(tag) {
+    var els = doc.querySelectorAll(tag);
+    hCounts[tag] = els.length;
+    hTexts[tag] = [];
+    els.forEach(function(el) { hTexts[tag].push(el.textContent.trim()); });
+  });
+  
+  var hIssues = [];
+  if (hCounts.h1 === 0) { hIssues.push({icon:'❌', title:'H1 отсутствует', desc:'Критично для SEO', level:'bad'}); score -= 15; }
+  else if (hCounts.h1 > 1) { hIssues.push({icon:'⚠️', title:'Больше одного H1 (' + hCounts.h1 + ')', desc:'Желательно один H1 на страницу', level:'warn'}); score -= 5; }
+  else { hIssues.push({icon:'✅', title:'Один H1', desc: hTexts.h1[0] || '', level:'good'}); }
+
+  if (hCounts.h2 === 0 && hCounts.h3 > 0) { hIssues.push({icon:'⚠️', title:'Есть H3, но нет H2', desc:'Нарушена иерархия', level:'warn'}); score -= 3; }
+
+  hIssues.push({icon:'ℹ️', title:'Статистика заголовков',
+    desc: hTags.map(function(t){ return t.toUpperCase() + ': ' + hCounts[t]; }).join(' | '),
+    level:'info'});
+
+  if (hTexts.h2.length > 0) hIssues.push({icon:'✅', title:'Пример H2', desc: hTexts.h2.slice(0,3).join(' • '), level:'info'});
+
+  renderHeadings(hIssues, hTexts);
+
+  // === СТРУКТУРА URL ===
+  var u = new URL(url);
+  var urlIssues = [];
+  var pathParts = u.pathname.split('/').filter(function(p){ return p; });
+  var urlLen = url.length;
+
+  if (urlLen > 100) { urlIssues.push({icon:'⚠️', title:'URL длинный (' + urlLen + ' зн.)', desc:'Короткие URL лучше для SEO и UX', level:'warn'}); score -= 3; }
+  else { urlIssues.push({icon:'✅', title:'Длина URL: ' + urlLen + ' зн.', desc:'Нормально', level:'good'}); }
+
+  urlIssues.push({icon:'ℹ️', title:'Протокол', desc: u.protocol, level: u.protocol === 'https:' ? 'good' : 'warn'});
+  if (u.protocol !== 'https:') { score -= 5; }
+
+  var hasParams = u.search.length > 0;
+  if (hasParams) { urlIssues.push({icon:'⚠️', title:'Есть URL-параметры', desc: u.search.substring(0, 80), level:'warn'});
+    if (isCmsUrl(u.search)) { urlIssues.push({icon:'⚠️', title:'CMS-параметры', desc:'Параметры похожи на CMS(session/utm)', level:'warn'}); }
+  } else { urlIssues.push({icon:'✅', title:'Нет параметров', desc:'Чистый URL', level:'good'}); }
+
+  urlIssues.push({icon:'ℹ️', title:'Путь: ' + pathParts.length + ' сегментов', desc: u.pathname, level:'info'});
+  urlIssues.push({icon:'ℹ️', title:'Домен', desc: u.hostname, level:'info'});
+
+  renderUrl(urlIssues);
+
+  // === ИЗОБРАЖЕНИЯ ===
+  var imgs = doc.querySelectorAll('img');
+  var imgIssues = [];
+  var noAlt = 0, totalImgs = imgs.length;
+  imgs.forEach(function(img) {
+    if (!img.alt && !img.src.startsWith('data:') && !img.src.startsWith('blob:')) noAlt++;
+  });
+  if (totalImgs === 0) { imgIssues.push({icon:'ℹ️', title:'Нет изображений', desc:'Страница без картинок', level:'info'}); }
+  else {
+    var pct = totalImgs > 0 ? Math.round(noAlt / totalImgs * 100) : 0;
+    if (noAlt > 0) { imgIssues.push({icon: pct > 50 ? '❌' : '⚠️', title:'Изображений без alt: ' + noAlt + ' из ' + totalImgs + ' (' + pct + '%)', desc: 'Каждое изображение должно иметь alt-текст', level: pct > 50 ? 'bad' : 'warn'}); score -= pct > 50 ? 10 : 5; }
+    else { imgIssues.push({icon:'✅', title:'Все ' + totalImgs + ' изображений с alt', desc:'Отлично!', level:'good'}); }
+  }
+  renderImages(imgIssues);
+
+  // === ПРОИЗВОДИТЕЛЬНОСТЬ ===
+  var bodyHtml = (doc.body || {}).innerHTML || '';
+  var pageSize = Math.round(html.length / 1024);
+  var styleCount = doc.querySelectorAll('link[rel="stylesheet"], style').length;
+  var scriptCount = doc.querySelectorAll('script[src], script:not([src])').length;
+  var extScripts = doc.querySelectorAll('script[src]').length;
+  var perfIssues = [];
+
+  if (pageSize > 500) { perfIssues.push({icon:'⚠️', title:'Размер страницы: ' + pageSize + ' KB', desc:'Рекомендуется < 300 KB', level:'warn'}); score -= 5; }
+  else { perfIssues.push({icon:'✅', title:'Размер страницы: ' + pageSize + ' KB', desc:'Хорошо', level:'good'}); }
+
+  if (extScripts > 10) { perfIssues.push({icon:'⚠️', title:'Внешних скриптов: ' + extScripts, desc:'Много запросов, замедляет загрузку', level:'warn'}); score -= 3; }
+  else { perfIssues.push({icon:'✅', title:'Внешних скриптов: ' + extScripts, desc:'Нормально', level:'good'}); }
+
+  perfIssues.push({icon:'ℹ️', title:'CSS-файлов: ' + styleCount + ' | Всего скриптов: ' + scriptCount, desc:'', level:'info'});
+
+  renderPerf(perfIssues);
+
+  // === ИТОГО ===
+  score = Math.max(0, Math.min(100, score));
+  renderScore(score, issues.filter(function(i){ return i.level === 'bad' || i.level === 'warn'; }).length);
+}
+
+function renderMeta(title, desc, keywords, canonical, robots, og) {
+  var grid = document.getElementById('metaGrid');
+  grid.innerHTML = '';
+  var items = [
+    {label:'Title', value: title || '<span class="hl-missing">не указан</span>'},
+    {label:'Description', value: desc || '<span class="hl-missing">не указан</span>'},
+    {label:'Keywords', value: keywords || 'не указаны'},
+    {label:'Canonical', value: canonical || 'не указана'},
+    {label:'Robots', value: robots || 'по умолчанию'},
+    {label:'Charset', value: 'UTF-8 (принят через DOCTYPE)'},
+    {label:'OG:title', value: og['og:title'] || '<span class="hl-missing">—</span>'},
+    {label:'OG:desc', value: (og['og:description'] || '<span class="hl-missing">—</span>').substring(0,80)},
+  ];
+  items.forEach(function(item) {
+    grid.innerHTML += '<div class="meta-item"><div class="meta-label">' + item.label + '</div><div class="meta-value">' + item.value + '</div></div>';
+  });
+}
+
+function renderHeadings(issues, texts) {
+  var section = document.getElementById('headingsSection');
+  section.innerHTML = '<div class="seo-list" id="headingsList"></div>';
+  var list = document.getElementById('headingsList');
+  issues.forEach(function(i) {
+    list.innerHTML += '<div class="seo-item"><span class="seo-icon">' + i.icon + '</span><div class="seo-text"><h4>' + i.title + ' <span class="status-badge badge--' + i.level + '">' + i.level + '</span></h4><p>' + i.desc + '</p></div></div>';
+  });
+}
+
+function renderUrl(issues) {
+  var section = document.getElementById('urlSection');
+  section.innerHTML = '<div class="seo-list">';
+  issues.forEach(function(i) {
+    section.innerHTML += '<div class="seo-item"><span class="seo-icon">' + i.icon + '</span><div class="seo-text"><h4>' + i.title + ' <span class="status-badge badge--' + i.level + '">' + i.level + '</span></h4><p>' + i.desc + '</p></div></div>';
+  });
+  section.innerHTML += '</div>';
+}
+
+function renderImages(issues) {
+  var section = document.getElementById('imagesSection');
+  section.innerHTML = '<div class="seo-list">';
+  issues.forEach(function(i) {
+    section.innerHTML += '<div class="seo-item"><span class="seo-icon">' + i.icon + '</span><div class="seo-text"><h4>' + i.title + ' <span class="status-badge badge--' + i.level + '">' + i.level + '</span></h4><p>' + i.desc + '</p></div></div>';
+  });
+  section.innerHTML += '</div>';
+}
+
+function renderPerf(issues) {
+  var section = document.getElementById('perfSection');
+  section.innerHTML = '<div class="seo-list">';
+  issues.forEach(function(i) {
+    section.innerHTML += '<div class="seo-item"><span class="seo-icon">' + i.icon + '</span><div class="seo-text"><h4>' + i.title + ' <span class="status-badge badge--' + i.level + '">' + i.level + '</span></h4><p>' + i.desc + '</p></div></div>';
+  });
+  section.innerHTML += '</div>';
+}
+
+function renderScore(score, problems) {
+  var card = document.getElementById('scoreCard');
+  var circle = document.getElementById('scoreCircle');
+  var title = document.getElementById('scoreTitle');
+  var desc = document.getElementById('scoreDesc');
+  card.className = 'summary-score';
+  circle.textContent = score;
+  if (score >= 80) { card.classList.add('good'); title.textContent = 'Отлично'; desc.textContent = 'Страница хорошо оптимизирована.'; }
+  else if (score >= 60) { card.classList.add('warn'); title.textContent = 'Средне (' + problems + ' проблем)'; desc.textContent = 'Рекомендуется доработка.'; }
+  else { card.classList.add('bad'); title.textContent = 'Плохо (' + problems + ' проблем)'; desc.textContent = 'Серьёзные проблемы SEO.'; }
+}
+
+function isCmsUrl(search) {
+  var cmsParams = ['s_','utm_','gclid','fbclid','yclid','_openstat','from','ref','source','mc_','ysclid'];
+  var params = search.substring(1).split('&');
+  for (var i = 0; i < params.length; i++) {
+    for (var j = 0; j < cmsParams.length; j++) {
+      if (params[i].startsWith(cmsParams[j])) return true;
+    }
+  }
+  return false;
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:8px;font-size:0.9rem;font-weight:500;opacity:0;transition:all 0.3s;z-index:1000;pointer-events:none;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(function() {
+    t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(80px)';
+    setTimeout(function(){ t.remove(); }, 300);
+  }, 2500);
+}
+</script>
+</body>
+</html>
