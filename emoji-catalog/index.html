@@ -730,7 +730,7 @@ var EMOJI_NAMES = {
 var CATEGORIES = Object.keys(EMOJIS);
 
 // ========== СОСТОЯНИЕ ==========
-var history = JSON.parse(localStorage.getItem('emojiHistory') || '[]');
+var emojiHistory = JSON.parse(localStorage.getItem('emojiHistory') || '[]');
 
 // ========== ЗАГРУЗКА ==========
 document.addEventListener('DOMContentLoaded', function() {
@@ -854,25 +854,25 @@ function copyEmoji(emoji, el) {
 
 // ========== ИСТОРИЯ ==========
 function addToHistory(emoji) {
-  history = history.filter(function(e) { return e !== emoji; });
-  history.unshift(emoji);
-  if (history.length > 30) history = history.slice(0, 30);
-  localStorage.setItem('emojiHistory', JSON.stringify(history));
+  emojiHistory = emojiHistory.filter(function(e) { return e !== emoji; });
+  emojiHistory.unshift(emoji);
+  if (emojiHistory.length > 30) history = emojiHistory.slice(0, 30);
+  localStorage.setItem('emojiHistory', JSON.stringify(emojiHistory));
   renderHistory();
 }
 
 function removeFromHistory(emoji) {
-  history = history.filter(function(e) { return e !== emoji; });
-  localStorage.setItem('emojiHistory', JSON.stringify(history));
+  emojiHistory = emojiHistory.filter(function(e) { return e !== emoji; });
+  localStorage.setItem('emojiHistory', JSON.stringify(emojiHistory));
   renderHistory();
 }
 
 function renderHistory() {
   var section = document.getElementById('historySection');
   var list = document.getElementById('historyList');
-  section.style.display = history.length ? 'block' : 'none';
+  section.style.display = emojiHistory.length ? 'block' : 'none';
   list.innerHTML = '';
-  history.forEach(function(e) {
+  emojiHistory.forEach(function(e) {
     var item = document.createElement('span');
     item.className = 'history-item';
     item.innerHTML = e + ' <span class="remove" onclick="event.stopPropagation();removeFromHistory(\'' + e + '\')">✕</span>';
