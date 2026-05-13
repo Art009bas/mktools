@@ -524,39 +524,61 @@ function calculate() {
 }
 
 // ====== SVG CHART ======
+
 function drawChart(data) {
   var svg = document.getElementById('chartSvg');
   if (data.length < 2) { svg.innerHTML = '<text x="300" y="130" text-anchor="middle" fill="#9ca3af" font-size="14">Добавьте 2+ периода для графика</text>'; return; }
 
-  var W = 600, H = 240, pad = {top:20, right:50, bottom:40, left:50};
+  var W = 600, H = 260, pad = {top:20, right:50, bottom:45, left:50};
   var cw = W - pad.left - pad.right;
   var ch = H - pad.top - pad.bottom;
 
-  var allRomi = data.map(function(d){return d.romi;});
-  var allNet = data.map(function(d){return d.netRoi;});
+  // Кумулятивные (накопленные) значения
+  var cumulatives = [];
+  var cumSpend = 0, cumLeads = 0, cumSales = 0, cumRevenue = 0;
+  var agencyPct = parseFloat(document.getElementById('agencyPct').value) || 25;
+  var rkC = parseFloat(document.getElementById('rkCost').value) || 0;
+  var svcF = parseFloat(document.getElementById('servicesFixed').value) || 0;
+  var svcP = parseFloat(document.getElementById('servicesPct').value) || 0;
+  var oth = parseFloat(document.getElementById('otherCost').value) || 0;
+
+  data.forEach(function(d, i) {
+    cumSpend += d.spend;
+    cumLeads += d.leads;
+    cumSales += d.sales;
+    cumRevenue += d.revenue;
+    var totalCost = cumSpend + rkC + svcF + svcP + oth;
+    var netRev = cumRevenue * (1 - agencyPct/100);
+    cumulatives.push({
+      label: d.label,
+      cumRomi: cumSpend > 0 ? (cumRevenue - cumSpend) / cumSpend * 100 : 0,
+      cumNetRoi: totalCost > 0 ? (netRev - totalCost) / totalCost * 100 : 0,
+      cumCac: cumSales > 0 ? totalCost / cumSales : 0,
+      cumSpend: cumSpend
+    });
+  });
+
+  var allRomi = cumulatives.map(function(d){return d.cumRomi;});
+  var allNet = cumulatives.map(function(d){return d.cumNetRoi;});
   var maxVal = Math.max.apply(null, allRomi.concat(allNet));
   var minVal = Math.min.apply(null, allRomi.concat(allNet));
-  var range = Math.max(Math.abs(maxVal), Math.abs(minVal), 20);
-  range = Math.ceil(range / 10) * 10;
+  var range = Math.max(Math.abs(maxVal), Math.abs(minVal), 5);
+  range = Math.ceil(range / 10) * 10 + 10;
 
   var yScale = function(v) { return pad.top + ch - (v - (-range)) / (2*range) * ch; };
   var xStep = cw / (data.length - 1);
 
-  // lines
   var pointsR = '', pointsN = '';
-  data.forEach(function(d, i) {
+  cumulatives.forEach(function(d, i) {
     var x = pad.left + i * xStep;
-    pointsR += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.romi) + ' ';
-    pointsN += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.netRoi) + ' ';
+    pointsR += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.cumRomi) + ' ';
+    pointsN += (i === 0 ? 'M' : 'L') + x + ',' + yScale(d.cumNetRoi) + ' ';
   });
 
-  // zero line
   var zeroY = yScale(0);
-
   var html = '';
 
-  // grid lines
-  var gridSteps = 4;
+  var gridSteps = 5;
   for (var g = 0; g <= gridSteps; g++) {
     var val = -range + (2*range / gridSteps) * g;
     var y = yScale(val);
@@ -564,47 +586,60 @@ function drawChart(data) {
     html += '<text x="' + (pad.left - 8) + '" y="' + (y+4) + '" text-anchor="end" fill="#9ca3af" font-size="11">' + (val >= 0 ? '+' : '') + val + '%</text>';
   }
 
-  // zero line (bold)
-  html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="4,3"/>';
+  html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3"/>';
 
-  // area fill (ROMI — заштрихованная область)
   var areaR = 'M' + pad.left + ',' + zeroY;
-  data.forEach(function(d, i) {
+  cumulatives.forEach(function(d, i) {
     var x = pad.left + i * xStep;
-    areaR += ' L' + x + ',' + yScale(d.romi);
+    areaR += ' L' + x + ',' + yScale(d.cumRomi);
   });
   areaR += ' L' + (pad.left + (data.length-1)*xStep) + ',' + zeroY + ' Z';
+  html += '<path d="' + areaR + '" fill="rgba(249,115,22,0.1)" stroke="none"/>';
 
-  // ROMI fill (light orange)
-  html += '<path d="' + areaR + '" fill="rgba(249,115,22,0.12)" stroke="none"/>';
+  html += '<path d="' + pointsR + '" stroke="#f97316" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  html += '<path d="' + pointsN + '" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
 
-  // ROMI line
-  html += '<path d="' + pointsR + '" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';
-  // Net ROI line
-  html += '<path d="' + pointsN + '" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="6,3" stroke-linejoin="round"/>';
-
-  // Points
-  data.forEach(function(d, i) {
+  cumulatives.forEach(function(d, i) {
     var x = pad.left + i * xStep;
     // ROMI dot
-    html += '<circle cx="' + x + '" cy="' + yScale(d.romi) + '" r="4" fill="#fff" stroke="#f97316" stroke-width="2"/>';
-    html += '<text x="' + x + '" y="' + (yScale(d.romi)-8) + '" text-anchor="middle" fill="#f97316" font-size="10" font-weight="700">' + (d.romi>=0?'+':'') + d.romi.toFixed(0) + '</text>';
-    // Net dot
-    html += '<circle cx="' + x + '" cy="' + yScale(d.netRoi) + '" r="3" fill="#fff" stroke="#ef4444" stroke-width="2"/>';
-    html += '<text x="' + (x+12) + '" y="' + (yScale(d.netRoi)+4) + '" text-anchor="start" fill="#ef4444" font-size="9">' + (d.netRoi>=0?'+':'') + d.netRoi.toFixed(0) + '%</text>';
-    // X labels
-    html += '<text x="' + x + '" y="' + (H-4) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.label + '</text>';
-
-    // CAC bar at bottom
-    var cacMax = 0;
-    data.forEach(function(dd){if(dd.cps>cacMax)cacMax=dd.cps;});
-    var barH = cacMax > 0 ? (d.cps/cacMax * 50) : 0;
-    var barY = H - pad.bottom + 18;
-    if (d.cps > 0) {
-      html += '<rect x="' + (x-6) + '" y="' + (barY-barH) + '" width="12" height="' + barH + '" rx="2" fill="rgba(16,185,129,' + (0.4 + 0.6*(barH/50)) + ')" stroke="#10b981" stroke-width="1"/>';
-      html += '<text x="' + x + '" y="' + (barY+12) + '" text-anchor="middle" fill="#10b981" font-size="9" font-weight="600">' + fmtShort(d.cps) + '</text>';
+    html += '<circle cx="' + x + '" cy="' + yScale(d.cumRomi) + '" r="4.5" fill="#fff" stroke="#f97316" stroke-width="2.5"/>';
+    if (i === cumulatives.length - 1) {
+      html += '<text x="' + x + '" y="' + (yScale(d.cumRomi)-10) + '" text-anchor="middle" fill="#f97316" font-size="12" font-weight="800">ROMI ' + (d.cumRomi>=0?'+':'') + d.cumRomi.toFixed(0) + '%</text>';
     }
+    // Net ROI dot
+    html += '<circle cx="' + x + '" cy="' + yScale(d.cumNetRoi) + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>';
+    if (i === cumulatives.length - 1) {
+      html += '<text x="' + x + '" y="' + (yScale(d.cumNetRoi)-10) + '" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="800">ROI ' + (d.cumNetRoi>=0?'+':'') + d.cumNetRoi.toFixed(0) + '%</text>';
+    }
+    html += '<text x="' + x + '" y="' + (H - 8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.label + '</text>';
   });
+
+  // Info block
+  var last = cumulatives[cumulatives.length - 1];
+  html += '<rect x="' + (W - pad.right - 160) + '" y="' + pad.top + '" width="150" height="46" rx="6" fill="#f8f9fb" stroke="#e5e7eb" stroke-width="1" opacity="0.9"/>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 16) + '" fill="#f97316" font-size="11" font-weight="700">ROMI: ' + (last.cumRomi>=0?'+':'') + last.cumRomi.toFixed(1) + '%</text>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 32) + '" fill="#ef4444" font-size="11" font-weight="700">Чистый ROI: ' + (last.cumNetRoi>=0?'+':'') + last.cumNetRoi.toFixed(1) + '%</text>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 44) + '" fill="#6b7280" font-size="10">Расход: ' + fmtShort(last.cumSpend) + '</text>';
+
+
+  cumulatives.forEach(function(d, i) {
+    var x = pad.left + i * xStep;
+    html += '<circle cx="' + x + '" cy="' + yScale(d.cumRomi) + '" r="4.5" fill="#fff" stroke="#f97316" stroke-width="2.5"/>';
+    if (i === cumulatives.length - 1) {
+      html += '<text x="' + x + '" y="' + (yScale(d.cumRomi)-10) + '" text-anchor="middle" fill="#f97316" font-size="12" font-weight="800">ROMI ' + (d.cumRomi>=0?'+':'') + d.cumRomi.toFixed(0) + '%</text>';
+    }
+    html += '<circle cx="' + x + '" cy="' + yScale(d.cumNetRoi) + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2.5"/>';
+    if (i === cumulatives.length - 1) {
+      html += '<text x="' + x + '" y="' + (yScale(d.cumNetRoi)-10) + '" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="800">ROI ' + (d.cumNetRoi>=0?'+':'') + d.cumNetRoi.toFixed(0) + '%</text>';
+    }
+    html += '<text x="' + x + '" y="' + (H - 8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.label + '</text>';
+  });
+
+  var last = cumulatives[cumulatives.length - 1];
+  html += '<rect x="' + (W - pad.right - 160) + '" y="' + pad.top + '" width="150" height="46" rx="6" fill="#f8f9fb" stroke="#e5e7eb" stroke-width="1" opacity="0.9"/>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 16) + '" fill="#f97316" font-size="11" font-weight="700">ROMI: ' + (last.cumRomi>=0?'+':'') + last.cumRomi.toFixed(1) + '%</text>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 32) + '" fill="#ef4444" font-size="11" font-weight="700">Чистый ROI: ' + (last.cumNetRoi>=0?'+':'') + last.cumNetRoi.toFixed(1) + '%</text>';
+  html += '<text x="' + (W - pad.right - 150) + '" y="' + (pad.top + 44) + '" fill="#6b7280" font-size="10">Расход: ' + fmtShort(last.cumSpend) + '</text>';
 
   svg.innerHTML = html;
 }
