@@ -387,9 +387,22 @@
           term: document.getElementById('utmTerm').value.trim()
         }
       });
-      // Лимит 50 записей
-      if (history.length > 50) history = history.slice(0, 50);
-      localStorage.setItem('utmHistory', JSON.stringify(history));
+      // Лимит 30 записей + сжатие
+      if (history.length > 30) history = history.slice(0, 30);
+      try {
+        localStorage.setItem('utmHistory', JSON.stringify(history));
+      } catch(e) {
+        // Если переполнение - чистим половину
+        history = history.slice(0, Math.floor(history.length / 2));
+        try {
+          localStorage.setItem('utmHistory', JSON.stringify(history));
+        } catch(e2) {
+          // Если всё равно не влезло - чистим всё
+          localStorage.removeItem('utmHistory');
+          history = [{ url: url, name: name, date: new Date().toISOString(), params: { source: '', medium: '', campaign: '', content: '', term: '' } }];
+          localStorage.setItem('utmHistory', JSON.stringify(history));
+        }
+      }
       renderHistory();
       showToast('Ссылка сохранена в историю');
     }
