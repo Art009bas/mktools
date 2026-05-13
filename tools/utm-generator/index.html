@@ -293,7 +293,7 @@
     <!-- История -->
     <div class="card">
       <div class="history-header">
-        <div class="card-title">История</div>
+        <div class="card-title">История <span id="historyCounter" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.8rem;color:var(--text-tertiary);"></span></div>
         <button class="btn-danger" id="clearHistoryBtn" onclick="clearHistory()">Очистить всё</button>
       </div>
       <div id="historyList">
@@ -380,49 +380,41 @@
       var content = document.getElementById('utmContent').value.trim();
       var term = document.getElementById('utmTerm').value.trim();
       
-      // Сначала чистим старые проблемные данные
-      try { localStorage.removeItem('utmHistory_old'); } catch(e) {}
-      
       var history = [];
       try {
         history = JSON.parse(localStorage.getItem('utmHistory')) || [];
         if (!Array.isArray(history)) history = [];
       } catch(e) { history = []; }
       
-      // Новая запись — только нужное
+      // Лимит 10 записей
+      var slotsLeft = 10 - history.length;
+      if (history.length >= 10) {
+        showToast('\u26A0 Лимит: 10/10. Удалите старые записи.');
+        renderHistory();
+        return;
+      }
+      
       history.unshift({
-        u: url,        // url
-        n: name,        // name
-        d: Date.now(),  // timestamp (число, короче)
-        s: source,      // source
-        m: medium,      // medium
-        c: campaign,    // campaign
-        o: content,     // content
-        t: term         // term
+        u: url,
+        n: name,
+        d: Date.now(),
+        s: source,
+        m: medium,
+        c: campaign,
+        o: content,
+        t: term
       });
       
-      // Лимит 20
-      if (history.length > 20) history = history.slice(0, 20);
-      
-      // Пробуем сохранить, если не влезает — чистим половину
-      var data = JSON.stringify(history);
-      if (data.length > 4000000) {
-        // Слишком много — чистим до 5 записей
-        history = history.slice(0, 5);
-        data = JSON.stringify(history);
-      }
-      
       try {
-        localStorage.setItem('utmHistory', data);
+        localStorage.setItem('utmHistory', JSON.stringify(history));
       } catch(e) {
-        // Всё ещё не влезает — чистим вообще всё
-        localStorage.removeItem('utmHistory');
-        history = [{ u: url, n: name, d: Date.now(), s: source, m: medium, c: campaign, o: content, t: term }];
-        data = JSON.stringify(history);
-        localStorage.setItem('utmHistory', data);
+        showToast('\u26A0 Ошибка: переполнение. Удалите старые записи.');
+        renderHistory();
+        return;
       }
+      
       renderHistory();
-      showToast('Ссылка сохранена в историю');
+      showToast('\u2705 Сохранено (' + (slotsLeft - 1) + '/' + 10 + ' мест)');
     }
 
     function deleteFromHistory(index) {
@@ -430,12 +422,16 @@
       history.splice(index, 1);
       localStorage.setItem('utmHistory', JSON.stringify(history));
       renderHistory();
+      var counter = document.getElementById('historyCounter');
+      if (counter) counter.textContent = '(' + history.length + '/10)';
     }
 
     function clearHistory() {
       if (!confirm('Очистить всю историю?')) return;
       localStorage.removeItem('utmHistory');
       renderHistory();
+      var counter = document.getElementById('historyCounter');
+      if (counter) counter.textContent = '(0/10)';
       showToast('История очищена');
     }
 
@@ -494,6 +490,10 @@
         html += '</div>';
       }
 
+      // Счётчик
+      var counter = document.getElementById('historyCounter');
+      if (counter) counter.textContent = '(' + history.length + '/10)';
+      
       list.innerHTML = html;
     }
 
