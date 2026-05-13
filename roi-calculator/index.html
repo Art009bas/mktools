@@ -551,9 +551,7 @@ function drawMonthChart(data) {
   var allR = data.map(function(d){return d.periodRomi;});
   var allN = data.map(function(d){return d.periodNetRoi;});
   var maxV = Math.max.apply(null, allR.concat(allN));
-  var minV = Math.max.apply(null, allR.concat(allN));
-  // Fix: also get min of negatives
-  allR.concat(allN).forEach(function(v){if(v<minV)minV=v;});
+  var minV = Math.min.apply(null, allR.concat(allN));
   var range = Math.max(Math.abs(maxV), Math.abs(minV), 5);
   range = Math.ceil(range / 10) * 10 + 10;
 
@@ -572,82 +570,97 @@ function drawMonthChart(data) {
   }
   html += '<line x1="' + pad.left + '" y1="' + zeroY + '" x2="' + (W-pad.right) + '" y2="' + zeroY + '" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4,3"/>';
 
-  // lines
-  var ptsR = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsR+=(i===0?'M':'L')+x+','+yScale(d.periodRomi)+' ';});
-  var ptsN = ''; data.forEach(function(d,i){var x=pad.left+i*xStep; ptsN+=(i===0?'M':'L')+x+','+yScale(d.periodNetRoi)+' ';});
+  // ROMI line
+  var ptsR = ''; 
+  data.forEach(function(d,i){var x=pad.left+i*xStep; ptsR+=(i===0?'M':'L')+x+','+yScale(d.periodRomi)+' ';});
+  // Net ROI line  
+  var ptsN = '';
+  data.forEach(function(d,i){var x=pad.left+i*xStep; ptsN+=(i===0?'M':'L')+x+','+yScale(d.periodNetRoi)+' ';});
 
-  // area
+  // area fill
   var area = 'M' + pad.left + ',' + zeroY;
   data.forEach(function(d,i){var x=pad.left+i*xStep; area+=' L'+x+','+yScale(d.periodRomi);});
   area += ' L' + (pad.left+(data.length-1)*xStep) + ',' + zeroY + ' Z';
   html += '<path d="' + area + '" fill="rgba(249,115,22,0.08)" stroke="none"/>';
 
-  html += '<path d="' + ptsR + '" stroke="#f97316" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
-  html += '<path d="' + ptsN + '" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
+  html += '<path d="' + ptsR + '" stroke="#f97316" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
+  html += '<path d="' + ptsN + '" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="6,3" stroke-linejoin="round" stroke-linecap="round"/>';
 
-  // SVG-native tooltip group (hidden, shows on hover)
-  var tooltipGroup = '<g id="chartTooltip" style="display:none">';
+  // Тултип: один универсальный, показывается при наведении
+  var activeTip = -1;
 
-  // Points with hover
+  // Сначала рендерим всё
   data.forEach(function(d, i) {
     var x = pad.left + i * xStep;
     var rR = yScale(d.periodRomi);
     var rN = yScale(d.periodNetRoi);
 
-    // Invisible large hit area
-    html += '<rect x="' + (x-14) + '" y="0" width="28" height="' + H + '" fill="transparent" class="dot-area" data-idx="' + i + '" style="cursor:pointer"/>';
+    // Большая невидимая зона ховера — 24px вокруг точки
+    html += '<rect x="' + (x-14) + '" y="0" width="28" height="' + H + '" fill="transparent" style="cursor:pointer" class="ht-' + i + '" onmouseenter="showTip(' + i + ')" onmouseleave="hideTip()"/>';
 
     // ROMI dot
-    html += '<circle cx="' + x + '" cy="' + rR + '" r="5" fill="#fff" stroke="#f97316" stroke-width="2.5" class="dot-m" data-idx="' + i + '" style="cursor:pointer"/>';
-    // Net ROI dot
-    html += '<circle cx="' + x + '" cy="' + rN + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2" class="dot-m" data-idx="' + i + '" style="cursor:pointer"/>';
+    html += '<circle cx="' + x + '" cy="' + rR + '" r="5" fill="#fff" stroke="#f97316" stroke-width="2.5" style="cursor:pointer" class="hd-' + i + '" onmouseenter="showTip(' + i + ')" onmouseleave="hideTip()"/>';
+    // ROI dot
+    html += '<circle cx="' + x + '" cy="' + rN + '" r="4" fill="#fff" stroke="#ef4444" stroke-width="2" style="cursor:pointer" class="hd-' + i + '" onmouseenter="showTip(' + i + ')" onmouseleave="hideTip()"/>';
 
-    // Tooltip per-point hidden by default — positioned just below dots
-    var tipY = Math.max(rR, rN) + 10;
-    var tipW = 155, tipH = 58;
-    var tipX = x - tipW/2;
-    if (tipX < 5) tipX = 5;
-    if (tipX + tipW > W - 5) tipX = W - tipW - 5;
-
-    tooltipGroup += '<g class="tip-g" data-idx="' + i + '">';
-    tooltipGroup += '<rect x="' + tipX + '" y="' + tipY + '" width="' + tipW + '" height="' + tipH + '" rx="6" fill="#1a1a2e" opacity="0.95"/>';
-    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+16) + '" fill="#fff" font-size="11" font-weight="700">' + d.periodLabel + '</text>';
-    var romiStr = (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%';
-    var roiStr = (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%';
-    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+30) + '" fill="#f97316" font-size="10">ROMI ' + romiStr + '</text>';
-    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+42) + '" fill="#ef4444" font-size="10">ROI ' + roiStr + '</text>';
-    tooltipGroup += '<text x="' + (tipX+8) + '" y="' + (tipY+54) + '" fill="#10b981" font-size="10">CAC ' + fmt(d.periodCac) + '</text>';
-    tooltipGroup += '</g>';
-
-    // X label
+    // X label  
     html += '<text x="' + x + '" y="' + (H-8) + '" text-anchor="middle" fill="#6b7280" font-size="10">' + d.periodLabel + '</text>';
   });
 
-  tooltipGroup += '</g>';
-  html += tooltipGroup;
+  // Один тултип (скрыт по умолчанию)
+  html += '<g id="tipGroup" style="display:none">';
+  html += '<rect id="tipBg" x="0" y="0" width="160" height="64" rx="6" fill="#1a1a2e" opacity="0.95"/>';
+  html += '<text id="tipTitle" x="8" y="18" fill="#fff" font-size="11" font-weight="700">-</text>';
+  html += '<text id="tipRomi" x="8" y="32" fill="#f97316" font-size="10">-</text>';
+  html += '<text id="tipRoi" x="8" y="44" fill="#ef4444" font-size="10">-</text>';
+  html += '<text id="tipCac" x="8" y="56" fill="#10b981" font-size="10">-</text>';
+  html += '</g>';
+
   svg.innerHTML = html;
 
-  // Hover listeners (SVG-native, stable)
-  var items = svg.querySelectorAll('.dot-area, .dot-m');
-  var tips = svg.querySelectorAll('.tip-g');
-  var lastIdx = -1;
-  items.forEach(function(el) {
-    el.addEventListener('mouseenter', function() {
-      var idx = parseInt(el.getAttribute('data-idx'));
-      if (idx === lastIdx) return;
-      lastIdx = idx;
-      tips.forEach(function(t, ti) {
-        t.setAttribute('style', ti === idx ? 'display:block' : 'display:none');
-      });
-    });
-  });
-  var chartBox = document.getElementById('chartBox');
-  chartBox.addEventListener('mouseleave', function() {
-    tips.forEach(function(t){ t.setAttribute('style','display:none'); });
-    lastIdx = -1;
-  });
-}
+  // Глобальные функции для тултипа
+  window.showTip = function(idx) {
+    if (idx < 0 || idx >= data.length) return;
+    var d = data[idx];
+    var tipG = document.getElementById('tipGroup');
+    if (!tipG) return;
 
+    var x = pad.left + idx * xStep;
+    var rR = yScale(d.periodRomi);
+    var rN = yScale(d.periodNetRoi);
+    var tipY = Math.min(rR, rN) - 70;
+    if (tipY < 10) tipY = 10;
+    var tipX = x - 80;
+    if (tipX < 2) tipX = 2;
+    if (tipX + 160 > W - 2) tipX = W - 162;
+
+    var bg = document.getElementById('tipBg');
+    bg.setAttribute('x', tipX);
+    bg.setAttribute('y', tipY);
+
+    document.getElementById('tipTitle').setAttribute('x', tipX + 8);
+    document.getElementById('tipTitle').setAttribute('y', tipY + 18);
+    document.getElementById('tipTitle').textContent = d.periodLabel;
+
+    document.getElementById('tipRomi').setAttribute('x', tipX + 8);
+    document.getElementById('tipRomi').setAttribute('y', tipY + 32);
+    document.getElementById('tipRomi').textContent = 'ROMI: ' + (d.periodRomi>=0?'+':'') + d.periodRomi.toFixed(1) + '%';
+
+    document.getElementById('tipRoi').setAttribute('x', tipX + 8);
+    document.getElementById('tipRoi').setAttribute('y', tipY + 44);
+    document.getElementById('tipRoi').textContent = 'ROI: ' + (d.periodNetRoi>=0?'+':'') + d.periodNetRoi.toFixed(1) + '%';
+
+    document.getElementById('tipCac').setAttribute('x', tipX + 8);
+    document.getElementById('tipCac').setAttribute('y', tipY + 56);
+    document.getElementById('tipCac').textContent = 'CAC: ' + fmt(d.periodCac);
+
+    tipG.style.display = 'block';
+  };
+  window.hideTip = function() {
+    var g = document.getElementById('tipGroup');
+    if (g) g.style.display = 'none';
+  };
+}
 function fmt(x) {
   if (Math.abs(x) >= 10000000) return (x/1000000).toFixed(1) + ' млн';
   if (Math.abs(x) >= 1000) return Math.round(x).toLocaleString('ru-RU') + ' ₽';
