@@ -49,6 +49,11 @@
       border-radius: var(--radius-sm); font-size: 0.9rem; font-family: var(--font);
       outline: none; background: var(--bg); transition: border-color 0.2s;
     }
+    .field-input.const {
+      background: #eef2ff; border-color: #c7d2fe; color: #4338ca; font-weight: 600;
+      font-size: 0.85rem; letter-spacing: 0.02em;
+    }
+    }
     .field-input:focus { border-color: var(--accent); background: var(--surface); }
     .field-input.tight { padding: 7px 8px; font-size: 0.82rem; }
     .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -370,12 +375,6 @@ function toggleParams() {
 // ====== LOAD/SAVE ======
 function loadProject() {
   var p = cp();
-  document.getElementById('ndsPct').value = p.ndsPct || 22;
-  document.getElementById('rkPctPlain').value = p.rkPctPlain || 15;
-  document.getElementById('agencyPct').value = p.agencyPct || 25;
-  document.getElementById('svcFixed').value = p.svcFixed || 0;
-  document.getElementById('svcPct').value = p.svcPct || 0;
-  document.getElementById('otherCost').value = p.otherCost || 0;
   document.getElementById('ltvVal').value = p.ltv || '';
   renderMonths();
 }
