@@ -374,34 +374,52 @@
       var url = document.getElementById('resultUrl').value;
       if (!url) return;
       var name = document.getElementById('campaignName').value.trim() || 'Без названия';
-      var history = getHistory();
-      history.unshift({
-        url: url,
-        name: name,
-        date: new Date().toISOString(),
-        params: {
-          source: document.getElementById('utmSource').value,
-          medium: document.getElementById('utmMedium').value,
-          campaign: document.getElementById('utmCampaign').value.trim(),
-          content: document.getElementById('utmContent').value.trim(),
-          term: document.getElementById('utmTerm').value.trim()
-        }
-      });
-      // Лимит 30 записей + сжатие
-      if (history.length > 30) history = history.slice(0, 30);
+      var source = document.getElementById('utmSource').value;
+      var medium = document.getElementById('utmMedium').value;
+      var campaign = document.getElementById('utmCampaign').value.trim();
+      var content = document.getElementById('utmContent').value.trim();
+      var term = document.getElementById('utmTerm').value.trim();
+      
+      // Сначала чистим старые проблемные данные
+      try { localStorage.removeItem('utmHistory_old'); } catch(e) {}
+      
+      var history = [];
       try {
-        localStorage.setItem('utmHistory', JSON.stringify(history));
+        history = JSON.parse(localStorage.getItem('utmHistory')) || [];
+        if (!Array.isArray(history)) history = [];
+      } catch(e) { history = []; }
+      
+      // Новая запись — только нужное
+      history.unshift({
+        u: url,        // url
+        n: name,        // name
+        d: Date.now(),  // timestamp (число, короче)
+        s: source,      // source
+        m: medium,      // medium
+        c: campaign,    // campaign
+        o: content,     // content
+        t: term         // term
+      });
+      
+      // Лимит 20
+      if (history.length > 20) history = history.slice(0, 20);
+      
+      // Пробуем сохранить, если не влезает — чистим половину
+      var data = JSON.stringify(history);
+      if (data.length > 4000000) {
+        // Слишком много — чистим до 5 записей
+        history = history.slice(0, 5);
+        data = JSON.stringify(history);
+      }
+      
+      try {
+        localStorage.setItem('utmHistory', data);
       } catch(e) {
-        // Если переполнение - чистим половину
-        history = history.slice(0, Math.floor(history.length / 2));
-        try {
-          localStorage.setItem('utmHistory', JSON.stringify(history));
-        } catch(e2) {
-          // Если всё равно не влезло - чистим всё
-          localStorage.removeItem('utmHistory');
-          history = [{ url: url, name: name, date: new Date().toISOString(), params: { source: '', medium: '', campaign: '', content: '', term: '' } }];
-          localStorage.setItem('utmHistory', JSON.stringify(history));
-        }
+        // Всё ещё не влезает — чистим вообще всё
+        localStorage.removeItem('utmHistory');
+        history = [{ u: url, n: name, d: Date.now(), s: source, m: medium, c: campaign, o: content, t: term }];
+        data = JSON.stringify(history);
+        localStorage.setItem('utmHistory', data);
       }
       renderHistory();
       showToast('Ссылка сохранена в историю');
@@ -425,7 +443,7 @@
       var history = getHistory();
       var item = history[parseInt(idx)];
       if (!item) return;
-      navigator.clipboard.writeText(item.url).then(function() {
+      navigator.clipboard.writeText(item.u).then(function() {
         showToast('Ссылка скопирована');
       });
     }
@@ -434,12 +452,12 @@
       var history = getHistory();
       var item = history[parseInt(idx)];
       if (!item) return;
-      document.getElementById('baseUrl').value = item.url.split('?')[0];
-      document.getElementById('utmSource').value = item.params.source || '';
-      document.getElementById('utmMedium').value = item.params.medium || '';
-      document.getElementById('utmCampaign').value = item.params.campaign || '';
-      document.getElementById('utmContent').value = item.params.content || '';
-      document.getElementById('utmTerm').value = item.params.term || '';
+      document.getElementById('baseUrl').value = item.u.split('?')[0];
+      document.getElementById('utmSource').value = item.s || '';
+      document.getElementById('utmMedium').value = item.m || '';
+      document.getElementById('utmCampaign').value = item.c || '';
+      document.getElementById('utmContent').value = item.o || '';
+      document.getElementById('utmTerm').value = item.t || '';
       updateResult();
       showToast('Параметры загружены');
     }
@@ -465,9 +483,9 @@
         var item = history[i];
         html += '<div class="history-item">';
         html += '  <div class="history-info" data-idx="' + i + '" onclick="loadFromHistory(this.dataset.idx)">';
-        html += '    <div class="history-name">' + escapeHtml(item.name) + '</div>';
-        html += '    <div class="history-url" title="' + escapeHtml(item.url) + '">' + escapeHtml(item.url) + '</div>';
-        html += '    <div class="history-date">' + formatDate(item.date) + ' · ' + escapeHtml(item.params.source) + ' / ' + escapeHtml(item.params.medium) + '</div>';
+        html += '    <div class="history-name">' + escapeHtml(item.n) + '</div>';
+        html += '    <div class="history-url" title="' + escapeHtml(item.u) + '">' + escapeHtml(item.u) + '</div>';
+        html += '    <div class="history-date">' + formatDate(new Date(item.d)) + ' · ' + escapeHtml(item.s) + ' / ' + escapeHtml(item.m) + '</div>';
         html += '  </div>';
         html += '  <div class="history-actions">';
         html += '    <button class="btn-icon" onclick="copyFromHistory(' + i + ')" title="Копировать">📋</button>';
