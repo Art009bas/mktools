@@ -224,8 +224,8 @@ async function analyze() {
   if (!url) { showToast('Введите URL'); return; }
   if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
 
-  var proxyInput = document.getElementById('proxyUrl');
-  PROXY = proxyInput.value.trim() || PROXY;
+  var proxySelect = document.getElementById('proxySelect');
+  PROXY = proxySelect.value;
 
   var results = document.getElementById('results');
   results.style.display = 'block';
