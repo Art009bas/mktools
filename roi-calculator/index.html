@@ -259,10 +259,46 @@ var currentIdx = 0;
 
 if (projects.length === 0) {
   projects.push({
-    name: 'Проект 1',
-    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 0,
+    name: 'Январь',
+    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 15, rkPctPlain: 15, ndsPct: 22,
     months: [
-      {label:'Мес 1', spend:0, leads:0, sales:0, revenue:0, extra:0}
+      {label:'01.01', spend:0, leads:1, sales:1, revenue:9098, extra:0},
+      {label:'05.01', spend:0, leads:2, sales:0, revenue:0, extra:0},
+      {label:'12.01', spend:5527.81, leads:37, sales:2, revenue:22918.14, extra:0},
+      {label:'19.01', spend:1114.94, leads:17, sales:3, revenue:41566, extra:0},
+      {label:'26.01', spend:9527.79, leads:68, sales:0, revenue:0, extra:0}
+    ]
+  });
+  projects.push({
+    name: 'Февраль',
+    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 15, rkPctPlain: 15, ndsPct: 22,
+    months: [
+      {label:'01.02', spend:18608.82, leads:143, sales:4, revenue:50634, extra:0},
+      {label:'08.02', spend:15981.68, leads:80, sales:7, revenue:52149, extra:0},
+      {label:'16.02', spend:16088, leads:59, sales:5, revenue:50337, extra:0},
+      {label:'23.02', spend:2660.92, leads:15, sales:3, revenue:42900, extra:0}
+    ]
+  });
+  projects.push({
+    name: 'Март',
+    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 15, rkPctPlain: 15, ndsPct: 22,
+    months: [
+      {label:'01.03', spend:31979.43, leads:90, sales:3, revenue:34440.63, extra:0},
+      {label:'08.03', spend:36764, leads:68, sales:8, revenue:91741.89, extra:0},
+      {label:'16.03', spend:26437.26, leads:45, sales:4, revenue:38071.99, extra:0},
+      {label:'23.03', spend:13971.63, leads:55, sales:0, revenue:0, extra:0},
+      {label:'30.03', spend:3325.83, leads:29, sales:1, revenue:6696, extra:0}
+    ]
+  });
+  projects.push({
+    name: 'Апрель',
+    agencyPct: 25, ltv: 0, svcFixed: 39000, svcPct: 15, rkPctPlain: 15, ndsPct: 22,
+    months: [
+      {label:'01.04', spend:9445.72, leads:20, sales:1, revenue:7649, extra:0},
+      {label:'05.04', spend:8690.75, leads:15, sales:1, revenue:5591.50, extra:0},
+      {label:'12.04', spend:8424.21, leads:21, sales:3, revenue:11117.12, extra:0},
+      {label:'19.04', spend:853.45, leads:6, sales:1, revenue:2243, extra:0},
+      {label:'26.04', spend:1469.25, leads:6, sales:2, revenue:18030.20, extra:0}
     ]
   });
   saveProjects(projects);
