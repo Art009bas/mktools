@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Markdown Converter — конвертация HTML ↔ Markdown</title>
+<meta name="description" content="Бесплатный онлайн-конвертер Markdown. HTML в Markdown, Markdown в HTML, Markdown в текст. Превью в реальном времени.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1000px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.hero{padding:48px 0 32px;text-align:center}
+.hero p{color:var(--text2)}
+
+.mode-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin:20px 0}
+.tab{padding:8px 20px;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);font-family:var(--font)}
+.tab.active{background:var(--accent);color:#fff}
+.tab:hover:not(.active){background:#f3f4f6}
+
+.editor-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.editor-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+.editor-header__label{font-weight:600;font-size:.85rem}
+.editor-header__actions{display:flex;gap:6px}
+.editor-header__actions button{padding:5px 12px;border:none;border-radius:6px;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--font);background:#f3f4f6;color:var(--text2)}
+.editor-header__actions button:hover{background:#e5e7eb}
+.editor-header__actions button.primary{background:var(--accent);color:#fff}
+.editor-header__actions button.primary:hover{background:var(--accent-hover)}
+
+.editor-panel{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:768px){.editor-panel{grid-template-columns:1fr}}
+
+.editor-panel__input textarea{width:100%;height:400px;border:none;padding:16px;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:.85rem;line-height:1.7;resize:vertical;outline:none;background:var(--surface);color:var(--text)}
+.editor-panel__input textarea::placeholder{color:#b0b7c3}
+.editor-panel__output{padding:16px;overflow-y:auto;max-height:400px;border-left:1px solid var(--border);font-size:.92rem;line-height:1.7}
+.editor-panel__output h1{font-size:1.5rem;margin:8px 0;font-weight:700}
+.editor-panel__output h2{font-size:1.25rem;margin:6px 0;font-weight:700}
+.editor-panel__output h3{font-size:1.1rem;margin:6px 0;font-weight:600}
+.editor-panel__output p{margin:6px 0}
+.editor-panel__output ul,.editor-panel__output ol{padding-left:24px;margin:4px 0}
+.editor-panel__output li{margin:2px 0}
+.editor-panel__output pre{background:#f3f4f6;padding:12px;border-radius:6px;overflow-x:auto;font-size:.8rem;margin:8px 0}
+.editor-panel__output code{background:#f3f4f6;padding:2px 5px;border-radius:3px;font-size:.85rem}
+.editor-panel__output pre code{background:none;padding:0}
+.editor-panel__output blockquote{border-left:3px solid var(--accent);padding:4px 12px;margin:8px 0;color:var(--text2)}
+.editor-panel__output table{border-collapse:collapse;width:100%;margin:8px 0}
+.editor-panel__output th,.editor-panel__output td{border:1px solid var(--border);padding:6px 10px;text-align:left}
+.editor-panel__output th{background:#f9fafb;font-weight:600}
+.editor-panel__output img{max-width:100%;border-radius:6px;margin:8px 0}
+.editor-panel__output a{color:var(--accent)}
+.editor-panel__output hr{margin:16px 0;border:none;border-top:1px solid var(--border)}
+.editor-panel__output .empty-preview{color:var(--text2);font-size:.85rem;text-align:center;padding:40px 0}
+
+@media(max-width:768px){
+  .editor-panel__output{border-left:none;border-top:1px solid var(--border);max-height:300px}
+}
+
+.actions{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.actions button{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.actions .btn-primary{background:var(--accent);color:#fff}
+.actions .btn-primary:hover{background:var(--accent-hover)}
+.actions .btn-secondary{background:#f3f4f6;color:var(--text)}
+.actions .btn-secondary:hover{background:#e5e7eb}
+
+.info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:48px}
+.info h3{font-size:.95rem;margin-bottom:8px}
+.info .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.info .col{}
+.info .col h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:6px}
+.info .col ul{list-style:none}
+.info .col ul li{padding:3px 0;font-size:.8rem;color:var(--text)}
+.info .col ul li span{color:var(--text2);font-family:monospace;font-size:.75rem}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:12px;font-size:.85rem;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>📝 Markdown Converter</h1>
+<p>Конвертируй HTML в Markdown, Markdown в HTML и простой текст. С живым превью.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="mode-tabs" id="modeTabs">
+<button class="tab active" data-mode="md2html">Markdown → HTML</button>
+<button class="tab" data-mode="html2md">HTML → Markdown</button>
+<button class="tab" data-mode="md2text">Markdown → Текст</button>
+</div>
+
+<div class="editor-wrap">
+<div class="editor-header">
+<span class="editor-header__label">Редактор</span>
+<div class="editor-header__actions">
+<button id="pasteBtn">📋 Вставить</button>
+<button id="clearBtn">✕ Очистить</button>
+<button id="sampleBtn">📄 Пример</button>
+</div>
+</div>
+<div class="editor-panel">
+<div class="editor-panel__input">
+<textarea id="inputArea" placeholder="Введи Markdown или HTML здесь..." spellcheck="false"></textarea>
+</div>
+<div class="editor-panel__output" id="outputArea">
+<div class="empty-preview">Превью появится здесь</div>
+</div>
+</div>
+</div>
+
+<div class="actions">
+<button class="btn-primary" id="copyBtn">📋 Копировать результат</button>
+<button class="btn-secondary" id="downloadBtn">⬇ Скачать</button>
+</div>
+
+<div class="info">
+<h3>ℹ️ Что поддерживается</h3>
+<div class="grid">
+<div class="col">
+<h4>Markdown → HTML</h4>
+<ul>
+<li>Заголовки H1-H6 <span># ## ###</span></li>
+<li>Жирный/курсив <span>** *</span></li>
+<li>Списки <span>- 1.</span></li>
+<li>Ссылки <span>[text](url)</span></li>
+<li>Изображения <span>![alt](url)</span></li>
+<li>Таблицы <span>| col | col |</span></li>
+<li>Цитаты <span>> text</span></li>
+<li>Код <span>``` `code`</span></li>
+<li>Чекбоксы <span>- [x]</span></li>
+<li>Горизонтальная черта <span>---</span></li>
+</ul>
+</div>
+<div class="col">
+<h4>HTML → Markdown</h4>
+<ul>
+<li>Конвертирует обратно</li>
+<li>Очищает лишние пробелы</li>
+<li>Сохраняет структуру</li>
+<li>Чистый Markdown без лишнего мусора</li>
+</ul>
+</div>
+<div class="col">
+<h4>Markdown → Текст</h4>
+<ul>
+<li>Убирает всю разметку</li>
+<li>Оставляет чистое содержание</li>
+<li>Сохраняет абзацы</li>
+<li>Убирает URL из ссылок</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.2.0/turndown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.4/marked.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const inputArea=$('inputArea'), outputArea=$('outputArea');
+const copyBtn=$('copyBtn'), downloadBtn=$('downloadBtn');
+const pasteBtn=$('pasteBtn'), clearBtn=$('clearBtn'), sampleBtn=$('sampleBtn');
+const toast=$('toast');
+
+let currentMode='md2html';
+let mdTimer=null;
+
+// Mode tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode=tab.dataset.mode;
+    doConvert();
+  };
+});
+
+// Auto-convert on input
+inputArea.oninput=()=>{
+  clearTimeout(mdTimer);
+  mdTimer=setTimeout(doConvert, 200);
+};
+
+function doConvert(){
+  const text=inputArea.value.trim();
+  if(!text){outputArea.innerHTML='<div class="empty-preview">Превью появится здесь</div>';return}
+  
+  try{
+    if(currentMode==='md2html'){
+      outputArea.innerHTML=marked.parse(text);
+    } else if(currentMode==='html2md'){
+      const turndownService=new TurndownService({
+        headingStyle:'atx',
+        codeBlockStyle:'fenced',
+        emDelimiter:'*',
+        bulletListMarker:'-',
+        linkStyle:'inlined'
+      });
+      outputArea.innerHTML='<pre style="background:none;padding:0;white-space:pre-wrap;font-family:monospace;font-size:.85rem;line-height:1.6">'+escapeHtml(turndownService.turndown(text))+'</pre>';
+    } else if(currentMode==='md2text'){
+      const html=marked.parse(text);
+      const tmp=document.createElement('div');
+      tmp.innerHTML=html;
+      outputArea.innerHTML='<pre style="background:none;padding:0;white-space:pre-wrap;font-family:monospace;font-size:.85rem;line-height:1.6;color:var(--text)">'+escapeHtml(tmp.textContent)+'</pre>';
+    }
+  }catch(e){
+    outputArea.innerHTML='<div style="color:#dc2626;padding:12px">Ошибка: '+e.message+'</div>';
+  }
+}
+
+function getResultText(){
+  if(currentMode==='md2html') return outputArea.innerHTML;
+  return outputArea.querySelector('pre')?.textContent||'';
+}
+
+copyBtn.onclick=()=>{
+  const text=getResultText();
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>showToast('Скопировано!')).catch(()=>showToast('Не удалось скопировать'));
+};
+
+downloadBtn.onclick=()=>{
+  const text=getResultText();
+  if(!text)return;
+  const ext=currentMode==='md2html'?'.html':'.md';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download='converted'+ext;
+  a.click();
+};
+
+pasteBtn.onclick=async()=>{
+  try{
+    const text=await navigator.clipboard.readText();
+    if(text)inputArea.value=text;doConvert();
+  }catch{showToast('Не удалось вставить')}
+};
+
+clearBtn.onclick=()=>{inputArea.value='';doConvert()};
+
+sampleBtn.onclick=()=>{
+  if(currentMode==='md2html'){
+    inputArea.value=`# Заголовок первого уровня\n\nЭто **жирный текст** и *курсив*. А это [ссылка](https://example.com).\n\n## Список покупок\n\n- 🍎 Яблоки\n- 🥛 Молоко\n- 🍞 Хлеб\n\n### Цитата\n\n> Маркетинг — это не битва продуктов, это битва восприятия.\n\n#### Таблица\n\n| Город | Заявок | Продаж |\n|-------|--------|--------|\n| Нск   | 125    | 6      |\n| Кем   | 87     | 4      |\n\n\`\`\`python\nprint("Hello, маркетинг!")\n\`\`\`\n\n- [x] Сделать отчёт\n- [ ] Запустить рекламу\n- [ ] Проверить лиды\n`;
+    doConvert();
+  } else if(currentMode==='html2md'){
+    inputArea.value=`<h1>Заголовок</h1>\n<p>Это <strong>жирный</strong> и <em>курсив</em>.</p>\n<ul>\n<li>Пункт 1</li>\n<li>Пункт 2</li>\n</ul>\n<p>Подробнее на <a href="https://example.com">нашем сайте</a>.</p>`;
+    doConvert();
+  } else {
+    inputArea.value='# Привет\n\nЭто **просто** *текст* без разметки.\n\n[ссылка](https://example.com) превратится в текст.';
+    doConvert();
+  }
+};
+
+function escapeHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+}
+</script>
+</body>
+</html>
