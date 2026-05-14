@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>File Converter — конвертация файлов онлайн</title>
+<meta name="description" content="Бесплатный онлайн-конвертер файлов: JSON ↔ CSV ↔ XML ↔ YAML ↔ TXT. Таблицы, массивы. Копирование и скачивание.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.hero{padding:40px 0 24px;text-align:center}
+.hero p{color:var(--text2);font-size:.95rem}
+
+/* Swap bar */
+.swap-bar{display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0;flex-wrap:wrap}
+.swap-bar select{padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;font-family:var(--font);background:var(--surface);color:var(--text);cursor:pointer;min-width:80px}
+.swap-bar select:focus{outline:none;border-color:var(--accent)}
+.swap-btn{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:var(--surface);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text2)}
+.swap-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Editor panels */
+.editors{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+@media(max-width:768px){.editors{grid-template-columns:1fr}}
+.editor-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.editor-panel__header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border)}
+.editor-panel__header label{font-weight:600;font-size:.85rem}
+.editor-panel__header .badge{font-size:.7rem;padding:2px 8px;border-radius:4px;background:var(--accent-light);color:var(--accent)}
+.editor-panel__header .actions{display:flex;gap:4px}
+.editor-panel__header .actions button{padding:4px 10px;border:none;border-radius:4px;font-size:.72rem;font-weight:500;cursor:pointer;font-family:var(--font);background:#f3f4f6;color:var(--text2);transition:all .12s}
+.editor-panel__header .actions button:hover{background:#e5e7eb}
+.editor-panel__input textarea{width:100%;height:380px;border:none;padding:14px;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:.82rem;line-height:1.6;resize:vertical;outline:none;background:var(--surface);color:var(--text)}
+.editor-panel__input textarea::placeholder{color:#b0b7c3}
+
+/* Actions bar */
+.actions-bar{display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.actions-bar button{padding:10px 24px;border:none;border-radius:var(--radius-sm);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e5e7eb}
+
+/* Preview table */
+.table-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;display:none}
+.table-preview.show{display:block}
+.table-preview__header{padding:10px 14px;font-weight:600;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.table-preview__wrap{overflow-x:auto;padding:8px}
+.table-preview table{width:100%;border-collapse:collapse;font-size:.8rem}
+.table-preview th{text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);white-space:nowrap}
+.table-preview td{padding:6px 10px;border-bottom:1px solid var(--border);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.table-preview tr:hover td{background:#f9fafb}
+.table-preview .row-num{color:var(--text2);text-align:center;width:36px;font-size:.72rem}
+
+/* Drop zone */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;margin-bottom:16px}
+.drop-zone:hover{border-color:var(--accent);background:var(--accent-light)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-zone-text{font-size:.85rem;color:var(--text2)}
+
+.info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:48px}
+.info h3{font-size:.95rem;margin-bottom:8px}
+.info .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.info .col{}
+.info .col h4{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.info .col ul{list-style:none;font-size:.8rem}
+.info .col ul li{padding:2px 0}
+.info .col ul li span{font-family:monospace;color:var(--accent);font-size:.75rem}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:12px;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1}
+
+.error-box{background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:var(--radius-sm);font-size:.82rem;display:none;margin-bottom:12px}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>📄 File Converter</h1>
+<p>Конвертация между JSON · CSV · XML · YAML · TXT. Табличный просмотр. Загрузка файлов.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="drop-zone" id="dropzone">
+<input type="file" id="fileInput" accept=".json,.csv,.xml,.yaml,.yml,.txt">
+<div class="drop-zone-text">📁 Перетащи файл или <strong>выбери</strong> (.json, .csv, .xml, .yaml, .txt)</div>
+</div>
+
+<div class="swap-bar">
+<select id="fromFormat">
+<option value="json">JSON</option>
+<option value="csv">CSV</option>
+<option value="xml">XML</option>
+<option value="yaml">YAML</option>
+<option value="txt">TXT (ключ:значение)</option>
+</select>
+<button class="swap-btn" id="swapBtn" title="Поменять местами">⇄</button>
+<select id="toFormat">
+<option value="json">JSON</option>
+<option value="csv" selected>CSV</option>
+<option value="xml">XML</option>
+<option value="yaml">YAML</option>
+<option value="txt">TXT (ключ:значение)</option>
+</select>
+</div>
+
+<div class="editors">
+<div class="editor-panel">
+<div class="editor-panel__header">
+<label id="fromLabel">JSON</label>
+<span class="badge" id="fromBadge">0 строк</span>
+<div class="actions">
+<button id="fromPasteBtn">📋 Вставить</button>
+<button id="fromClearBtn">✕</button>
+</div>
+</div>
+<div class="editor-panel__input">
+<textarea id="fromArea" placeholder="Введите или вставьте данные..." spellcheck="false"></textarea>
+</div>
+</div>
+
+<div class="editor-panel">
+<div class="editor-panel__header">
+<label id="toLabel">CSV</label>
+<span class="badge" id="toBadge">0 строк</span>
+<div class="actions">
+<button id="toCopyBtn">📋 Копировать</button>
+<button id="toDownloadBtn">⬇</button>
+</div>
+</div>
+<div class="editor-panel__input">
+<textarea id="toArea" placeholder="Результат появится здесь..." spellcheck="false" readonly></textarea>
+</div>
+</div>
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<div class="actions-bar">
+<button class="btn btn-primary" id="convertBtn">⟳ Конвертировать</button>
+<button class="btn-secondary" id="exampleBtn">📄 Пример</button>
+</div>
+
+<div class="table-preview" id="tablePreview">
+<div class="table-preview__header">
+<span>📊 Табличный просмотр</span>
+<span style="font-size:.8rem;color:var(--text2)" id="tableInfo"></span>
+</div>
+<div class="table-preview__wrap" id="tableWrap"></div>
+</div>
+
+<div class="info">
+<h3>ℹ️ Форматы</h3>
+<div class="grid">
+<div class="col">
+<h4>JSON</h4>
+<ul>
+<li>Массив объектов: <span>[{...},{...}]</span></li>
+<li>Вложенные объекты раскрываются</li>
+<li>Автоопределение ключей</li>
+</ul>
+</div>
+<div class="col">
+<h4>CSV</h4>
+<ul>
+<li>Разделитель: <span>, (запятая)</span></li>
+<li>Первая строка — заголовки</li>
+<li>Кавычки экранируются</li>
+</ul>
+</div>
+<div class="col">
+<h4>XML</h4>
+<ul>
+<li>Структура: <span>&lt;item&gt;&lt;key&gt;val&lt;/key&gt;</span></li>
+<li>Массив объектов</li>
+<li>Только одноимённые элементы</li>
+</ul>
+</div>
+<div class="col">
+<h4>YAML</h4>
+<ul>
+<li>Отступы: <span>2 пробела</span></li>
+<li>Массив: <span>- ключ: значение</span></li>
+<li>Объекты: <span>ключ: значение</span></li>
+</ul>
+</div>
+<div class="col">
+<h4>TXT</h4>
+<ul>
+<li>Формат: <span>ключ: значение</span></li>
+<li>Один объект на строку</li>
+<li>Пустые строки — разделители</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const fromArea=$('fromArea'), toArea=$('toArea'), fromFormat=$('fromFormat'), toFormat=$('toFormat');
+const fromLabel=$('fromLabel'), toLabel=$('toLabel'), fromBadge=$('fromBadge'), toBadge=$('toBadge');
+const errorBox=$('errorBox'), tablePreview=$('tablePreview'), tableWrap=$('tableWrap'), tableInfo=$('tableInfo');
+const dropzone=$('dropzone'), fileInput=$('fileInput'), toast=$('toast');
+
+let sourceData=null; // Parsed JS array of objects
+let sourceKeys=[];   // Column order
+
+// Update labels
+fromFormat.onchange=()=>{fromLabel.textContent=fromFormat.value.toUpperCase()};
+toFormat.onchange=()=>{toLabel.textContent=toFormat.value.toUpperCase()};
+
+// Swap
+$('swapBtn').onclick=()=>{
+  [fromFormat.value,toFormat.value]=[toFormat.value,fromFormat.value];
+  fromLabel.textContent=fromFormat.value.toUpperCase();
+  toLabel.textContent=toFormat.value.toUpperCase();
+  [fromArea.value,toArea.value]=[toArea.value,fromArea.value];
+  doConvert();
+};
+
+// Paste / Clear
+$('fromPasteBtn').onclick=async()=>{try{const t=await navigator.clipboard.readText();fromArea.value=t;doConvert()}catch{showToast('Не удалось вставить')}};
+$('fromClearBtn').onclick=()=>{fromArea.value='';toArea.value='';sourceData=null;clearPreview();updateBadge()};
+
+$('toCopyBtn').onclick=()=>{if(toArea.value)navigator.clipboard.writeText(toArea.value).then(()=>showToast('Скопировано!'))};
+$('toDownloadBtn').onclick=()=>{
+  if(!toArea.value)return;
+  const ext=toFormat.value;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([toArea.value],{type:'text/plain;charset=utf-8'}));
+  a.download='converted.'+ext;
+  a.click();
+};
+
+// Drag & drop file upload
+dropzone.ondragover=e=>{e.preventDefault();dropzone.classList.add('dragover')};
+dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
+dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])};
+fileInput.onchange=()=>{if(fileInput.files[0])loadFile(fileInput.files[0])};
+
+function loadFile(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    fromArea.value=e.target.result;
+    // Auto-detect format by extension
+    const ext=file.name.split('.').pop().toLowerCase();
+    if(['json','csv','xml','yaml','yml','txt'].includes(ext)){
+      const fmts={json:'json',csv:'csv',xml:'xml',yaml:'yaml',yml:'yaml',txt:'txt'};
+      fromFormat.value=fmts[ext];
+      fromLabel.textContent=fromFormat.value.toUpperCase();
+    }
+    doConvert();
+  };
+  reader.readAsText(file);
+}
+
+// Convert
+$('convertBtn').onclick=doConvert;
+
+function doConvert(){
+  const text=fromArea.value.trim();
+  if(!text){toArea.value='';sourceData=null;clearPreview();updateBadge();return}
+  
+  errorBox.style.display='none';
+  
+  try{
+    // 1. Parse input
+    sourceData=parseInput(text, fromFormat.value);
+    if(!Array.isArray(sourceData))sourceData=[sourceData];
+    
+    // 2. Collect keys
+    sourceKeys=[];
+    const keySet=new Set();
+    sourceData.forEach(obj=>{if(typeof obj==='object'&&obj!==null)Object.keys(obj).forEach(k=>keySet.add(k))});
+    sourceKeys=Array.from(keySet);
+    
+    // 3. Convert
+    const output=convertOutput(sourceData, sourceKeys, toFormat.value);
+    toArea.value=output;
+    updateBadge();
+    showTablePreview();
+    
+  }catch(e){
+    errorBox.textContent='❌ '+e.message;
+    errorBox.style.display='block';
+    toArea.value='';
+    sourceData=null;
+    clearPreview();
+  }
+}
+
+function parseInput(text, format){
+  switch(format){
+    case 'json':
+      try{return JSON.parse(text)}
+      catch(e){throw new Error('Ошибка JSON: '+e.message)}
+      
+    case 'csv':
+      const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+      if(lines.length<2)throw new Error('CSV должен содержать заголовки и хотя бы одну строку');
+      const headers=parseCSVLine(lines[0]);
+      const rows=[];
+      for(let i=1;i<lines.length;i++){
+        const vals=parseCSVLine(lines[i]);
+        const obj={};
+        headers.forEach((h,j)=>{obj[h.trim()]=(vals[j]||'').trim()});
+        rows.push(obj);
+      }
+      return rows;
+      
+    case 'xml':
+      const parser=new DOMParser();
+      const xmlDoc=parser.parseFromString(text,'text/xml');
+      const parseErr=xmlDoc.querySelector('parsererror');
+      if(parseErr)throw new Error('Ошибка XML: '+parseErr.textContent);
+      
+      // Find root children
+      const root=xmlDoc.documentElement;
+      const items=Array.from(root.children);
+      if(items.length===0){
+        // Try to interpret as single object
+        return xmlToObj(root);
+      }
+      return items.map(el=>xmlToObj(el));
+      
+    case 'yaml':
+      try{
+        const data=jsyaml.load(text);
+        if(data===null||data===undefined)throw new Error('Пустой YAML');
+        return data;
+      }catch(e){throw new Error('Ошибка YAML: '+e.message)}
+      
+    case 'txt':
+      const tlines=text.split('\n').filter(l=>l.trim());
+      const tobj={};
+      tlines.forEach(l=>{
+        const idx=l.indexOf(':');
+        if(idx>0){tobj[l.slice(0,idx).trim()]=l.slice(idx+1).trim()}
+      });
+      if(Object.keys(tobj).length===0)throw new Error('Нет пар ключ:значение');
+      return [tobj];
+      
+    default:
+      throw new Error('Неизвестный формат: '+format);
+  }
+}
+
+function parseCSVLine(line){
+  const result=[];
+  let current='', inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){
+      if(inQuotes&&line[i+1]==='"'){current+='"';i++}
+      else inQuotes=!inQuotes;
+    }else if(c===','&&!inQuotes){result.push(current);current=''}
+    else current+=c;
+  }
+  result.push(current);
+  return result;
+}
+
+function xmlToObj(el){
+  const obj={};
+  obj['_tag']=el.tagName;
+  Array.from(el.attributes||[]).forEach(attr=>{obj['@'+attr.name]=attr.value});
+  const children=Array.from(el.children);
+  if(children.length===0){
+    obj['_text']=el.textContent.trim();
+  } else {
+    children.forEach(child=>{
+      const k=child.tagName;
+      if(obj[k]!==undefined){
+        if(!Array.isArray(obj[k]))obj[k]=[obj[k]];
+        obj[k].push(xmlToObj(child));
+      } else {
+        obj[k]=xmlToObj(child);
+      }
+    });
+  }
+  return obj;
+}
+
+function convertOutput(data, keys, format){
+  // Flatten nested objects for tabular formats
+  const flat=data.map(item=>flattenObj(item, keys));
+  
+  switch(format){
+    case 'json':
+      return JSON.stringify(data, null, 2);
+      
+    case 'csv':
+      if(flat.length===0)return '';
+      const allKeys=collectKeys(flat);
+      const esc=v=>{
+        const s=String(v===null||v===undefined?'':v);
+        return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;
+      };
+      return allKeys.join(',')+'\n'+flat.map(row=>allKeys.map(k=>esc(row[k]??'')).join(',')).join('\n');
+      
+    case 'xml':
+      let xml='<?xml version="1.0" encoding="UTF-8"?>\n<data>\n';
+      flat.forEach(row=>{
+        xml+='  <item>\n';
+        Object.entries(row).forEach(([k,v])=>{
+          const val=String(v===null||v===undefined?'':v);
+          xml+=`    <${k}>${escapeXml(val)}</${k}>\n`;
+        });
+        xml+='  </item>\n';
+      });
+      xml+='</data>';
+      return xml;
+      
+    case 'yaml':
+      let yaml='';
+      if(typeof jsyaml?.dump==='function'){
+        return jsyaml.dump(flat.length<=1?flat[0]||{}:flat,{indent:2,lineWidth:-1,noRefs:true,quotingType:"'"});
+      }
+      // Fallback
+      flat.forEach(row=>{
+        yaml+='- ';
+        Object.entries(row).forEach(([k,v],i)=>{
+          const val=v===null||v===undefined?'':String(v);
+          yaml+=k+': "'+val.replace(/"/g,'\\"')+'"'+(i<Object.keys(row).length-1?'\n  ':'');
+        });
+        yaml+='\n';
+      });
+      return yaml;
+      
+    case 'txt':
+      return flat.map(row=>Object.entries(row).map(([k,v])=>k+': '+(v===null||v===undefined?'':v)).join('\n')).join('\n\n');
+      
+    default:
+      throw new Error('Неизвестный формат: '+format);
+  }
+}
+
+function flattenObj(obj,keys){
+  const r={};
+  if(typeof obj!=='object'||obj===null)return r;
+  keys.forEach(k=>{
+    const v=obj[k];
+    if(typeof v==='object'&&v!==null&&!Array.isArray(v)){
+      // Flatten first level
+      Object.entries(v).forEach(([sk,sv])=>{
+        r[k+'_'+sk]=typeof sv==='object'?JSON.stringify(sv):sv;
+      });
+    } else if(Array.isArray(v)){
+      r[k]=v.map(i=>typeof i==='object'?JSON.stringify(i):i).join('; ');
+    } else {
+      r[k]=v;
+    }
+  });
+  return r;
+}
+
+function collectKeys(rows){
+  const ks=new Set();
+  rows.forEach(r=>Object.keys(r).forEach(k=>ks.add(k)));
+  return Array.from(ks);
+}
+
+function escapeXml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Table Preview
+function showTablePreview(){
+  if(!sourceData||!Array.isArray(sourceData)||sourceData.length===0){clearPreview();return}
+  
+  const flat=sourceData.map(item=>flattenObj(item, sourceKeys));
+  const keys=collectKeys(flat);
+  
+  if(keys.length===0||keys.length>20){clearPreview();return}
+  if(flat.length>200){tablePreview.classList.add('show');tableWrap.innerHTML='<div style="padding:20px;color:var(--text2);font-size:.85rem">Слишком много строк для табличного просмотра ('+flat.length+' строк)</div>';return}
+  
+  tablePreview.classList.add('show');
+  tableInfo.textContent=flat.length+' строк · '+keys.length+' колонок';
+  
+  let html='<table><thead><tr><th class="row-num">#</th>';
+  keys.forEach(k=>{html+='<th>'+k+'</th>'});
+  html+='</tr></thead><tbody>';
+  flat.forEach((row,i)=>{
+    html+='<tr><td class="row-num">'+(i+1)+'</td>';
+    keys.forEach(k=>{html+='<td title="'+escapeHtml(String(row[k]??''))+'">'+escapeHtml(String(row[k]??'')).slice(0,40)+'</td>'});
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  tableWrap.innerHTML=html;
+}
+
+function clearPreview(){tablePreview.classList.remove('show');tableWrap.innerHTML=''}
+
+function updateBadge(){
+  fromBadge.textContent=(fromArea.value.match(/\n/g)||[]).length+1+' строк';
+  toBadge.textContent=(toArea.value.match(/\n/g)||[]).length+1+' строк';
+}
+
+// Example
+$('exampleBtn').onclick=()=>{
+  fromFormat.value='json';fromLabel.textContent='JSON';
+  toFormat.value='csv';toLabel.textContent='CSV';
+  fromArea.value=`[
+  {"city":"Новосибирск","leads":125,"sales":6,"revenue":73582},
+  {"city":"Кемерово","leads":87,"sales":4,"revenue":41900},
+  {"city":"Томск","leads":42,"sales":2,"revenue":22500},
+  {"city":"Барнаул","leads":28,"sales":1,"revenue":11500}
+]`;
+  doConvert();
+};
+
+function escapeHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+}
+
+// Area oninput auto-convert with debounce
+let convTimer;
+fromArea.oninput=()=>{clearTimeout(convTimer);convTimer=setTimeout(doConvert,300)};
+
+// Initial example
+$('exampleBtn').click();
+</script>
+</body>
+</html>
