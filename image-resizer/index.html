@@ -59,9 +59,8 @@ h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
 /* Crop area */
 .crop-container{position:relative;display:inline-block;margin:0 auto;width:100%}
 .crop-container img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none}
-.crop-overlay{position:absolute;inset:0;pointer-events:none}
-.crop-overlay.dark{background:rgba(0,0,0,0.5)}
-.crop-box{position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.5);cursor:move;pointer-events:auto}
+.crop-overlay{position:absolute;inset:0;pointer-events:none;background:rgba(0,0,0,0.5)}
+.crop-box{position:absolute;border:2px solid #fff;cursor:move;pointer-events:auto}
 .crop-handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:50%}
 .crop-handle.nw{top:-6px;left:-6px;cursor:nw-resize}
 .crop-handle.ne{top:-6px;right:-6px;cursor:ne-resize}
@@ -156,7 +155,7 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
     <button class="aspect-btn" data-ar="2:3">2:3 (вертик)</button>
     <button class="aspect-btn" data-ar="9:16">9:16 (сторис)</button>
   </div>
-  <div class="crop-container" id="cropContainer" style="display:none">
+  <div class="crop-wrap"><div class="crop-container" id="cropContainer" style="display:none">
     <img id="cropSource" draggable="false">
     <div class="crop-overlay" id="cropOverlay"></div>
     <div class="crop-box" id="cropBox">
@@ -166,7 +165,7 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
       <div class="crop-handle se"></div>
     </div>
     <div class="crop-info" id="cropInfo"></div>
-  </div>
+  </div></div>
   <div class="param-row" style="margin-top:40px">
     <button class="btn btn-primary" id="applyCropBtn" disabled>✂️ Кадрировать</button>
   </div>
@@ -377,6 +376,10 @@ function setCropBox(x,y,w,h){
   cropBox.style.top=y+'px';
   cropBox.style.width=w+'px';
   cropBox.style.height=h+'px';
+  // Update overlay clip-path to "cut out" the crop area
+  const pad=2;
+  const cp='polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, '+(x-pad)+'px 0%, '+(x-pad)+'px '+(y-pad)+'px, '+(x+w+pad)+'px '+(y-pad)+'px, '+(x+w+pad)+'px '+(y+h+pad)+'px, '+(x-pad)+'px '+(y+h+pad)+'px, '+(x-pad)+'px 0%, 0% 0%)';
+  cropOverlay.style.setProperty('--cp', cp);
   updateCropInfo(x,y,w,h);
   return {x,y,w,h};
 }
