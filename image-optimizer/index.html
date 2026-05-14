@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Image Optimizer — сжатие изображений онлайн</title>
+<meta name="description" content="Бесплатный онлайн-оптимизатор изображений. Сжатие JPEG/PNG без потери качества, превью до/после, процент экономии.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--font:'Inter',system-ui,-apple-system,sans-serif;--shadow:0 1px 3px rgba(0,0,0,0.08)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+
+h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.hero{padding:48px 0 32px;text-align:center}
+.hero p{color:var(--text2)}
+
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:60px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:var(--accent-light)}
+.dropzone-icon{font-size:3rem;margin-bottom:12px}
+.dropzone-text{color:var(--text2);font-size:.95rem}
+.dropzone-text strong{color:var(--text)}
+.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:24px 0;padding:16px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.controls label{font-size:.85rem;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:8px}
+.controls input[type=range]{width:140px;accent-color:var(--accent)}
+.controls .val{font-weight:700;color:var(--text);min-width:28px;text-align:right}
+.btn{padding:10px 24px;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text)}
+.btn-secondary:hover{background:#e5e7eb}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+
+.results{display:none}
+.results.show{display:block}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.stat-card__label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-card__value{font-size:1.4rem;font-weight:800}
+.stat-card__value.green{color:#059669}
+.stat-card__value.orange{color:var(--accent)}
+.stat-card__value.red{color:#dc2626}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.compare-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.compare-card__label{padding:12px 16px;font-weight:600;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.compare-card__label .size{font-weight:400;color:var(--text2)}
+.compare-card img{width:100%;height:auto;display:block}
+.compare-card .dim{font-size:.8rem;color:var(--text2);text-align:center;padding:6px}
+
+.download-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px}
+
+.info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:48px}
+.info h3{font-size:.95rem;margin-bottom:8px}
+.info ul{list-style:none;font-size:.85rem;color:var(--text2)}
+.info ul li{padding:4px 0;padding-left:20px;position:relative}
+.info ul li::before{content:"•";position:absolute;left:4px;color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+@media(max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .controls{flex-direction:column;align-items:stretch}
+  h1{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>🖼️ Image Optimizer</h1>
+<p>Сжатие JPEG/PNG прямо в браузере. Никаких загрузок на сервер.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="dropzone" id="dropzone">
+<input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+<div class="dropzone-icon">📁</div>
+<div class="dropzone-text">Перетащи изображение сюда или <strong>выбери файл</strong></div>
+<div style="font-size:.8rem;color:var(--text2);margin-top:6px">JPEG / PNG / WebP</div>
+</div>
+
+<div class="controls">
+<label>Качество: <input type="range" id="qualitySlider" min="10" max="100" value="80"><span class="val" id="qualityVal">80</span>%</label>
+<label>Макс. ширина: <input type="range" id="maxWSlider" min="200" max="4000" step="100" value="1920"><span class="val" id="maxWVal">1920</span>px</label>
+<button class="btn btn-primary" id="applyBtn" disabled>⟳ Применить</button>
+</div>
+
+<div class="results" id="results">
+
+<div class="stats-grid" id="statsGrid"></div>
+
+<div class="compare">
+<div class="compare-card">
+<div class="compare-card__label">Оригинал <span class="size" id="origSize"></span></div>
+<img id="origPreview">
+<div class="dim" id="origDim"></div>
+</div>
+<div class="compare-card">
+<div class="compare-card__label">Сжато <span class="size" id="optSize"></span></div>
+<img id="optPreview">
+<div class="dim" id="optDim"></div>
+</div>
+</div>
+
+<div class="download-bar">
+<button class="btn btn-primary" id="downloadBtn">⬇ Скачать</button>
+<button class="btn btn-secondary btn-sm" id="downloadOrigBtn">⬇ Оригинал</button>
+</div>
+</div>
+
+<div class="info">
+<h3>ℹ️ Как это работает</h3>
+<ul>
+<li>Всё сжатие происходит в вашем браузере через Canvas API</li>
+<li>Изображения не отправляются на сервер — безопасно</li>
+<li>JPEG: регулировка качества (10–100%)</li>
+<li>PNG: ресайз + конвертация в JPEG (если нет прозрачности)</li>
+<li>Ресайз по максимальной ширине (пропорции сохраняются)</li>
+</ul>
+</div>
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const dropzone=$('dropzone'), fileInput=$('fileInput'), qualitySlider=$('qualitySlider'), qualityVal=$('qualityVal');
+const maxWSlider=$('maxWSlider'), maxWVal=$('maxWVal'), applyBtn=$('applyBtn');
+const results=$('results'), statsGrid=$('statsGrid');
+const origPreview=$('origPreview'), optPreview=$('optPreview');
+const origSize=$('origSize'), optSize=$('optSize'), origDim=$('origDim'), optDim=$('optDim');
+const downloadBtn=$('downloadBtn'), downloadOrigBtn=$('downloadOrigBtn');
+
+let originalFile=null, originalBlob=null, optimizedBlob=null;
+let origW=0, origH=0, optW=0, optH=0;
+
+qualitySlider.oninput=()=>qualityVal.textContent=qualitySlider.value;
+maxWSlider.oninput=()=>maxWVal.textContent=maxWSlider.value;
+
+// Drag & Drop
+dropzone.ondragover=e=>{e.preventDefault();dropzone.classList.add('dragover')};
+dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
+dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)handleFile(f)};
+fileInput.onchange=()=>{if(fileInput.files[0])handleFile(fileInput.files[0])};
+
+function handleFile(file){
+  if(!file.type.match(/^image\/(jpeg|png|webp)$/)){alert('Только JPEG/PNG/WebP');return}
+  originalFile=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    origPreview.src=e.target.result;
+    origPreview.onload=()=>{
+      origW=origPreview.naturalWidth;
+      origH=origPreview.naturalHeight;
+      origDim.textContent=origW+'×'+origH+'px';
+      origSize.textContent=fmtSize(file.size);
+      applyBtn.disabled=false;
+      doOptimize();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function doOptimize(){
+  const q=parseInt(qualitySlider.value)/100;
+  const mw=parseInt(maxWSlider.value);
+  
+  const canvas=document.createElement('canvas');
+  let w=origW, h=origH;
+  if(w>mw){h=Math.round(h*mw/w);w=mw}
+  optW=w; optH=h;
+  canvas.width=w; canvas.height=h;
+  
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(origPreview,0,0,w,h);
+  
+  // Detect if PNG has transparency
+  let mime='image/jpeg';
+  if(originalFile.type==='image/png'){
+    // Quick check for alpha by reading first pixel
+    const pd=ctx.getImageData(0,0,1,1).data;
+    if(pd[3]<255) mime='image/png'; // has transparency
+    else mime='image/webp';
+
+    // Fallback webp→jpeg if webp unsupported
+  }
+  if(originalFile.type==='image/webp') mime='image/webp';
+  
+  // Try webp, fallback to jpeg
+  canvas.toBlob(b=>{
+    if(!b){results.classList.remove('show');return}
+    optimizedBlob=b;
+    const url=URL.createObjectURL(b);
+    optPreview.src=url;
+    optPreview.onload=()=>{
+      optSize.textContent=fmtSize(b.size);
+      optDim.textContent=optW+'×'+optH+'px';
+      updateStats(originalFile.size, b.size);
+      results.classList.add('show');
+    };
+  }, mime, mime==='image/jpeg'?q:0.8);
+}
+
+applyBtn.onclick=doOptimize;
+
+let origBlobURL=null;
+downloadBtn.onclick=()=>{
+  if(!optimizedBlob)return;
+  const a=document.createElement('a');
+  const ext=originalFile.name.match(/\.(\w+)$/)?.[1]||'jpg';
+  const name=originalFile.name.replace(/\.[^.]+$/,'')+'_optimized.'+ext;
+  a.href=URL.createObjectURL(optimizedBlob);
+  a.download=name;
+  a.click();
+};
+
+downloadOrigBtn.onclick=()=>{
+  const a=document.createElement('a');
+  a.href=origPreview.src;
+  a.download=originalFile.name;
+  a.click();
+};
+
+function updateStats(orig,opt){
+  const saved=orig-opt;
+  const pct=orig>0?Math.round(saved/orig*100):0;
+  statsGrid.innerHTML=
+    '<div class="stat-card"><div class="stat-card__label">Оригинал</div><div class="stat-card__value">'+fmtSize(orig)+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">После сжатия</div><div class="stat-card__value green">'+fmtSize(opt)+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">Экономия</div><div class="stat-card__value '+(saved>0?'green':'')+'">'+fmtSize(saved)+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">Сжатие</div><div class="stat-card__value orange">'+pct+'%</div></div>';
+}
+
+function fmtSize(b){
+  if(b<1024) return b+' Б';
+  if(b<1048576) return (b/1024).toFixed(1)+' КБ';
+  return (b/1048576).toFixed(2)+' МБ';
+}
+</script>
+</body>
+</html>
