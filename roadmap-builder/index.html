@@ -48,8 +48,7 @@ header .container{display:flex;align-items:center;justify-content:space-between}
 .fm{width:130px}
 
 /* Grid container — single source of truth */
-.grid-wrap{overflow-x:auto;position:relative;padding:0 0 0 200px}
-.grid-label-col{position:sticky;left:0;z-index:10;width:200px;background:var(--surface);float:left}
+.grid-wrap{overflow-x:auto;position:relative}
 .grid-body{position:relative}
 .grid-header{position:relative;height:48px}
 .grid-months{position:absolute;top:0;left:0;right:0;height:26px;display:flex}
@@ -66,11 +65,10 @@ header .container{display:flex;align-items:center;justify-content:space-between}
 .grid-line{border-left:1px solid #f3f4f6;position:absolute;top:0;bottom:0}
 .grid-line.thick{border-left-color:var(--border)}
 
-/* Label cell */
-.label-cell{position:relative;height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px 0 14px;gap:6px;font-size:.82rem;font-weight:500;cursor:pointer}
-.label-cell .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.label-cell .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.label-cell:hover{background:rgba(0,0,0,.02)}
+/* Task label embedded in row */
+.task-label{position:absolute;left:4px;top:0;height:44px;display:flex;align-items:center;gap:5px;font-size:.82rem;font-weight:500;pointer-events:none;z-index:8;max-width:160px;overflow:hidden}
+.task-label .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-label .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* Task bar — positioned in pixels */
 .task-bar{position:absolute;height:26px;top:9px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:.68rem;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -152,7 +150,6 @@ footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margi
 </div>
 
 <div id="gridWrap" class="grid-wrap">
-<div class="grid-label-col" id="labelCol"></div>
 <div class="grid-body" id="gridBody">
 <div class="grid-header" id="gridHeader"></div>
 <div class="grid-rows" id="gridRows"></div>
@@ -269,9 +266,7 @@ function render(){
   
   // ── Task rows ──
   const rows = document.getElementById('gridRows');
-  const labelCol = document.getElementById('labelCol');
   rows.innerHTML = '';
-  labelCol.innerHTML = '';
   
   if(tasks.length === 0){
     rows.innerHTML = '<div style="padding:80px 20px;text-align:center;color:var(--text2);font-size:.85rem">➕ Нажмите «Новая задача» или введите название выше</div>';
@@ -280,22 +275,11 @@ function render(){
   }
   
   tasks.forEach((t, i) => {
-    // Label
-    const lb = document.createElement('div');
-    lb.className = 'label-cell'+(i===sel?' selected':'');
-    lb.innerHTML = '<span class="dot" style="background:'+(SC[t.status]||'#6366f1')+'"></span><span class="name">'+e(t.name)+'</span>';
-    lb.dataset.idx = i;
-    lb.onclick = ()=>{sk(i)};
-    lb.ondblclick = ()=>{opEd(i)};
-    labelCol.appendChild(lb);
-    
     // Row body
     const rw = document.createElement('div');
     rw.className = 'grid-row'+(i===sel?' selected':'');
     rw.dataset.idx = i;
     rw.style.width = tw + 'px';
-    rw.onclick = ()=>{sk(i)};
-    rw.ondblclick = ()=>{opEd(i)};
     
     // Grid lines
     let g = '<div class="grid-lines">';
@@ -304,9 +288,13 @@ function render(){
       g += '<div class="grid-line" style="left:'+(j*pw)+'px;width:0'+l+'"></div>';
     }
     g += '</div>';
+    
+    // Task label embedded in row
+    g += '<div class="task-label"><span class="dot" style="background:'+(SC[t.status]||'#6366f1')+'"></span><span class="name">'+e(t.name)+'</span></div>';
+    
     rw.innerHTML = g;
     
-    // Task bar
+    // Task bar — click selects, dblclick edits
     const bl = Math.max(0, Math.min(t.week, w-1)) * pw;
     const bw = Math.max(10, Math.min(t.span||1, w - t.week)) * pw - 2;
     const bar = document.createElement('div');
@@ -318,6 +306,10 @@ function render(){
     bar.ondblclick = e=>{e.stopPropagation();opEd(i)};
     rw.appendChild(bar);
     
+    // Click on row (background) also selects
+    rw.onclick = e=>{if(e.target===rw||e.target.classList.contains('grid-lines')||e.target.classList.contains('grid-line'))sk(i)};
+    rw.ondblclick = e=>{if(e.target===rw)opEd(i)};
+    
     rows.appendChild(rw);
   });
   
@@ -327,11 +319,12 @@ function render(){
 function sk(i){
   if(i<0||i>=tasks.length) return;
   sel = i;
-  document.querySelectorAll('.label-cell,.grid-row').forEach(el=>el.classList.remove('selected'));
-  const l = document.querySelector('.label-cell[data-idx="'+i+'"]');
-  if(l) l.classList.add('selected');
-  const r = document.querySelector('.grid-row[data-idx="'+i+'"]');
-  if(r) r.classList.add('selected');
+  // Remove all selected highlights
+  document.querySelectorAll('.grid-row').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.task-bar').forEach(el=>el.style.outline='');
+  // Highlight selected task bar
+  const bar = document.querySelector('.task-bar[data-idx="'+i+'"]');
+  if(bar) bar.style.outline = '2px solid #1a1a2e';
   document.getElementById('editBtn').disabled = false;
   document.getElementById('delBtn').disabled = false;
 }
