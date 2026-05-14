@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Roadmap Builder — конструктор дорожных карт</title>
+<meta name="description" content="Визуальный конструктор дорожных карт. Кварталы, задачи, статусы, таймлайн. Экспорт в PNG и CSV.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.hero{padding:28px 0 16px;text-align:center}
+.hero p{color:var(--text2);font-size:.88rem}
+
+/* Toolbar */
+.toolbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.toolbar .sep{width:1px;height:28px;background:var(--border)}
+.toolbar button{padding:7px 14px;border:none;border-radius:6px;font-size:.8rem;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .12s;display:flex;align-items:center;gap:5px}
+.toolbar button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.toolbar input[type=text]{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--bg);color:var(--text);min-width:200px}
+.toolbar select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--bg);color:var(--text)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text)}
+.btn-secondary:hover{background:#e5e7eb;color:var(--text)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Roadmap canvas */
+.roadmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.roadmap-header{display:flex;padding:16px 16px 0;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.roadmap-title{flex:1;min-width:200px}
+.roadmap-title input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:1rem;font-weight:700;font-family:var(--font);background:var(--surface);color:var(--text)}
+.roadmap-title input:focus{outline:none;border-color:var(--accent)}
+.roadmap-meta{display:flex;gap:12px;margin-top:8px}
+.roadmap-meta input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--surface);color:var(--text2)}
+.roadmap-canvas{padding:16px;overflow-x:auto;position:relative;margin-top:0;min-height:400px}
+.roadmap-table{width:100%;border-collapse:collapse;min-width:600px}
+.roadmap-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);padding:8px 10px;border-bottom:2px solid var(--border);text-align:left;font-weight:600}
+.roadmap-table td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:top;font-size:.85rem}
+
+/* Gantt-like bars */
+.gantt-row{display:flex;align-items:center;gap:8px;padding:8px 0}
+.gantt-labels{width:220px;flex-shrink:0}
+.gantt-labels .task-name{font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:6px}
+.gantt-labels .task-desc{font-size:.72rem;color:var(--text2);margin-top:2px}
+.gantt-timeline{flex:1;height:32px;background:#f3f4f6;border-radius:6px;position:relative;min-width:400px}
+.gantt-bar{position:absolute;height:28px;top:2px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 10px;font-size:.7rem;font-weight:600;color:#fff;transition:all .12s;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.gantt-bar:hover{opacity:.85;z-index:10;transform:scaleY(1.1)}
+.gantt-bar.done{background:#059669}
+.gantt-bar.inprogress{background:#f97316}
+.gantt-bar.plan{background:#6366f1}
+.gantt-bar.paused{background:#9ca3af}
+.gantt-bar.canceled{background:#ef4444}
+
+/* Task manager */
+.panel-group{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+@media(max-width:768px){.panel-group{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.panel h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:10px}
+.form-group{margin-bottom:8px}
+.form-group label{display:block;font-size:.75rem;color:var(--text2);margin-bottom:3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
+.form-group textarea{resize:vertical;min-height:50px}
+.form-row{display:flex;gap:8px}
+.form-row>*{flex:1}
+
+/* Task list */
+.task-list{max-height:400px;overflow-y:auto}
+.task-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;position:relative}
+.task-item:hover{border-color:var(--border);background:var(--bg)}
+.task-item.active{border-color:var(--accent);background:var(--accent-light)}
+.task-item .color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.task-item .info{flex:1;min-width:0}
+.task-item .info .name{font-size:.83rem;font-weight:500}
+.task-item .info .meta{font-size:.7rem;color:var(--text2)}
+.task-item .actions{display:flex;gap:3px;opacity:0;transition:opacity .12s}
+.task-item:hover .actions{opacity:1}
+.task-item .actions button{width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-size:.75rem;display:flex;align-items:center;justify-content:center}
+.task-item .actions button:hover{background:#f3f4f6;color:var(--text)}
+.task-item .actions button.del:hover{background:#fef2f2;color:#ef4444}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-width:360px;max-width:500px}
+.modal h2{font-size:1rem;margin-bottom:12px}
+.modal button{margin-top:10px}
+
+footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--text2);font-size:.82rem;margin-top:32px}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>🗺 Roadmap Builder</h1>
+<p>Визуальный конструктор дорожных карт. Таймлайн, кварталы, статусы, экспорт в PNG/CSV.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="toolbar">
+<button class="btn-primary" id="addTaskBtn" onclick="openAddModal()">+ Новая задача</button>
+<div class="sep"></div>
+<button class="btn-secondary" id="exportPngBtn" onclick="exportPNG()">⬇ Экспорт PNG</button>
+<button class="btn-secondary" id="exportCsvBtn" onclick="exportCSV()">⬇ CSV</button>
+<div class="sep"></div>
+<button class="btn-outline" id="exampleBtn" onclick="loadExample()">📄 Пример</button>
+<button class="btn-outline" id="clearBtn" onclick="if(confirm('Очистить всё?')){tasks=[];save();renderAll();}" style="color:#ef4444">✕ Очистить</button>
+</div>
+
+<div class="roadmap-wrap">
+<div class="roadmap-header">
+<div class="roadmap-title">
+<input type="text" id="roadmapTitle" value="Дорожная карта 2026" onchange="save();renderAll();" placeholder="Название дорожной карты...">
+<div class="roadmap-meta">
+<input type="text" id="roadmapOwner" placeholder="Владелец" value="Отдел маркетинга" onchange="save();renderAll();">
+<input type="text" id="roadmapPeriod" placeholder="Период" value="Q1-Q4 2026" onchange="save();renderAll();">
+</div>
+</div>
+</div>
+
+<div class="roadmap-canvas" id="roadmapCanvas">
+<div id="ganttContainer"></div>
+</div>
+</div>
+
+<div class="panel-group">
+<div class="panel">
+<h3>📋 Все задачи (<span id="taskCount">0</span>)</h3>
+<div class="task-list" id="taskList"></div>
+</div>
+<div class="panel">
+<h3>📊 Легенда</h3>
+<div style="display:flex;flex-direction:column;gap:6px;font-size:.82rem">
+<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#059669"></span> Выполнено</div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#f97316"></span> В работе</div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#6366f1"></span> В плане</div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#9ca3af"></span> На паузе</div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#ef4444"></span> Отменено</div>
+</div>
+<br>
+<h3>💡 Горячие клавиши</h3>
+<div style="font-size:.78rem;color:var(--text2);line-height:1.8">
+<strong>Enter</strong> — сохранить задачу<br>
+<strong>Del</strong> — удалить выбранную<br>
+<strong>↑↓</strong> — навигация по списку
+</div>
+</div>
+</div>
+
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const QUARTERS = ['Q1','Q2','Q3','Q4'];
+const STAT_COLORS = {done:'#059669',inprogress:'#f97316',plan:'#6366f1',paused:'#9ca3af',canceled:'#ef4444'};
+const STAT_LABELS = {done:'Выполнено',inprogress:'В работе',plan:'В плане',paused:'На паузе',canceled:'Отменено'};
+
+let tasks = [];
+let selectedTask = -1;
+let nextId = 1;
+
+// Load
+try{const s = localStorage.getItem('mkt_roadmap'); if(s) { const d = JSON.parse(s); tasks = d.tasks || []; nextId = d.nextId || 1; }}catch(e){}
+
+function save(){
+  const title = document.getElementById('roadmapTitle').value;
+  const owner = document.getElementById('roadmapOwner').value;
+  const period = document.getElementById('roadmapPeriod').value;
+  localStorage.setItem('mkt_roadmap', JSON.stringify({tasks,nextId,title,owner,period}));
+}
+
+// Render Gantt
+function renderGantt(){
+  const cont = document.getElementById('ganttContainer');
+  if(tasks.length === 0){
+    cont.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text2)">➕ Нажмите «Новая задача», чтобы начать</div>';
+    return;
+  }
+  
+  // Determine timeline range
+  let minQ = 1, maxQ = 4, minY = 2026, maxY = 2026;
+  tasks.forEach(t => {
+    if(t.quarter < minQ) minQ = t.quarter;
+    if(t.quarter > maxQ) maxQ = t.quarter;
+    if(t.year < minY) minY = t.year;
+    if(t.year > maxY) maxY = t.year;
+  });
+  
+  const totalQ = (maxY - minY) * 4 + (maxQ - minQ + 1);
+  const qWidth = 80; // px per quarter
+  const totalWidth = totalQ * qWidth;
+  
+  let html = '<div class="gantt-container" style="min-width:' + (300 + totalWidth) + 'px">';
+  
+  // Header: quarters
+  html += '<div style="display:flex;">';
+  html += '<div style="width:220px;flex-shrink:0;padding:4px 10px;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);font-weight:600">Задача</div>';
+  html += '<div style="display:flex;flex:1">';
+  
+  for(let y = minY; y <= maxY; y++){
+    const qStart = (y === minY) ? minQ : 1;
+    const qEnd = (y === maxY) ? maxQ : 4;
+    for(let q = qStart; q <= qEnd; q++){
+      html += '<div style="width:' + qWidth + 'px;flex-shrink:0;text-align:center;padding:4px 0;font-size:.65rem;font-weight:600;color:var(--text2);border-left:1px solid var(--border)">' + QUARTERS[q-1] + ' ' + y + '</div>';
+    }
+  }
+  html += '</div></div>';
+  
+  // Task rows
+  tasks.forEach((t, i) => {
+    const qOff = (t.year - minY) * 4 + (t.quarter - minQ);
+    const barLeft = qOff * qWidth + 4;
+    const barWidth = (t.span || 1) * qWidth - 8;
+    const col = STAT_COLORS[t.status] || STAT_COLORS.plan;
+    
+    html += '<div style="display:flex;align-items:center;border-top:1px solid var(--border)">';
+    html += '<div style="width:220px;flex-shrink:0;padding:8px 10px;font-size:.82rem">';
+    html += '<div style="font-weight:600;display:flex;align-items:center;gap:6px">';
+    html += '<span style="width:8px;height:8px;border-radius:50%;background:' + col + ';flex-shrink:0"></span>';
+    html += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.name) + '</span></div>';
+    if(t.desc) html += '<div style="font-size:.7rem;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.desc) + '</div>';
+    html += '</div>';
+    html += '<div style="flex:1;position:relative;height:48px;padding:10px 0">';
+    html += '<div class="gantt-bar ' + t.status + '" style="left:' + barLeft + 'px;width:' + Math.max(barWidth, 20) + 'px;background:' + col + '" onclick="editTask(' + i + ')" title="' + esc(t.name) + ' (' + QUARTERS[t.quarter-1] + ' ' + t.year + ')">';
+    html += esc(t.name);
+    html += '</div></div></div>';
+  });
+  
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+// Render task list
+function renderTaskList(){
+  const cont = document.getElementById('taskList');
+  document.getElementById('taskCount').textContent = tasks.length;
+  
+  if(tasks.length === 0){
+    cont.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:.82rem">Пока нет задач</div>';
+    return;
+  }
+  
+  tasks.forEach((t, i) => {
+    const col = STAT_COLORS[t.status] || '#6366f1';
+    const label = STAT_LABELS[t.status] || '';
+    const div = document.createElement('div');
+    div.className = 'task-item' + (i === selectedTask ? ' active' : '');
+    div.innerHTML = 
+      '<span class="color-dot" style="background:' + col + '"></span>' +
+      '<div class="info"><div class="name">' + esc(t.name) + '</div><div class="meta">' + QUARTERS[t.quarter-1] + ' ' + t.year + ' · ' + (t.span||1) + ' кв. · ' + label + '</div></div>' +
+      '<div class="actions">' +
+        '<button onclick="event.stopPropagation();editTask(' + i + ')" title="Редактировать">✎</button>' +
+        '<button class="del" onclick="event.stopPropagation();deleteTask(' + i + ')" title="Удалить">🗑</button>' +
+      '</div>';
+    div.onclick = () => { selectedTask = i; renderTaskList(); renderGantt(); };
+    cont.appendChild(div);
+  });
+}
+
+// Add / Edit modals
+function openAddModal(){
+  openTaskModal(null);
+}
+
+function editTask(i){
+  selectedTask = i;
+  renderTaskList();
+  renderGantt();
+  openTaskModal(tasks[i], i);
+}
+
+function openTaskModal(task, idx){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  const isEdit = task !== null;
+  const t = task || {name:'',desc:'',quarter:1,year:2026,span:1,status:'plan'};
+  
+  const statusOpts = ['done','inprogress','plan','paused','canceled'].map(s => 
+    '<option value="' + s + '"' + (t.status === s ? ' selected' : '') + '>' + STAT_LABELS[s] + '</option>'
+  ).join('');
+  
+  overlay.innerHTML = '<div class="modal">' +
+    '<h2>' + (isEdit ? '✏️ Редактировать задачу' : '➕ Новая задача') + '</h2>' +
+    '<div class="form-group"><label>Название</label><input type="text" id="modalName" value="' + esc(t.name) + '" placeholder="Задача..."></div>' +
+    '<div class="form-group"><label>Описание</label><textarea id="modalDesc" placeholder="Краткое описание...">' + esc(t.desc||'') + '</textarea></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label>Квартал</label><select id="modalQuarter">' + 
+        QUARTERS.map((q, i) => '<option value="' + (i+1) + '"' + (t.quarter === i+1 ? ' selected' : '') + '>' + q + '</option>').join('') +
+      '</select></div>' +
+      '<div class="form-group"><label>Год</label><input type="number" id="modalYear" value="' + t.year + '" min="2024" max="2030"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label>Длительность (кварталов)</label><input type="number" id="modalSpan" value="' + (t.span||1) + '" min="1" max="8"></div>' +
+      '<div class="form-group"><label>Статус</label><select id="modalStatus">' + statusOpts + '</select></div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px">' +
+      '<button class="btn-primary" id="modalSaveBtn">💾 Сохранить</button>' +
+      '<button class="btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">Отмена</button>' +
+    '</div>' +
+  '</div>';
+  
+  document.body.appendChild(overlay);
+  
+  const nameInput = overlay.querySelector('#modalName');
+  nameInput.focus();
+  nameInput.select();
+  
+  const save = () => {
+    const name = overlay.querySelector('#modalName').value.trim();
+    if(!name) return;
+    const obj = {
+      name,
+      desc: overlay.querySelector('#modalDesc').value.trim(),
+      quarter: parseInt(overlay.querySelector('#modalQuarter').value),
+      year: parseInt(overlay.querySelector('#modalYear').value) || 2026,
+      span: parseInt(overlay.querySelector('#modalSpan').value) || 1,
+      status: overlay.querySelector('#modalStatus').value
+    };
+    
+    if(isEdit && idx !== null) tasks[idx] = obj;
+    else { obj.id = nextId++; tasks.push(obj); selectedTask = tasks.length - 1; }
+    
+    overlay.remove();
+    save(); renderAll();
+  };
+  
+  overlay.querySelector('#modalSaveBtn').onclick = save;
+  overlay.addEventListener('keydown', (e) => { if(e.key === 'Enter') save(); if(e.key === 'Escape') overlay.remove(); });
+}
+
+function deleteTask(i){
+  if(!confirm('Удалить задачу «' + tasks[i].name + '»?')) return;
+  tasks.splice(i, 1);
+  if(selectedTask >= tasks.length) selectedTask = tasks.length - 1;
+  save(); renderAll();
+}
+
+// Render all
+function renderAll(){
+  // Restore meta
+  const stored = JSON.parse(localStorage.getItem('mkt_roadmap') || '{}');
+  if(stored.title) document.getElementById('roadmapTitle').value = stored.title;
+  if(stored.owner) document.getElementById('roadmapOwner').value = stored.owner;
+  if(stored.period) document.getElementById('roadmapPeriod').value = stored.period;
+  
+  renderGantt();
+  renderTaskList();
+}
+
+// Export PNG
+function exportPNG(){
+  const el = document.querySelector('.roadmap-wrap');
+  html2canvas(el, {backgroundColor:'#fff',scale:2,useCORS:true,logging:false}).then(canvas => {
+    const a = document.createElement('a');
+    a.download = 'roadmap.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }).catch(() => {
+    alert('Не удалось создать PNG. Попробуйте скриншот страницы (Ctrl+Shift+S).');
+  });
+}
+
+// Export CSV
+function exportCSV(){
+  if(tasks.length === 0) return;
+  let csv = '\uFEFFНазвание,Описание,Квартал,Год,Длительность,Статус\n';
+  tasks.forEach(t => {
+    const escCsv = s => '"' + String(s||'').replace(/"/g,'""') + '"';
+    csv += escCsv(t.name) + ',' + escCsv(t.desc||'') + ',' + QUARTERS[t.quarter-1] + ' ' + t.year + ',' + t.year + ',' + (t.span||1) + ',' + STAT_LABELS[t.status] + '\n';
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'roadmap.csv';
+  a.click();
+}
+
+// Example
+function loadExample(){
+  tasks = [
+    {name:'Аудит текущих каналов',desc:'Сбор данных по всем каналам',quarter:1,year:2026,span:1,status:'done',id:1},
+    {name:'Стратегия лидогенерации',desc:'Определение ключевых каналов',quarter:2,year:2026,span:1,status:'inprogress',id:2},
+    {name:'Запуск Telegram-канала',desc:'Контент-план, оформление',quarter:2,year:2026,span:1,status:'inprogress',id:3},
+    {name:'SEO-оптимизация сайта',desc:'Технический аудит, контент',quarter:2,year:2026,span:2,status:'plan',id:4},
+    {name:'Внедрение CDP',desc:'Единая база клиентов',quarter:3,year:2026,span:2,status:'plan',id:5},
+    {name:'Автоматизация email-рассылок',desc:'Триггерные сценарии',quarter:3,year:2026,span:1,status:'plan',id:6},
+    {name:'Запуск ретаргетинга',desc:'По всем сегментам',quarter:3,year:2026,span:1,status:'plan',id:7},
+    {name:'Анализ эффективности',desc:'ROMI, CAC, LTV по каналам',quarter:4,year:2026,span:1,status:'plan',id:8}
+  ];
+  nextId = 9;
+  selectedTask = -1;
+  save(); renderAll();
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    if(document.querySelector('.modal-overlay')) return;
+    e.preventDefault();
+    if(tasks.length === 0) return;
+    const dir = e.key === 'ArrowDown' ? 1 : -1;
+    selectedTask = Math.max(0, Math.min(tasks.length - 1, selectedTask + dir));
+    renderTaskList(); renderGantt();
+    // Scroll into view
+    const el = document.querySelector('.task-item.active');
+    if(el) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  if(e.key === 'Delete' && selectedTask >= 0 && selectedTask < tasks.length){
+    if(!document.querySelector('.modal-overlay')) deleteTask(selectedTask);
+  }
+});
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// Init
+renderAll();
+
+// If empty, load example
+if(tasks.length === 0) loadExample();
+</script>
+</body>
+</html>
