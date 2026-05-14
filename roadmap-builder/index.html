@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Roadmap Builder — дорожная карта</title>
-<meta name="description" content="Конструктор дорожных карт. Календарная сетка с разбивкой на месяцы и недели. Экспорт PNG/CSV.">
+<meta name="description" content="Конструктор дорожных карт. Календарная сетка с разбивкой по неделям. Экспорт PNG/CSV.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8f9fb;--surface:#fff;--text:#111827;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif;--cell-w:40px}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#111827;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text)}
 .container{max-width:1200px;margin:0 auto;padding:0 20px}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100}
 header .container{display:flex;align-items:center;justify-content:space-between}
@@ -19,62 +19,73 @@ header .container{display:flex;align-items:center;justify-content:space-between}
 .logo span{color:var(--accent)}
 .back{color:var(--text2);text-decoration:none;font-size:.85rem}
 .back:hover{color:var(--accent)}
-h1{font-size:1.3rem;font-weight:700;letter-spacing:-.3px}
-h2{font-size:.85rem;font-weight:600;margin-bottom:10px}
 .hero{padding:24px 0 14px;text-align:center}
 .hero p{color:var(--text2);font-size:.82rem}
 
-/* Toolbar */
 .toolbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.toolbar button{padding:6px 14px;border:none;border-radius:6px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .1s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.toolbar button{padding:6px 14px;border:none;border-radius:6px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;white-space:nowrap}
 .btn-p{background:var(--accent);color:#fff}
 .btn-p:hover{background:var(--accent-hover)}
 .btn-s{background:#f3f4f6;color:var(--text)}
 .btn-s:hover{background:#e5e7eb}
 .btn-o{background:transparent;border:1px solid var(--border);color:var(--text2)}
 .btn-o:hover{border-color:var(--accent);color:var(--accent)}
-.sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.sep{width:1px;height:24px;background:var(--border)}
 
-/* Roadmap card */
 .roadmap-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .meta-bar{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
 .meta-bar input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--surface);color:var(--text);flex:1;min-width:140px}
 .meta-bar input:focus{outline:none;border-color:var(--accent)}
 .meta-bar .hint{font-size:.72rem;color:var(--text2);white-space:nowrap}
+.meta-bar select{padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:.75rem;font-family:var(--font);background:var(--surface);color:var(--text)}
 
-/* Calendar grid */
-.canvas-wrap{overflow-x:auto;padding:0}
-.calendar{width:100%;position:relative;table-layout:fixed}
-.calendar thead th{position:sticky;top:0;background:var(--surface);z-index:5;border-bottom:2px solid var(--border)}
-.calendar .month-row th{padding:10px 4px 4px;font-size:.72rem;font-weight:600;color:var(--text2);text-align:center;letter-spacing:.3px}
-.calendar .week-row th{padding:2px 4px 10px;font-size:.6rem;font-weight:500;color:#9ca3af;text-align:center}
+/* Inline form */
+.form-bar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.form-bar input,.form-bar select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
+.form-bar input:focus,.form-bar select:focus{outline:none;border-color:var(--accent)}
+.fn{flex:1;min-width:140px}
+.fs{width:100px}
+.fm{width:130px}
 
-/* Task rows */
-.task-row td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle}
-.task-label{padding:10px 8px 10px 14px;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:6px;width:200px;min-width:200px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.task-label .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.task-cal{position:relative;height:42px}
-.task-bar{position:absolute;height:26px;top:8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 10px;font-size:.7rem;font-weight:600;color:#fff;transition:all .1s;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+/* Grid container — single source of truth */
+.grid-wrap{overflow-x:auto;position:relative;padding:0 0 0 200px}
+.grid-label-col{position:sticky;left:0;z-index:10;width:200px;background:var(--surface);float:left}
+.grid-body{position:relative}
+.grid-header{position:relative;height:48px}
+.grid-months{position:absolute;top:0;left:0;right:0;height:26px;display:flex}
+.grid-month{font-size:.7rem;font-weight:600;color:var(--text2);text-align:center;padding-top:6px;border-left:1px solid var(--border);height:100%}
+.grid-weeks{position:absolute;bottom:0;left:0;right:0;height:22px;display:flex}
+.grid-week{font-size:.6rem;color:#ccc;text-align:center;border-left:1px solid var(--border);height:100%;padding-top:4px;display:flex;align-items:center;justify-content:center}
+.grid-week.odd{color:var(--text2)}
+.grid-rows{position:relative}
+.grid-row{position:relative;height:44px;border-bottom:1px solid var(--border)}
+.grid-row:nth-child(even){background:rgba(0,0,0,.012)}
+.grid-row-highlight{position:absolute;inset:0;background:var(--accent-light);opacity:0;pointer-events:none;transition:opacity .1s}
+.grid-row.selected .grid-row-highlight{opacity:1}
+.grid-lines{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+.grid-line{border-left:1px solid #f3f4f6;position:absolute;top:0;bottom:0}
+.grid-line.thick{border-left-color:var(--border)}
+
+/* Label cell */
+.label-cell{position:relative;height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px 0 14px;gap:6px;font-size:.82rem;font-weight:500;cursor:pointer}
+.label-cell .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.label-cell .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.label-cell:hover{background:rgba(0,0,0,.02)}
+
+/* Task bar — positioned in pixels */
+.task-bar{position:absolute;height:26px;top:9px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:.68rem;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .task-bar:hover{z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.2);transform:translateY(-1px)}
 .task-bar.s-done{background:#059669}
 .task-bar.s-inprogress{background:#f97316}
 .task-bar.s-plan{background:#6366f1}
 .task-bar.s-paused{background:#9ca3af}
 .task-bar.s-canceled{background:#ef4444}
-
-/* New task form right under toolbar */
-.form-bar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
-.form-bar input,.form-bar select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
-.form-bar input:focus,.form-bar select:focus{outline:none;border-color:var(--accent)}
-.form-bar .fname{flex:1;min-width:140px}
-.form-bar .fshort{width:90px}
-.form-bar .fmid{width:120px}
-.form-bar .ffull{width:140px}
+.task-bar.empty{opacity:.4}
 
 /* Legend */
 .legend-bar{display:flex;gap:14px;padding:8px 14px;border-top:1px solid var(--border);flex-wrap:wrap;font-size:.72rem;color:var(--text2);align-items:center}
 .legend-item{display:flex;align-items:center;gap:5px}
-.legend-item .swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.legend-item .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 .stats{font-size:.72rem;color:var(--text2);margin-left:auto;display:flex;gap:8px}
 
 /* Modal */
@@ -88,14 +99,7 @@ h2{font-size:.85rem;font-weight:600;margin-bottom:10px}
 .modal .actions{display:flex;gap:8px;margin-top:12px}
 .modal .actions button{padding:7px 18px;border:none;border-radius:6px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:var(--font)}
 
-/* Cell markers */
-.week-divider{border-left:1px solid var(--border)}
-.month-divider{border-left:2px solid var(--border)}
-td.marker{width:0;padding:0;border-left:0}
-.td-cell{width:var(--cell-w);border-left:1px solid #f3f4f6;text-align:center;font-size:.55rem;color:#e5e7eb;padding:0}
-
 footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margin-top:24px}
-@media(max-width:640px){.hero{padding:16px 0 8px}h1{font-size:1.1rem}.form-bar .fshort{width:70px}.form-bar .fmid{width:90px}.form-bar .ffull{width:110px}}
 </style>
 </head>
 <body>
@@ -109,7 +113,7 @@ footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margi
 <section class="hero">
 <div class="container">
 <h1>🗺 Roadmap Builder</h1>
-<p>Календарная сетка с разбивкой по неделям · Экспорт в PNG и CSV</p>
+<p>Календарная сетка по неделям с привязкой к шкале · Экспорт PNG/CSV</p>
 </div>
 </section>
 
@@ -122,59 +126,61 @@ footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margi
 <button class="btn-o" id="exampleBtn">📄 Пример</button>
 <button class="btn-o" id="clearBtn">✕ Очистить</button>
 <div class="sep"></div>
-<button class="btn-o" id="exportPng">⬇ PNG</button>
-<button class="btn-o" id="exportCsv">⬇ CSV</button>
+<button class="btn-o" id="exPng">⬇ PNG</button>
+<button class="btn-o" id="exCsv">⬇ CSV</button>
 </div>
 
-<div class="roadmap-card" id="roadmapCard">
+<div class="roadmap-card" id="rmCard">
 <div class="meta-bar">
-<input type="text" id="mapTitle" value="Дорожная карта 2026" placeholder="Название">
-<input type="text" id="mapOwner" value="Отдел маркетинга" placeholder="Владелец" style="flex:0.5">
-<span class="hint">Старт: <input type="month" id="startMonth" value="2026-01" style="width:130px;display:inline;padding:4px 8px"></span>
-<span class="hint">Показать: <select id="zoomSelect" style="padding:4px 6px;font-size:.75rem"><option value="26">Полгода (26 нед)</option><option value="52" selected>Год (52 нед)</option><option value="78">1.5 года (78 нед)</option><option value="104">2 года (104 нед)</option></select></span>
+<input type="text" id="rpTitle" value="Дорожная карта 2026">
+<input type="text" id="rpOwner" value="Отдел маркетинга" style="flex:.5">
+<span class="hint">Показать: <select id="zoomSel"><option value="26" selected>Полгода</option><option value="52">Год</option><option value="78">1.5 года</option><option value="104">2 года</option></select></span>
 </div>
 
-<div class="form-bar" id="formBar">
-<input class="fname" id="fName" placeholder="Название задачи (Enter для добавления)">
-<select class="fmid" id="fStatus">
+<div class="form-bar">
+<input class="fn" id="fName" placeholder="Название (Enter)">
+<select class="fm" id="fStatus">
 <option value="plan">В плане</option>
 <option value="inprogress">В работе</option>
 <option value="done">Выполнено</option>
 <option value="paused">На паузе</option>
 <option value="canceled">Отменено</option>
 </select>
-<input class="fshort" id="fWeeks" type="number" value="4" min="1" max="52" title="Длительность в неделях">
-<select class="fmid" id="fStartWeek" title="Неделя старта"></select>
-<button class="btn-p" id="fAddBtn">+ Добавить</button>
+<input class="fs" id="fWeeks" type="number" value="4" min="1" max="52" title="недель">
+<select class="fs" id="fWeekSel" title="Неделя"></select>
+<button class="btn-p" id="fAdd">+</button>
 </div>
 
-<div class="canvas-wrap" id="canvasWrap">
-<table class="calendar" id="calendar"><tbody id="calBody"></tbody></table>
+<div id="gridWrap" class="grid-wrap">
+<div class="grid-label-col" id="labelCol"></div>
+<div class="grid-body" id="gridBody">
+<div class="grid-header" id="gridHeader"></div>
+<div class="grid-rows" id="gridRows"></div>
+</div>
 </div>
 
 <div class="legend-bar">
-<div class="legend-item"><span class="swatch" style="background:#059669"></span>Выполнено</div>
-<div class="legend-item"><span class="swatch" style="background:#f97316"></span>В работе</div>
-<div class="legend-item"><span class="swatch" style="background:#6366f1"></span>В плане</div>
-<div class="legend-item"><span class="swatch" style="background:#9ca3af"></span>На паузе</div>
-<div class="legend-item"><span class="swatch" style="background:#ef4444"></span>Отменено</div>
+<div class="legend-item"><span class="sw" style="background:#059669"></span>Выполнено</div>
+<div class="legend-item"><span class="sw" style="background:#f97316"></span>В работе</div>
+<div class="legend-item"><span class="sw" style="background:#6366f1"></span>В плане</div>
+<div class="legend-item"><span class="sw" style="background:#9ca3af"></span>На паузе</div>
+<div class="legend-item"><span class="sw" style="background:#ef4444"></span>Отменено</div>
 <div class="stats" id="stats"></div>
 </div>
 </div>
 </div>
 
-<footer><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</footer>
+<footer><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a></footer>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalOverlay" style="display:none">
+<div class="modal-overlay" id="modal" style="display:none">
 <div class="modal">
 <h2 id="modalTitle">✏️ Редактировать</h2>
 <div class="mg"><label>Название</label><input type="text" id="mName"></div>
 <div class="mg"><label>Описание</label><textarea id="mDesc" rows="2"></textarea></div>
 <div class="mg" style="display:flex;gap:8px">
-<div style="flex:1"><label>Неделя старта</label><select id="mStartWeek"></select></div>
-<div style="flex:1"><label>Длительность (нед.)</label><input type="number" id="mSpan" min="1" max="52"></div>
-<div style="flex:1"><label>Статус</label><select id="mStatus">
+<div><label>Неделя</label><select id="mWeekSel"></select></div>
+<div><label>Длит.</label><input type="number" id="mSpan" min="1" max="52"></div>
+<div><label>Статус</label><select id="mStatus">
 <option value="plan">В плане</option>
 <option value="inprogress">В работе</option>
 <option value="done">Выполнено</option>
@@ -190,415 +196,247 @@ footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margi
 </div>
 
 <script>
-const MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
-const STAT_COL = {done:'#059669',inprogress:'#f97316',plan:'#6366f1',paused:'#9ca3af',canceled:'#ef4444'};
-const STAT_LABEL = {done:'Выполнено',inprogress:'В работе',plan:'В плане',paused:'На паузе',canceled:'Отменено'};
-const WEEK_MS = 7 * 24 * 3600 * 1000;
+// ── Constants ──
+const MON = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const SC = {done:'#059669',inprogress:'#f97316',plan:'#6366f1',paused:'#9ca3af',canceled:'#ef4444'};
+const SL = {done:'Выполнено',inprogress:'В работе',plan:'В плане',paused:'На паузе',canceled:'Отменено'};
+const D7 = 7*86400000;
+let tasks = [], sel = -1, ed = -1;
 
-let tasks = [];
-let selected = -1;
-let editing = -1;
-
-// Reference start: first Monday of start month
-function getStartDate(){
-  const v = document.getElementById('startMonth').value;
-  const d = new Date(v + '-01');
-  // Find Monday of that week
+// ── Time helpers ──
+function startDate(){
+  const d = new Date();
+  // Monday of current week
   const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  return d;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff);
 }
 
-function getWeeks(){
-  const start = getStartDate();
-  const weeks = parseInt(document.getElementById('zoomSelect').value) || 52;
-  return {start, weeks};
+function weekInfo(){
+  const s = startDate();
+  const w = parseInt(document.getElementById('zoomSel').value) || 26;
+  const pw = 40; // px per week
+  const tw = w * pw;
+  return {s, w, pw, tw};
 }
 
-// Render week select options
-function fillWeekSelect(sel, selectedWeek){
-  const {start, weeks} = getWeeks();
-  if(!sel) return;
-  sel.innerHTML = '';
-  for(let i = 0; i < weeks; i++){
-    const d = new Date(start.getTime() + i * WEEK_MS);
+// ── Fill select ──
+function fillSel(el, s){
+  const {s:start, w} = weekInfo();
+  el.innerHTML = '';
+  for(let i=0;i<w;i++){
+    const d = new Date(start.getTime() + i*D7);
     const opt = document.createElement('option');
     opt.value = i;
-    const mon = MONTHS[d.getMonth()];
-    opt.textContent = mon + ' ' + d.getDate() + ' (нед ' + (i+1) + ')';
-    sel.appendChild(opt);
+    const wk = Math.floor(i/4) + 1;
+    opt.textContent = MON[d.getMonth()] + ' д.' + d.getDate() + ' (нед ' + (i%4+1) + ')';
+    el.appendChild(opt);
   }
-  if(selectedWeek !== undefined && selectedWeek >= 0 && selectedWeek < weeks)
-    sel.value = selectedWeek;
+  if(s!==undefined && s>=0 && s<w) el.value = s;
 }
 
-// Render calendar
+// ── Render ──
 function render(){
-  adjustCellWidth();
-  const {start, weeks} = getWeeks();
-  const tbody = document.getElementById('calBody');
-  tbody.innerHTML = '';
+  const {s:start, w, pw, tw} = weekInfo();
   
-  // Month header row
-  let monthRow = '<tr class="month-row"><th style="width:200px;min-width:200px;text-align:left;padding-left:14px">Задача</th>';
-  let weekRow = '<tr class="week-row"><th></th>';
+  // ── Header: months → 4-week blocks ──
+  const hdr = document.getElementById('gridHeader');
+  let mHtml = '<div class="grid-months" style="width:'+tw+'px">';
+  let wHtml = '<div class="grid-weeks" style="width:'+tw+'px">';
   
-  let curMonth = -1;
-  let monthSpan = 0;
-  let monthStartCol = 0;
-  let col = 0;
-  
-  // First pass: collect month spans
-  const monthSpans = [];
-  for(let i = 0; i < weeks; i++){
-    const d = new Date(start.getTime() + i * WEEK_MS + 2 * 24 * 3600 * 1000); // midweek
-    const m = d.getMonth();
-    if(m !== curMonth){
-      if(curMonth >= 0) monthSpans.push({month: curMonth, span: monthSpan, start: monthStartCol});
-      curMonth = m;
-      monthStartCol = i;
-      monthSpan = 1;
-    } else {
-      monthSpan++;
+  for(let i=0;i<w;i++){
+    const d = new Date(start.getTime() + i*D7 + D7/2);
+    // Month label — only first week of each month
+    if(i===0 || d.getMonth() !== new Date(start.getTime() + (i-1)*D7 + D7/2).getMonth()){
+      // Count weeks until next month change
+      let span = 1;
+      for(let j=i+1;j<w;j++){
+        const dj = new Date(start.getTime() + j*D7 + D7/2);
+        if(dj.getMonth() === d.getMonth()) span++;
+        else break;
+      }
+      mHtml += '<div class="grid-month" style="width:'+(span*pw)+'px;border-left:'+(i===0?'none':'1px solid var(--border)')+'">'+MON[d.getMonth()]+'</div>';
     }
+    
+    // Week label: 1-4 repeating
+    const wkNum = (i % 4) + 1;
+    wHtml += '<div class="grid-week'+(wkNum===1?' odd':'')+'" style="width:'+pw+'px;border-left:'+(i===0?'none':'1px solid var(--border)')+'">'+wkNum+'</div>';
   }
-  if(curMonth >= 0) monthSpans.push({month: curMonth, span: monthSpan, start: monthStartCol});
   
-  // Month row
-  monthRow += '<td colspan="' + weeks + '" style="padding:0"><div style="display:flex">';
-  monthSpans.forEach(ms => {
-    monthRow += '<div style="flex:' + ms.span + ';padding:10px 0 2px;font-size:.7rem;font-weight:600;color:var(--text2);text-align:center;border-left:1px solid var(--border)">' + MONTHS[ms.month] + '</div>';
-  });
-  monthRow += '</div></td></tr>';
-  tbody.innerHTML += monthRow;
+  mHtml += '</div>';
+  wHtml += '</div>';
+  hdr.innerHTML = mHtml + wHtml;
   
-  // Week numbers row
-  weekRow += '<td colspan="' + weeks + '" style="padding:0"><div style="display:flex">';
-  for(let i = 0; i < weeks; i++){
-    const d = new Date(start.getTime() + i * WEEK_MS);
-    const num = d.getDate();
-    const isFirst = num <= 7;
-    weekRow += '<div style="flex:1;padding:2px 0 8px;font-size:.6rem;color:' + (isFirst ? 'var(--text2)' : '#ccc') + ';text-align:center;border-left:1px solid var(--border)">' + num + '</div>';
-  }
-  weekRow += '</div></td></tr>';
-  tbody.innerHTML += weekRow;
+  // ── Task rows ──
+  const rows = document.getElementById('gridRows');
+  const labelCol = document.getElementById('labelCol');
+  rows.innerHTML = '';
+  labelCol.innerHTML = '';
   
-  // Task rows
   if(tasks.length === 0){
-    tbody.innerHTML += '<tr><td colspan="2" style="padding:40px;text-align:center;color:var(--text2);font-size:.85rem">➕ Создайте первую задачу</td></tr>';
-    updateStats();
+    rows.innerHTML = '<div style="padding:80px 20px;text-align:center;color:var(--text2);font-size:.85rem">➕ Нажмите «Новая задача» или введите название выше</div>';
+    stat();
     return;
   }
   
   tasks.forEach((t, i) => {
-    const col = STAT_COL[t.status] || '#6366f1';
-    const barLeft = t.week;
-    const barWidth = Math.max(t.span || 4, 1);
+    // Label
+    const lb = document.createElement('div');
+    lb.className = 'label-cell'+(i===sel?' selected':'');
+    lb.innerHTML = '<span class="dot" style="background:'+(SC[t.status]||'#6366f1')+'"></span><span class="name">'+e(t.name)+'</span>';
+    lb.dataset.idx = i;
+    lb.onclick = ()=>{sk(i)};
+    lb.ondblclick = ()=>{opEd(i)};
+    labelCol.appendChild(lb);
     
-    let row = '<tr class="task-row" data-idx="' + i + '" style="cursor:pointer">';
-    row += '<td style="padding:0;border-bottom:1px solid var(--border)"><div class="task-label" title="' + esc(t.desc||t.name) + '">';
-    row += '<span class="dot" style="background:' + col + '"></span>';
-    row += '<span>' + esc(t.name) + '</span></div></td>';
-    row += '<td style="padding:0;border-bottom:1px solid var(--border);position:relative">';
+    // Row body
+    const rw = document.createElement('div');
+    rw.className = 'grid-row'+(i===sel?' selected':'');
+    rw.dataset.idx = i;
+    rw.style.width = tw + 'px';
+    rw.onclick = ()=>{sk(i)};
+    rw.ondblclick = ()=>{opEd(i)};
     
-    // Background grid
-    row += '<div style="display:flex;height:42px">';
-    for(let w = 0; w < weeks; w++){
-      row += '<div style="flex:1;border-left:1px solid #f3f4f6"></div>';
+    // Grid lines
+    let g = '<div class="grid-lines">';
+    for(let j=0;j<=w;j++){
+      const l = j%4===0 ? ' border-left:1px solid var(--border)' : ' border-left:1px solid #f3f4f6';
+      g += '<div class="grid-line" style="left:'+(j*pw)+'px;width:0'+l+'"></div>';
     }
-    row += '</div>';
+    g += '</div>';
+    rw.innerHTML = g;
     
     // Task bar
-    if(barLeft < weeks){
-      const pct = (barLeft / weeks) * 100;
-      const wpct = (barWidth / weeks) * 100;
-      row += '<div class="task-bar s-' + t.status + '" style="left:' + pct + '%;width:' + Math.min(wpct, 100-pct) + '%;background:' + col + '" data-idx="' + i + '">' + esc(t.name) + '</div>';
-    }
+    const bl = Math.max(0, Math.min(t.week, w-1)) * pw;
+    const bw = Math.max(10, Math.min(t.span||1, w - t.week)) * pw - 2;
+    const bar = document.createElement('div');
+    bar.className = 'task-bar s-' + t.status;
+    bar.style.cssText = 'left:'+bl+'px;width:'+bw+'px;background:'+(SC[t.status]||'#6366f1');
+    bar.textContent = t.name;
+    bar.dataset.idx = i;
+    bar.onclick = e=>{e.stopPropagation();sk(i)};
+    bar.ondblclick = e=>{e.stopPropagation();opEd(i)};
+    rw.appendChild(bar);
     
-    row += '</td></tr>';
-    tbody.innerHTML += row;
+    rows.appendChild(rw);
   });
   
-  // Bind click handlers
-  document.querySelectorAll('.task-row').forEach(el => {
-    el.addEventListener('click', function(){
-      const i = parseInt(this.dataset.idx);
-      selectTask(i);
-    });
-    el.addEventListener('dblclick', function(){
-      const i = parseInt(this.dataset.idx);
-      openEdit(i);
-    });
-  });
-  document.querySelectorAll('.task-bar').forEach(el => {
-    el.addEventListener('click', function(e){
-      e.stopPropagation();
-      const i = parseInt(this.dataset.idx);
-      selectTask(i);
-    });
-    el.addEventListener('dblclick', function(e){
-      e.stopPropagation();
-      const i = parseInt(this.dataset.idx);
-      openEdit(i);
-    });
-  });
-  
-  updateStats();
+  stat();
 }
 
-function selectTask(i){
-  if(i < 0 || i >= tasks.length) return;
-  selected = i;
-  document.querySelectorAll('.task-row').forEach((el, idx) => {
-    el.style.background = idx === i ? 'var(--accent-light)' : '';
-  });
+function sk(i){
+  if(i<0||i>=tasks.length) return;
+  sel = i;
+  document.querySelectorAll('.label-cell,.grid-row').forEach(el=>el.classList.remove('selected'));
+  const l = document.querySelector('.label-cell[data-idx="'+i+'"]');
+  if(l) l.classList.add('selected');
+  const r = document.querySelector('.grid-row[data-idx="'+i+'"]');
+  if(r) r.classList.add('selected');
   document.getElementById('editBtn').disabled = false;
   document.getElementById('delBtn').disabled = false;
 }
 
-function updateStats(){
-  const totals = {};
-  tasks.forEach(t => { totals[t.status] = (totals[t.status]||0) + 1; });
-  let html = '';
-  Object.entries(totals).forEach(([k,v]) => {
-    html += '<span><span class="legend-item" style="display:inline"><span class="swatch" style="background:' + (STAT_COL[k]||'#ccc') + ';display:inline-block;vertical-align:middle"></span> ' + STAT_LABEL[k] + ': ' + v + '</span></span>';
+function stat(){
+  const ts = {};
+  tasks.forEach(t=>{ts[t.status]=(ts[t.status]||0)+1});
+  let h='';
+  Object.entries(ts).forEach(([k,v])=>{
+    h+='<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:'+(SC[k]||'#ccc')+'"></span> '+SL[k]+': '+v+'</span>';
   });
-  document.getElementById('stats').innerHTML = html || '0 задач';
+  document.getElementById('stats').innerHTML = h||'0 задач';
 }
 
-// Add task
-function addTask(name, status, week, span){
-  if(!name || !name.trim()) return;
-  const {weeks} = getWeeks();
-  const w = Math.max(0, Math.min(week || 0, weeks - 1));
-  const s = Math.max(1, Math.min(span || 4, weeks - w));
-  tasks.push({name: name.trim(), desc: '', status: status || 'plan', week: w, span: s});
-  save();
-  render();
-  selectTask(tasks.length - 1);
+// ── Add ──
+function addTask(n,st,wk,sp){
+  if(!n||!n.trim()) return;
+  const {w}=weekInfo();
+  tasks.push({name:n.trim(),desc:'',status:st||'plan',week:Math.max(0,Math.min(wk||0,w-1)),span:Math.max(1,Math.min(sp||1,w))});
+  sv(); render(); sk(tasks.length-1);
 }
 
-// Save / Load
-function save(){
-  const title = document.getElementById('mapTitle').value;
-  const owner = document.getElementById('mapOwner').value;
-  const startMonth = document.getElementById('startMonth').value;
-  localStorage.setItem('mkt_roadmap2', JSON.stringify({tasks,title,owner,startMonth}));
+// ── Save/Load ──
+function sv(){
+  localStorage.setItem('mr2', JSON.stringify({
+    tasks,
+    title: document.getElementById('rpTitle').value,
+    owner: document.getElementById('rpOwner').value
+  }));
+}
+function ld(){
+  try{const d=JSON.parse(localStorage.getItem('mr2'));if(d){tasks=d.tasks||[];if(d.title)document.getElementById('rpTitle').value=d.title;if(d.owner)document.getElementById('rpOwner').value=d.owner}}catch(e){}
 }
 
-function load(){
-  try{
-    const s = localStorage.getItem('mkt_roadmap2');
-    if(s){
-      const d = JSON.parse(s);
-      tasks = d.tasks || [];
-      if(d.title) document.getElementById('mapTitle').value = d.title;
-      if(d.owner) document.getElementById('mapOwner').value = d.owner;
-      if(d.startMonth) document.getElementById('startMonth').value = d.startMonth;
-    }
-  }catch(e){}
+// ── Events ──
+document.getElementById('addBtn').onclick=()=>{document.getElementById('fName').focus();document.getElementById('fName').scrollIntoView({behavior:'smooth'})};
+document.getElementById('editBtn').onclick=()=>{if(sel>=0&&sel<tasks.length)opEd(sel)};
+document.getElementById('delBtn').onclick=()=>{if(sel<0)return;if(!confirm('Удалить «'+tasks[sel].name+'»?'))return;tasks.splice(sel,1);sel=-1;document.getElementById('editBtn').disabled=true;document.getElementById('delBtn').disabled=true;sv();render()};
+document.getElementById('fAdd').onclick=()=>{const n=document.getElementById('fName').value.trim(),st=document.getElementById('fStatus').value,sp=parseInt(document.getElementById('fWeeks').value)||4,wk=parseInt(document.getElementById('fWeekSel').value)||0;if(!n)return;addTask(n,st,wk,sp);document.getElementById('fName').value='';document.getElementById('fName').focus()};
+document.getElementById('fName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('fAdd').click()});
+
+function opEd(i){
+  if(i<0||i>=tasks.length) return;
+  ed=i;const t=tasks[i];
+  document.getElementById('modalTitle').textContent='✏️ Редактировать';
+  document.getElementById('mName').value=t.name;
+  document.getElementById('mDesc').value=t.desc||'';
+  fillSel(document.getElementById('mWeekSel'),t.week);
+  document.getElementById('mSpan').value=t.span||1;
+  document.getElementById('mStatus').value=t.status||'plan';
+  document.getElementById('modal').style.display='flex';
+  document.getElementById('mName').focus();document.getElementById('mName').select();
 }
+document.getElementById('mSave').onclick=()=>{if(ed<0)return;const n=document.getElementById('mName').value.trim();if(!n)return;tasks[ed].name=n;tasks[ed].desc=document.getElementById('mDesc').value.trim();tasks[ed].week=parseInt(document.getElementById('mWeekSel').value)||0;tasks[ed].span=parseInt(document.getElementById('mSpan').value)||1;tasks[ed].status=document.getElementById('mStatus').value;document.getElementById('modal').style.display='none';ed=-1;sv();render();if(sel>=0&&sel<tasks.length)sk(sel)};
+document.getElementById('mCancel').onclick=()=>{document.getElementById('modal').style.display='none';ed=-1};
 
-// Event handlers
-document.getElementById('addBtn').onclick = () => {
-  document.getElementById('fName').focus();
-  document.getElementById('fName').scrollIntoView({behavior:'smooth'});
-};
+['rpTitle','rpOwner','zoomSel'].forEach(id=>{document.getElementById(id).addEventListener('change',()=>{sv();fillSel(document.getElementById('fWeekSel'),0);render()})});
 
-document.getElementById('editBtn').onclick = () => {
-  if(selected >= 0 && selected < tasks.length) openEdit(selected);
-};
-
-document.getElementById('delBtn').onclick = () => {
-  if(selected < 0 || selected >= tasks.length) return;
-  if(!confirm('Удалить «' + tasks[selected].name + '»?')) return;
-  tasks.splice(selected, 1);
-  selected = -1;
-  document.getElementById('editBtn').disabled = true;
-  document.getElementById('delBtn').disabled = true;
-  save(); render();
-};
-
-// Quick form
-document.getElementById('fAddBtn').onclick = () => {
-  const name = document.getElementById('fName').value.trim();
-  const status = document.getElementById('fStatus').value;
-  const span = parseInt(document.getElementById('fWeeks').value) || 4;
-  const week = parseInt(document.getElementById('fStartWeek').value) || 0;
-  if(!name) return;
-  addTask(name, status, week, span);
-  document.getElementById('fName').value = '';
-  document.getElementById('fName').focus();
-};
-
-document.getElementById('fName').addEventListener('keydown', e => {
-  if(e.key === 'Enter') document.getElementById('fAddBtn').click();
-});
-
-// Edit modal
-function openEdit(i){
-  if(i < 0 || i >= tasks.length) return;
-  editing = i;
-  const t = tasks[i];
-  document.getElementById('modalTitle').textContent = '✏️ Редактировать';
-  document.getElementById('mName').value = t.name;
-  document.getElementById('mDesc').value = t.desc || '';
-  fillWeekSelect(document.getElementById('mStartWeek'), t.week);
-  document.getElementById('mSpan').value = t.span || 4;
-  document.getElementById('mStatus').value = t.status || 'plan';
-  document.getElementById('modalOverlay').style.display = 'flex';
-  document.getElementById('mName').focus();
-  document.getElementById('mName').select();
-}
-
-document.getElementById('mSave').onclick = () => {
-  if(editing < 0) return;
-  const name = document.getElementById('mName').value.trim();
-  if(!name) return;
-  tasks[editing].name = name;
-  tasks[editing].desc = document.getElementById('mDesc').value.trim();
-  tasks[editing].week = parseInt(document.getElementById('mStartWeek').value) || 0;
-  tasks[editing].span = parseInt(document.getElementById('mSpan').value) || 4;
-  tasks[editing].status = document.getElementById('mStatus').value;
-  document.getElementById('modalOverlay').style.display = 'none';
-  editing = -1;
-  save(); render();
-};
-
-document.getElementById('mCancel').onclick = () => {
-  document.getElementById('modalOverlay').style.display = 'none';
-  editing = -1;
-};
-
-// Auto-save on meta changes
-['mapTitle','mapOwner','startMonth','zoomSelect'].forEach(id => {
-  document.getElementById(id).addEventListener('change', () => { save(); fillWeekSelect(document.getElementById('fStartWeek'), 0); render(); });
-});
-
-// Zoom: adjust cell width dynamically
-function adjustCellWidth(){
-  const wrap = document.getElementById('canvasWrap');
-  const {weeks} = getWeeks();
-  const wrapW = wrap.clientWidth - 220; // minus label column
-  const cellW = Math.max(24, Math.min(64, Math.floor(wrapW / weeks)));
-  document.documentElement.style.setProperty('--cell-w', cellW + 'px');
-}
-
-// Clear
-document.getElementById('clearBtn').onclick = () => {
-  if(!confirm('Очистить все задачи?')) return;
-  tasks = []; selected = -1;
-  document.getElementById('editBtn').disabled = true;
-  document.getElementById('delBtn').disabled = true;
-  save(); render();
-};
-
-// Example
-document.getElementById('exampleBtn').onclick = () => {
-  tasks = [
+document.getElementById('clearBtn').onclick=()=>{if(!confirm('Очистить всё?'))return;tasks=[];sel=-1;document.getElementById('editBtn').disabled=true;document.getElementById('delBtn').disabled=true;sv();render()};
+document.getElementById('exampleBtn').onclick=()=>{
+  tasks=[
     {name:'Аудит каналов',desc:'Сбор данных',status:'done',week:0,span:4},
     {name:'Стратегия лидогенерации',desc:'Определение каналов',status:'inprogress',week:4,span:4},
     {name:'Запуск Telegram-канала',desc:'Контент-план',status:'inprogress',week:6,span:6},
-    {name:'SEO-оптимизация',desc:'Технический аудит',status:'plan',week:8,span:8},
-    {name:'Внедрение CDP',desc:'Единая база',status:'plan',week:16,span:8},
-    {name:'Автоматизация email',desc:'Триггеры',status:'plan',week:20,span:6},
-    {name:'Ретаргетинг',desc:'По сегментам',status:'plan',week:26,span:6},
-    {name:'Анализ эффективности',desc:'ROMI, CAC',status:'plan',week:34,span:6}
+    {name:'SEO-оптимизация',desc:'Технический аудит',status:'plan',week:10,span:8},
+    {name:'Внедрение CDP',desc:'Единая база',status:'plan',week:18,span:8},
+    {name:'Автоматизация email',desc:'Триггеры',status:'plan',week:22,span:6},
+    {name:'Ретаргетинг',desc:'По сегментам',status:'plan',week:28,span:6},
+    {name:'Анализ эффективности',desc:'ROMI, CAC',status:'plan',week:36,span:6}
   ];
-  selected = -1;
-  save(); render();
+  sel=-1;sv();render();
 };
 
-// Export
-document.getElementById('exportPng').onclick = () => {
-  const el = document.getElementById('roadmapCard');
-  // Dynamic load html2canvas, then export
-  if(typeof html2canvas === 'undefined'){
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-    s.onload = () => doExport(el);
-    document.body.appendChild(s);
-  } else {
-    doExport(el);
-  }
+document.getElementById('exPng').onclick=()=>{
+  const el=document.getElementById('rmCard');
+  if(typeof html2canvas==='undefined'){
+    const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';s.onload=()=>{px(el)};document.body.appendChild(s)
+  }else{px(el)}
+};
+function px(el){html2canvas(el,{backgroundColor:'#fff',scale:2,useCORS:true,logging:false,width:el.scrollWidth,height:el.scrollHeight}).then(c=>{const a=document.createElement('a');a.download='roadmap.png';a.href=c.toDataURL('image/png');a.click()})}
+document.getElementById('exCsv').onclick=()=>{
+  if(!tasks.length)return;
+  let c='\uFEFFНазвание,Описание,Неделя,Длит(нед),Статус\n';
+  tasks.forEach(t=>{const es=s=>'"'+String(s||'').replace(/"/g,'""')+'"';c+=es(t.name)+','+es(t.desc||'')+','+(t.week+1)+','+t.span+','+SL[t.status]+'\n'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv;charset=utf-8'}));a.download='roadmap.csv';a.click()
 };
 
-function doExport(el){
-  html2canvas(el, {backgroundColor:'#fff',scale:2,useCORS:true,logging:false,width:el.scrollWidth,height:el.scrollHeight}).then(canvas => {
-    const a = document.createElement('a');
-    a.download = 'roadmap.png';
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-  });
-}
-
-document.getElementById('exportCsv').onclick = () => {
-  if(!tasks.length) return;
-  let csv = '\uFEFFНазвание,Описание,Неделя,Длительность(нед),Статус\n';
-  tasks.forEach(t => {
-    const e = s => '"' + String(s||'').replace(/"/g,'""') + '"';
-    csv += e(t.name) + ',' + e(t.desc||'') + ',' + (t.week+1) + ',' + t.span + ',' + STAT_LABEL[t.status] + '\n';
-  });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
-  a.download = 'roadmap.csv';
-  a.click();
-};
-
-// Keyboard
-document.addEventListener('keydown', e => {
-  if(document.getElementById('modalOverlay').style.display === 'flex') {
-    if(e.key === 'Escape') { document.getElementById('modalOverlay').style.display = 'none'; editing = -1; }
-    if(e.key === 'Enter') { document.getElementById('mSave').click(); }
-    return;
-  }
-  
-  if(e.key === 'ArrowDown' && tasks.length > 0){
-    e.preventDefault();
-    const next = Math.min(tasks.length - 1, selected + 1);
-    selectTask(next);
-    const row = document.querySelector('.task-row[data-idx="' + next + '"]');
-    if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
-  }
-  if(e.key === 'ArrowUp' && tasks.length > 0){
-    e.preventDefault();
-    const prev = Math.max(0, selected - 1);
-    selectTask(prev);
-    const row = document.querySelector('.task-row[data-idx="' + prev + '"]');
-    if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
-  }
-  if(e.key === 'Delete' && selected >= 0){
-    if(!confirm('Удалить «' + tasks[selected].name + '»?')) return;
-    tasks.splice(selected, 1);
-    selected = -1;
-    document.getElementById('editBtn').disabled = true;
-    document.getElementById('delBtn').disabled = true;
-    save(); render();
-  }
-  if(e.key === 'Enter' && selected >= 0){
-    openEdit(selected);
-  }
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('modal').style.display==='flex'){if(e.key==='Escape'){document.getElementById('modal').style.display='none';ed=-1}if(e.key==='Enter')document.getElementById('mSave').click();return}
+  if(e.key==='ArrowDown'&&tasks.length>0){e.preventDefault();sel=Math.min(tasks.length-1,sel+1);sk(sel)}
+  if(e.key==='ArrowUp'&&tasks.length>0){e.preventDefault();sel=Math.max(0,sel-1);sk(sel)}
+  if(e.key==='Delete'&&sel>=0){e.preventDefault();if(!confirm('Удалить «'+tasks[sel].name+'»?'))return;tasks.splice(sel,1);sel=-1;document.getElementById('editBtn').disabled=true;document.getElementById('delBtn').disabled=true;sv();render()}
+  if(e.key==='Enter'&&sel>=0){opEd(sel)}
 });
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-// Init
-load();
-
-// Wait for DOM + fill selects then render
-setTimeout(() => {
-  fillWeekSelect(document.getElementById('fStartWeek'), 0);
-  fillWeekSelect(document.getElementById('mStartWeek'), 0);
-  adjustCellWidth();
+// ── Init ──
+ld();
+setTimeout(()=>{
+  fillSel(document.getElementById('fWeekSel'),0);
+  fillSel(document.getElementById('mWeekSel'),0);
   render();
-  
-  // If empty, load example
-  if(tasks.length === 0) document.getElementById('exampleBtn').click();
-}, 100);
-
-// Recalc on resize
-window.addEventListener('resize', () => { adjustCellWidth(); render(); });
+  if(tasks.length===0) document.getElementById('exampleBtn').click();
+},100);
 </script>
 </body>
 </html>
