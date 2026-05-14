@@ -3,100 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Roadmap Builder — конструктор дорожных карт</title>
-<meta name="description" content="Визуальный конструктор дорожных карт. Кварталы, задачи, статусы, таймлайн. Экспорт в PNG и CSV.">
+<title>Roadmap Builder — дорожная карта</title>
+<meta name="description" content="Конструктор дорожных карт. Календарная сетка с разбивкой на месяцы и недели. Экспорт PNG/CSV.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#111827;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}
-.container{max-width:1200px;margin:0 auto;padding:0 24px}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100}
 header .container{display:flex;align-items:center;justify-content:space-between}
-.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo{font-weight:800;font-size:1.1rem;color:var(--text);text-decoration:none}
 .logo span{color:var(--accent)}
-.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back{color:var(--text2);text-decoration:none;font-size:.85rem}
 .back:hover{color:var(--accent)}
-h1{font-size:1.5rem;font-weight:800;margin-bottom:4px}
-.hero{padding:28px 0 16px;text-align:center}
-.hero p{color:var(--text2);font-size:.88rem}
+h1{font-size:1.3rem;font-weight:700;letter-spacing:-.3px}
+h2{font-size:.85rem;font-weight:600;margin-bottom:10px}
+.hero{padding:24px 0 14px;text-align:center}
+.hero p{color:var(--text2);font-size:.82rem}
 
 /* Toolbar */
-.toolbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.toolbar .sep{width:1px;height:28px;background:var(--border)}
-.toolbar button{padding:7px 14px;border:none;border-radius:6px;font-size:.8rem;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .12s;display:flex;align-items:center;gap:5px}
-.toolbar button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.toolbar input[type=text]{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--bg);color:var(--text);min-width:200px}
-.toolbar select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--bg);color:var(--text)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-hover)}
-.btn-secondary{background:#f3f4f6;color:var(--text)}
-.btn-secondary:hover{background:#e5e7eb;color:var(--text)}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
-.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.toolbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toolbar button{padding:6px 14px;border:none;border-radius:6px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .1s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover{background:var(--accent-hover)}
+.btn-s{background:#f3f4f6;color:var(--text)}
+.btn-s:hover{background:#e5e7eb}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+.sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
 
-/* Roadmap canvas */
-.roadmap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.roadmap-header{display:flex;padding:16px 16px 0;gap:12px;align-items:flex-start;flex-wrap:wrap}
-.roadmap-title{flex:1;min-width:200px}
-.roadmap-title input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:1rem;font-weight:700;font-family:var(--font);background:var(--surface);color:var(--text)}
-.roadmap-title input:focus{outline:none;border-color:var(--accent)}
-.roadmap-meta{display:flex;gap:12px;margin-top:8px}
-.roadmap-meta input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:var(--font);background:var(--surface);color:var(--text2)}
-.roadmap-canvas{padding:16px;overflow-x:auto;position:relative;margin-top:0;min-height:400px}
-.roadmap-table{width:100%;border-collapse:collapse;min-width:600px}
-.roadmap-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);padding:8px 10px;border-bottom:2px solid var(--border);text-align:left;font-weight:600}
-.roadmap-table td{padding:6px 10px;border-bottom:1px solid var(--border);vertical-align:top;font-size:.85rem}
+/* Roadmap card */
+.roadmap-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.meta-bar{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.meta-bar input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--surface);color:var(--text);flex:1;min-width:140px}
+.meta-bar input:focus{outline:none;border-color:var(--accent)}
+.meta-bar .hint{font-size:.72rem;color:var(--text2);white-space:nowrap}
 
-/* Gantt-like bars */
-.gantt-row{display:flex;align-items:center;gap:8px;padding:8px 0}
-.gantt-labels{width:220px;flex-shrink:0}
-.gantt-labels .task-name{font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:6px}
-.gantt-labels .task-desc{font-size:.72rem;color:var(--text2);margin-top:2px}
-.gantt-timeline{flex:1;height:32px;background:#f3f4f6;border-radius:6px;position:relative;min-width:400px}
-.gantt-bar{position:absolute;height:28px;top:2px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 10px;font-size:.7rem;font-weight:600;color:#fff;transition:all .12s;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.gantt-bar:hover{opacity:.85;z-index:10;transform:scaleY(1.1)}
-.gantt-bar.done{background:#059669}
-.gantt-bar.inprogress{background:#f97316}
-.gantt-bar.plan{background:#6366f1}
-.gantt-bar.paused{background:#9ca3af}
-.gantt-bar.canceled{background:#ef4444}
+/* Calendar grid */
+.canvas-wrap{overflow-x:auto;padding:0}
+.calendar{min-width:700px;position:relative}
+.calendar thead th{position:sticky;top:0;background:var(--surface);z-index:5;border-bottom:2px solid var(--border)}
+.calendar .month-row th{padding:10px 4px 4px;font-size:.72rem;font-weight:600;color:var(--text2);text-align:center;letter-spacing:.3px}
+.calendar .week-row th{padding:2px 4px 10px;font-size:.6rem;font-weight:500;color:#9ca3af;text-align:center}
 
-/* Task manager */
-.panel-group{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
-@media(max-width:768px){.panel-group{grid-template-columns:1fr}}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-.panel h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);margin-bottom:10px}
-.form-group{margin-bottom:8px}
-.form-group label{display:block;font-size:.75rem;color:var(--text2);margin-bottom:3px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
-.form-group textarea{resize:vertical;min-height:50px}
-.form-row{display:flex;gap:8px}
-.form-row>*{flex:1}
+/* Task rows */
+.task-row td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle}
+.task-label{padding:10px 8px 10px 14px;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:6px;width:200px;min-width:200px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-label .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-cal{position:relative;height:42px}
+.task-bar{position:absolute;height:26px;top:8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 10px;font-size:.7rem;font-weight:600;color:#fff;transition:all .1s;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.task-bar:hover{z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.2);transform:translateY(-1px)}
+.task-bar.s-done{background:#059669}
+.task-bar.s-inprogress{background:#f97316}
+.task-bar.s-plan{background:#6366f1}
+.task-bar.s-paused{background:#9ca3af}
+.task-bar.s-canceled{background:#ef4444}
 
-/* Task list */
-.task-list{max-height:400px;overflow-y:auto}
-.task-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px;position:relative}
-.task-item:hover{border-color:var(--border);background:var(--bg)}
-.task-item.active{border-color:var(--accent);background:var(--accent-light)}
-.task-item .color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.task-item .info{flex:1;min-width:0}
-.task-item .info .name{font-size:.83rem;font-weight:500}
-.task-item .info .meta{font-size:.7rem;color:var(--text2)}
-.task-item .actions{display:flex;gap:3px;opacity:0;transition:opacity .12s}
-.task-item:hover .actions{opacity:1}
-.task-item .actions button{width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text2);font-size:.75rem;display:flex;align-items:center;justify-content:center}
-.task-item .actions button:hover{background:#f3f4f6;color:var(--text)}
-.task-item .actions button.del:hover{background:#fef2f2;color:#ef4444}
+/* New task form right under toolbar */
+.form-bar{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.form-bar input,.form-bar select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
+.form-bar input:focus,.form-bar select:focus{outline:none;border-color:var(--accent)}
+.form-bar .fname{flex:1;min-width:140px}
+.form-bar .fshort{width:90px}
+.form-bar .fmid{width:120px}
+.form-bar .ffull{width:140px}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-width:360px;max-width:500px}
-.modal h2{font-size:1rem;margin-bottom:12px}
-.modal button{margin-top:10px}
+/* Legend */
+.legend-bar{display:flex;gap:14px;padding:8px 14px;border-top:1px solid var(--border);flex-wrap:wrap;font-size:.72rem;color:var(--text2);align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-item .swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.stats{font-size:.72rem;color:var(--text2);margin-left:auto;display:flex;gap:8px}
 
-footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--text2);font-size:.82rem;margin-top:32px}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:400px;max-width:92vw}
+.modal h2{font-size:1rem;margin-bottom:14px}
+.modal .mg{margin-bottom:8px}
+.modal .mg label{display:block;font-size:.75rem;color:var(--text2);margin-bottom:3px}
+.modal .mg input,.modal .mg select,.modal .mg textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:var(--font);background:var(--bg);color:var(--text)}
+.modal .mg textarea{resize:vertical;min-height:50px}
+.modal .actions{display:flex;gap:8px;margin-top:12px}
+.modal .actions button{padding:7px 18px;border:none;border-radius:6px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:var(--font)}
+
+/* Cell markers */
+.week-divider{border-left:1px solid var(--border)}
+.month-divider{border-left:2px solid var(--border)}
+td.marker{width:0;padding:0;border-left:0}
+.td-cell{width:28px;min-width:28px;border-left:1px solid #f3f4f6;text-align:center;font-size:.55rem;color:#e5e7eb;padding:0}
+
+footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margin-top:24px}
+@media(max-width:640px){.hero{padding:16px 0 8px}h1{font-size:1.1rem}.form-bar .fshort{width:70px}.form-bar .fmid{width:90px}.form-bar .ffull{width:110px}}
 </style>
 </head>
 <body>
@@ -110,335 +109,483 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 <section class="hero">
 <div class="container">
 <h1>🗺 Roadmap Builder</h1>
-<p>Визуальный конструктор дорожных карт. Таймлайн, кварталы, статусы, экспорт в PNG/CSV.</p>
+<p>Календарная сетка с разбивкой по неделям · Экспорт в PNG и CSV</p>
 </div>
 </section>
 
 <div class="container">
-
 <div class="toolbar">
-<button class="btn-primary" id="addTaskBtn" onclick="openAddModal()">+ Новая задача</button>
+<button class="btn-p" id="addBtn">+ Новая задача</button>
+<button class="btn-s" id="editBtn" disabled>✎ Править</button>
+<button class="btn-s" id="delBtn" disabled>🗑 Удалить</button>
 <div class="sep"></div>
-<button class="btn-secondary" id="exportPngBtn" onclick="exportPNG()">⬇ Экспорт PNG</button>
-<button class="btn-secondary" id="exportCsvBtn" onclick="exportCSV()">⬇ CSV</button>
+<button class="btn-o" id="exampleBtn">📄 Пример</button>
+<button class="btn-o" id="clearBtn">✕ Очистить</button>
 <div class="sep"></div>
-<button class="btn-outline" id="exampleBtn" onclick="loadExample()">📄 Пример</button>
-<button class="btn-outline" id="clearBtn" onclick="if(confirm('Очистить всё?')){tasks=[];save();renderAll();}" style="color:#ef4444">✕ Очистить</button>
+<button class="btn-o" id="exportPng">⬇ PNG</button>
+<button class="btn-o" id="exportCsv">⬇ CSV</button>
 </div>
 
-<div class="roadmap-wrap">
-<div class="roadmap-header">
-<div class="roadmap-title">
-<input type="text" id="roadmapTitle" value="Дорожная карта 2026" onchange="save();renderAll();" placeholder="Название дорожной карты...">
-<div class="roadmap-meta">
-<input type="text" id="roadmapOwner" placeholder="Владелец" value="Отдел маркетинга" onchange="save();renderAll();">
-<input type="text" id="roadmapPeriod" placeholder="Период" value="Q1-Q4 2026" onchange="save();renderAll();">
-</div>
-</div>
+<div class="roadmap-card" id="roadmapCard">
+<div class="meta-bar">
+<input type="text" id="mapTitle" value="Дорожная карта 2026" placeholder="Название">
+<input type="text" id="mapOwner" value="Отдел маркетинга" placeholder="Владелец" style="flex:0.5">
+<span class="hint">Старт: <input type="month" id="startMonth" value="2026-01" style="width:130px;display:inline;padding:4px 8px"></span>
+<span class="hint">Длительность: <span id="totalWeeks">52</span> нед.</span>
 </div>
 
-<div class="roadmap-canvas" id="roadmapCanvas">
-<div id="ganttContainer"></div>
-</div>
+<div class="form-bar" id="formBar">
+<input class="fname" id="fName" placeholder="Название задачи (Enter для добавления)">
+<select class="fmid" id="fStatus">
+<option value="plan">В плане</option>
+<option value="inprogress">В работе</option>
+<option value="done">Выполнено</option>
+<option value="paused">На паузе</option>
+<option value="canceled">Отменено</option>
+</select>
+<input class="fshort" id="fWeeks" type="number" value="4" min="1" max="52" title="Длительность в неделях">
+<select class="fmid" id="fStartWeek" title="Неделя старта"></select>
+<button class="btn-p" id="fAddBtn">+ Добавить</button>
 </div>
 
-<div class="panel-group">
-<div class="panel">
-<h3>📋 Все задачи (<span id="taskCount">0</span>)</h3>
-<div class="task-list" id="taskList"></div>
+<div class="canvas-wrap" id="canvasWrap">
+<table class="calendar" id="calendar"><tbody id="calBody"></tbody></table>
 </div>
-<div class="panel">
-<h3>📊 Легенда</h3>
-<div style="display:flex;flex-direction:column;gap:6px;font-size:.82rem">
-<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#059669"></span> Выполнено</div>
-<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#f97316"></span> В работе</div>
-<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#6366f1"></span> В плане</div>
-<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#9ca3af"></span> На паузе</div>
-<div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:3px;background:#ef4444"></span> Отменено</div>
-</div>
-<br>
-<h3>💡 Горячие клавиши</h3>
-<div style="font-size:.78rem;color:var(--text2);line-height:1.8">
-<strong>Enter</strong> — сохранить задачу<br>
-<strong>Del</strong> — удалить выбранную<br>
-<strong>↑↓</strong> — навигация по списку
+
+<div class="legend-bar">
+<div class="legend-item"><span class="swatch" style="background:#059669"></span>Выполнено</div>
+<div class="legend-item"><span class="swatch" style="background:#f97316"></span>В работе</div>
+<div class="legend-item"><span class="swatch" style="background:#6366f1"></span>В плане</div>
+<div class="legend-item"><span class="swatch" style="background:#9ca3af"></span>На паузе</div>
+<div class="legend-item"><span class="swatch" style="background:#ef4444"></span>Отменено</div>
+<div class="stats" id="stats"></div>
 </div>
 </div>
 </div>
 
+<footer><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" style="display:none">
+<div class="modal">
+<h2 id="modalTitle">✏️ Редактировать</h2>
+<div class="mg"><label>Название</label><input type="text" id="mName"></div>
+<div class="mg"><label>Описание</label><textarea id="mDesc" rows="2"></textarea></div>
+<div class="mg" style="display:flex;gap:8px">
+<div style="flex:1"><label>Неделя старта</label><select id="mStartWeek"></select></div>
+<div style="flex:1"><label>Длительность (нед.)</label><input type="number" id="mSpan" min="1" max="52"></div>
+<div style="flex:1"><label>Статус</label><select id="mStatus">
+<option value="plan">В плане</option>
+<option value="inprogress">В работе</option>
+<option value="done">Выполнено</option>
+<option value="paused">На паузе</option>
+<option value="canceled">Отменено</option>
+</select></div>
+</div>
+<div class="actions">
+<button class="btn-p" id="mSave">💾 Сохранить</button>
+<button class="btn-o" id="mCancel">Отмена</button>
+</div>
+</div>
 </div>
 
-<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const QUARTERS = ['Q1','Q2','Q3','Q4'];
-const STAT_COLORS = {done:'#059669',inprogress:'#f97316',plan:'#6366f1',paused:'#9ca3af',canceled:'#ef4444'};
-const STAT_LABELS = {done:'Выполнено',inprogress:'В работе',plan:'В плане',paused:'На паузе',canceled:'Отменено'};
+const MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+const STAT_COL = {done:'#059669',inprogress:'#f97316',plan:'#6366f1',paused:'#9ca3af',canceled:'#ef4444'};
+const STAT_LABEL = {done:'Выполнено',inprogress:'В работе',plan:'В плане',paused:'На паузе',canceled:'Отменено'};
+const WEEK_MS = 7 * 24 * 3600 * 1000;
 
 let tasks = [];
-let selectedTask = -1;
-let nextId = 1;
+let selected = -1;
+let editing = -1;
 
-// Load
-try{const s = localStorage.getItem('mkt_roadmap'); if(s) { const d = JSON.parse(s); tasks = d.tasks || []; nextId = d.nextId || 1; }}catch(e){}
-
-function save(){
-  const title = document.getElementById('roadmapTitle').value;
-  const owner = document.getElementById('roadmapOwner').value;
-  const period = document.getElementById('roadmapPeriod').value;
-  localStorage.setItem('mkt_roadmap', JSON.stringify({tasks,nextId,title,owner,period}));
+// Reference start: first Monday of start month
+function getStartDate(){
+  const v = document.getElementById('startMonth').value;
+  const d = new Date(v + '-01');
+  // Find Monday of that week
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
 }
 
-// Render Gantt
-function renderGantt(){
-  const cont = document.getElementById('ganttContainer');
-  if(tasks.length === 0){
-    cont.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text2)">➕ Нажмите «Новая задача», чтобы начать</div>';
-    return;
+function getWeeks(){
+  const start = getStartDate();
+  // Show 52 weeks (1 year) from start
+  const weeks = 52;
+  return {start, weeks};
+}
+
+// Render week select options
+function fillWeekSelect(sel, selectedWeek){
+  const {start, weeks} = getWeeks();
+  if(!sel) return;
+  sel.innerHTML = '';
+  for(let i = 0; i < weeks; i++){
+    const d = new Date(start.getTime() + i * WEEK_MS);
+    const opt = document.createElement('option');
+    opt.value = i;
+    const mon = MONTHS[d.getMonth()];
+    opt.textContent = mon + ' ' + d.getDate() + ' (нед ' + (i+1) + ')';
+    sel.appendChild(opt);
   }
+  if(selectedWeek !== undefined && selectedWeek >= 0 && selectedWeek < weeks)
+    sel.value = selectedWeek;
+}
+
+// Render calendar
+function render(){
+  const {start, weeks} = getWeeks();
+  const tbody = document.getElementById('calBody');
+  tbody.innerHTML = '';
   
-  // Determine timeline range
-  let minQ = 1, maxQ = 4, minY = 2026, maxY = 2026;
-  tasks.forEach(t => {
-    if(t.quarter < minQ) minQ = t.quarter;
-    if(t.quarter > maxQ) maxQ = t.quarter;
-    if(t.year < minY) minY = t.year;
-    if(t.year > maxY) maxY = t.year;
-  });
+  // Month header row
+  let monthRow = '<tr class="month-row"><th style="width:200px;min-width:200px;text-align:left;padding-left:14px">Задача</th>';
+  let weekRow = '<tr class="week-row"><th></th>';
   
-  const totalQ = (maxY - minY) * 4 + (maxQ - minQ + 1);
-  const qWidth = 80; // px per quarter
-  const totalWidth = totalQ * qWidth;
+  let curMonth = -1;
+  let monthSpan = 0;
+  let monthStartCol = 0;
+  let col = 0;
   
-  let html = '<div class="gantt-container" style="min-width:' + (300 + totalWidth) + 'px">';
-  
-  // Header: quarters
-  html += '<div style="display:flex;">';
-  html += '<div style="width:220px;flex-shrink:0;padding:4px 10px;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);font-weight:600">Задача</div>';
-  html += '<div style="display:flex;flex:1">';
-  
-  for(let y = minY; y <= maxY; y++){
-    const qStart = (y === minY) ? minQ : 1;
-    const qEnd = (y === maxY) ? maxQ : 4;
-    for(let q = qStart; q <= qEnd; q++){
-      html += '<div style="width:' + qWidth + 'px;flex-shrink:0;text-align:center;padding:4px 0;font-size:.65rem;font-weight:600;color:var(--text2);border-left:1px solid var(--border)">' + QUARTERS[q-1] + ' ' + y + '</div>';
+  // First pass: collect month spans
+  const monthSpans = [];
+  for(let i = 0; i < weeks; i++){
+    const d = new Date(start.getTime() + i * WEEK_MS + 2 * 24 * 3600 * 1000); // midweek
+    const m = d.getMonth();
+    if(m !== curMonth){
+      if(curMonth >= 0) monthSpans.push({month: curMonth, span: monthSpan, start: monthStartCol});
+      curMonth = m;
+      monthStartCol = i;
+      monthSpan = 1;
+    } else {
+      monthSpan++;
     }
   }
-  html += '</div></div>';
+  if(curMonth >= 0) monthSpans.push({month: curMonth, span: monthSpan, start: monthStartCol});
+  
+  // Month row
+  monthRow += '<td colspan="' + weeks + '" style="padding:0"><div style="display:flex">';
+  monthSpans.forEach(ms => {
+    monthRow += '<div style="flex:' + ms.span + ';padding:10px 0 2px;font-size:.7rem;font-weight:600;color:var(--text2);text-align:center;border-left:1px solid var(--border)">' + MONTHS[ms.month] + '</div>';
+  });
+  monthRow += '</div></td></tr>';
+  tbody.innerHTML += monthRow;
+  
+  // Week numbers row
+  weekRow += '<td colspan="' + weeks + '" style="padding:0"><div style="display:flex">';
+  for(let i = 0; i < weeks; i++){
+    const d = new Date(start.getTime() + i * WEEK_MS);
+    const num = d.getDate();
+    const isFirst = num <= 7;
+    weekRow += '<div style="flex:1;padding:2px 0 8px;font-size:.6rem;color:' + (isFirst ? 'var(--text2)' : '#ccc') + ';text-align:center;border-left:1px solid var(--border)">' + num + '</div>';
+  }
+  weekRow += '</div></td></tr>';
+  tbody.innerHTML += weekRow;
   
   // Task rows
-  tasks.forEach((t, i) => {
-    const qOff = (t.year - minY) * 4 + (t.quarter - minQ);
-    const barLeft = qOff * qWidth + 4;
-    const barWidth = (t.span || 1) * qWidth - 8;
-    const col = STAT_COLORS[t.status] || STAT_COLORS.plan;
-    
-    html += '<div style="display:flex;align-items:center;border-top:1px solid var(--border)">';
-    html += '<div style="width:220px;flex-shrink:0;padding:8px 10px;font-size:.82rem">';
-    html += '<div style="font-weight:600;display:flex;align-items:center;gap:6px">';
-    html += '<span style="width:8px;height:8px;border-radius:50%;background:' + col + ';flex-shrink:0"></span>';
-    html += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.name) + '</span></div>';
-    if(t.desc) html += '<div style="font-size:.7rem;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.desc) + '</div>';
-    html += '</div>';
-    html += '<div style="flex:1;position:relative;height:48px;padding:10px 0">';
-    html += '<div class="gantt-bar ' + t.status + '" style="left:' + barLeft + 'px;width:' + Math.max(barWidth, 20) + 'px;background:' + col + '" onclick="editTask(' + i + ')" title="' + esc(t.name) + ' (' + QUARTERS[t.quarter-1] + ' ' + t.year + ')">';
-    html += esc(t.name);
-    html += '</div></div></div>';
-  });
-  
-  html += '</div>';
-  cont.innerHTML = html;
-}
-
-// Render task list
-function renderTaskList(){
-  const cont = document.getElementById('taskList');
-  document.getElementById('taskCount').textContent = tasks.length;
-  
   if(tasks.length === 0){
-    cont.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:.82rem">Пока нет задач</div>';
+    tbody.innerHTML += '<tr><td colspan="2" style="padding:40px;text-align:center;color:var(--text2);font-size:.85rem">➕ Создайте первую задачу</td></tr>';
+    updateStats();
     return;
   }
   
   tasks.forEach((t, i) => {
-    const col = STAT_COLORS[t.status] || '#6366f1';
-    const label = STAT_LABELS[t.status] || '';
-    const div = document.createElement('div');
-    div.className = 'task-item' + (i === selectedTask ? ' active' : '');
-    div.innerHTML = 
-      '<span class="color-dot" style="background:' + col + '"></span>' +
-      '<div class="info"><div class="name">' + esc(t.name) + '</div><div class="meta">' + QUARTERS[t.quarter-1] + ' ' + t.year + ' · ' + (t.span||1) + ' кв. · ' + label + '</div></div>' +
-      '<div class="actions">' +
-        '<button onclick="event.stopPropagation();editTask(' + i + ')" title="Редактировать">✎</button>' +
-        '<button class="del" onclick="event.stopPropagation();deleteTask(' + i + ')" title="Удалить">🗑</button>' +
-      '</div>';
-    div.onclick = () => { selectedTask = i; renderTaskList(); renderGantt(); };
-    cont.appendChild(div);
+    const col = STAT_COL[t.status] || '#6366f1';
+    const barLeft = t.week;
+    const barWidth = Math.max(t.span || 4, 1);
+    
+    let row = '<tr class="task-row" data-idx="' + i + '" style="cursor:pointer">';
+    row += '<td style="padding:0;border-bottom:1px solid var(--border)"><div class="task-label" title="' + esc(t.desc||t.name) + '">';
+    row += '<span class="dot" style="background:' + col + '"></span>';
+    row += '<span>' + esc(t.name) + '</span></div></td>';
+    row += '<td style="padding:0;border-bottom:1px solid var(--border);position:relative">';
+    
+    // Background grid
+    row += '<div style="display:flex;height:42px">';
+    for(let w = 0; w < weeks; w++){
+      row += '<div style="flex:1;border-left:1px solid #f3f4f6"></div>';
+    }
+    row += '</div>';
+    
+    // Task bar
+    if(barLeft < weeks){
+      const pct = (barLeft / weeks) * 100;
+      const wpct = (barWidth / weeks) * 100;
+      row += '<div class="task-bar s-' + t.status + '" style="left:' + pct + '%;width:' + Math.min(wpct, 100-pct) + '%;background:' + col + '" data-idx="' + i + '">' + esc(t.name) + '</div>';
+    }
+    
+    row += '</td></tr>';
+    tbody.innerHTML += row;
   });
+  
+  // Bind click handlers
+  document.querySelectorAll('.task-row').forEach(el => {
+    el.addEventListener('click', function(){
+      const i = parseInt(this.dataset.idx);
+      selectTask(i);
+    });
+    el.addEventListener('dblclick', function(){
+      const i = parseInt(this.dataset.idx);
+      openEdit(i);
+    });
+  });
+  document.querySelectorAll('.task-bar').forEach(el => {
+    el.addEventListener('click', function(e){
+      e.stopPropagation();
+      const i = parseInt(this.dataset.idx);
+      selectTask(i);
+    });
+    el.addEventListener('dblclick', function(e){
+      e.stopPropagation();
+      const i = parseInt(this.dataset.idx);
+      openEdit(i);
+    });
+  });
+  
+  updateStats();
 }
 
-// Add / Edit modals
-function openAddModal(){
-  openTaskModal(null);
+function selectTask(i){
+  if(i < 0 || i >= tasks.length) return;
+  selected = i;
+  document.querySelectorAll('.task-row').forEach((el, idx) => {
+    el.style.background = idx === i ? 'var(--accent-light)' : '';
+  });
+  document.getElementById('editBtn').disabled = false;
+  document.getElementById('delBtn').disabled = false;
 }
 
-function editTask(i){
-  selectedTask = i;
-  renderTaskList();
-  renderGantt();
-  openTaskModal(tasks[i], i);
+function updateStats(){
+  const totals = {};
+  tasks.forEach(t => { totals[t.status] = (totals[t.status]||0) + 1; });
+  let html = '';
+  Object.entries(totals).forEach(([k,v]) => {
+    html += '<span><span class="legend-item" style="display:inline"><span class="swatch" style="background:' + (STAT_COL[k]||'#ccc') + ';display:inline-block;vertical-align:middle"></span> ' + STAT_LABEL[k] + ': ' + v + '</span></span>';
+  });
+  document.getElementById('stats').innerHTML = html || '0 задач';
 }
 
-function openTaskModal(task, idx){
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  
-  const isEdit = task !== null;
-  const t = task || {name:'',desc:'',quarter:1,year:2026,span:1,status:'plan'};
-  
-  const statusOpts = ['done','inprogress','plan','paused','canceled'].map(s => 
-    '<option value="' + s + '"' + (t.status === s ? ' selected' : '') + '>' + STAT_LABELS[s] + '</option>'
-  ).join('');
-  
-  overlay.innerHTML = '<div class="modal">' +
-    '<h2>' + (isEdit ? '✏️ Редактировать задачу' : '➕ Новая задача') + '</h2>' +
-    '<div class="form-group"><label>Название</label><input type="text" id="modalName" value="' + esc(t.name) + '" placeholder="Задача..."></div>' +
-    '<div class="form-group"><label>Описание</label><textarea id="modalDesc" placeholder="Краткое описание...">' + esc(t.desc||'') + '</textarea></div>' +
-    '<div class="form-row">' +
-      '<div class="form-group"><label>Квартал</label><select id="modalQuarter">' + 
-        QUARTERS.map((q, i) => '<option value="' + (i+1) + '"' + (t.quarter === i+1 ? ' selected' : '') + '>' + q + '</option>').join('') +
-      '</select></div>' +
-      '<div class="form-group"><label>Год</label><input type="number" id="modalYear" value="' + t.year + '" min="2024" max="2030"></div>' +
-    '</div>' +
-    '<div class="form-row">' +
-      '<div class="form-group"><label>Длительность (кварталов)</label><input type="number" id="modalSpan" value="' + (t.span||1) + '" min="1" max="8"></div>' +
-      '<div class="form-group"><label>Статус</label><select id="modalStatus">' + statusOpts + '</select></div>' +
-    '</div>' +
-    '<div style="display:flex;gap:8px;margin-top:12px">' +
-      '<button class="btn-primary" id="modalSaveBtn">💾 Сохранить</button>' +
-      '<button class="btn-outline" onclick="this.closest(\'.modal-overlay\').remove()">Отмена</button>' +
-    '</div>' +
-  '</div>';
-  
-  document.body.appendChild(overlay);
-  
-  const nameInput = overlay.querySelector('#modalName');
-  nameInput.focus();
-  nameInput.select();
-  
-  const save = () => {
-    const name = overlay.querySelector('#modalName').value.trim();
-    if(!name) return;
-    const obj = {
-      name,
-      desc: overlay.querySelector('#modalDesc').value.trim(),
-      quarter: parseInt(overlay.querySelector('#modalQuarter').value),
-      year: parseInt(overlay.querySelector('#modalYear').value) || 2026,
-      span: parseInt(overlay.querySelector('#modalSpan').value) || 1,
-      status: overlay.querySelector('#modalStatus').value
-    };
-    
-    if(isEdit && idx !== null) tasks[idx] = obj;
-    else { obj.id = nextId++; tasks.push(obj); selectedTask = tasks.length - 1; }
-    
-    overlay.remove();
-    save(); renderAll();
-  };
-  
-  overlay.querySelector('#modalSaveBtn').onclick = save;
-  overlay.addEventListener('keydown', (e) => { if(e.key === 'Enter') save(); if(e.key === 'Escape') overlay.remove(); });
+// Add task
+function addTask(name, status, week, span){
+  if(!name || !name.trim()) return;
+  const {weeks} = getWeeks();
+  const w = Math.max(0, Math.min(week || 0, weeks - 1));
+  const s = Math.max(1, Math.min(span || 4, weeks - w));
+  tasks.push({name: name.trim(), desc: '', status: status || 'plan', week: w, span: s});
+  save();
+  render();
+  selectTask(tasks.length - 1);
 }
 
-function deleteTask(i){
-  if(!confirm('Удалить задачу «' + tasks[i].name + '»?')) return;
-  tasks.splice(i, 1);
-  if(selectedTask >= tasks.length) selectedTask = tasks.length - 1;
-  save(); renderAll();
+// Save / Load
+function save(){
+  const title = document.getElementById('mapTitle').value;
+  const owner = document.getElementById('mapOwner').value;
+  const startMonth = document.getElementById('startMonth').value;
+  localStorage.setItem('mkt_roadmap2', JSON.stringify({tasks,title,owner,startMonth}));
 }
 
-// Render all
-function renderAll(){
-  // Restore meta
-  const stored = JSON.parse(localStorage.getItem('mkt_roadmap') || '{}');
-  if(stored.title) document.getElementById('roadmapTitle').value = stored.title;
-  if(stored.owner) document.getElementById('roadmapOwner').value = stored.owner;
-  if(stored.period) document.getElementById('roadmapPeriod').value = stored.period;
-  
-  renderGantt();
-  renderTaskList();
+function load(){
+  try{
+    const s = localStorage.getItem('mkt_roadmap2');
+    if(s){
+      const d = JSON.parse(s);
+      tasks = d.tasks || [];
+      if(d.title) document.getElementById('mapTitle').value = d.title;
+      if(d.owner) document.getElementById('mapOwner').value = d.owner;
+      if(d.startMonth) document.getElementById('startMonth').value = d.startMonth;
+    }
+  }catch(e){}
 }
 
-// Export PNG
-function exportPNG(){
-  const el = document.querySelector('.roadmap-wrap');
-  html2canvas(el, {backgroundColor:'#fff',scale:2,useCORS:true,logging:false}).then(canvas => {
+// Event handlers
+document.getElementById('addBtn').onclick = () => {
+  document.getElementById('fName').focus();
+  document.getElementById('fName').scrollIntoView({behavior:'smooth'});
+};
+
+document.getElementById('editBtn').onclick = () => {
+  if(selected >= 0 && selected < tasks.length) openEdit(selected);
+};
+
+document.getElementById('delBtn').onclick = () => {
+  if(selected < 0 || selected >= tasks.length) return;
+  if(!confirm('Удалить «' + tasks[selected].name + '»?')) return;
+  tasks.splice(selected, 1);
+  selected = -1;
+  document.getElementById('editBtn').disabled = true;
+  document.getElementById('delBtn').disabled = true;
+  save(); render();
+};
+
+// Quick form
+document.getElementById('fAddBtn').onclick = () => {
+  const name = document.getElementById('fName').value.trim();
+  const status = document.getElementById('fStatus').value;
+  const span = parseInt(document.getElementById('fWeeks').value) || 4;
+  const week = parseInt(document.getElementById('fStartWeek').value) || 0;
+  if(!name) return;
+  addTask(name, status, week, span);
+  document.getElementById('fName').value = '';
+  document.getElementById('fName').focus();
+};
+
+document.getElementById('fName').addEventListener('keydown', e => {
+  if(e.key === 'Enter') document.getElementById('fAddBtn').click();
+});
+
+// Edit modal
+function openEdit(i){
+  if(i < 0 || i >= tasks.length) return;
+  editing = i;
+  const t = tasks[i];
+  document.getElementById('modalTitle').textContent = '✏️ Редактировать';
+  document.getElementById('mName').value = t.name;
+  document.getElementById('mDesc').value = t.desc || '';
+  fillWeekSelect(document.getElementById('mStartWeek'), t.week);
+  document.getElementById('mSpan').value = t.span || 4;
+  document.getElementById('mStatus').value = t.status || 'plan';
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.getElementById('mName').focus();
+  document.getElementById('mName').select();
+}
+
+document.getElementById('mSave').onclick = () => {
+  if(editing < 0) return;
+  const name = document.getElementById('mName').value.trim();
+  if(!name) return;
+  tasks[editing].name = name;
+  tasks[editing].desc = document.getElementById('mDesc').value.trim();
+  tasks[editing].week = parseInt(document.getElementById('mStartWeek').value) || 0;
+  tasks[editing].span = parseInt(document.getElementById('mSpan').value) || 4;
+  tasks[editing].status = document.getElementById('mStatus').value;
+  document.getElementById('modalOverlay').style.display = 'none';
+  editing = -1;
+  save(); render();
+};
+
+document.getElementById('mCancel').onclick = () => {
+  document.getElementById('modalOverlay').style.display = 'none';
+  editing = -1;
+};
+
+// Auto-save on meta changes
+['mapTitle','mapOwner','startMonth'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => { save(); fillWeekSelect(document.getElementById('fStartWeek'), 0); render(); });
+});
+
+// Clear
+document.getElementById('clearBtn').onclick = () => {
+  if(!confirm('Очистить все задачи?')) return;
+  tasks = []; selected = -1;
+  document.getElementById('editBtn').disabled = true;
+  document.getElementById('delBtn').disabled = true;
+  save(); render();
+};
+
+// Example
+document.getElementById('exampleBtn').onclick = () => {
+  tasks = [
+    {name:'Аудит каналов',desc:'Сбор данных',status:'done',week:0,span:4},
+    {name:'Стратегия лидогенерации',desc:'Определение каналов',status:'inprogress',week:4,span:4},
+    {name:'Запуск Telegram-канала',desc:'Контент-план',status:'inprogress',week:6,span:6},
+    {name:'SEO-оптимизация',desc:'Технический аудит',status:'plan',week:8,span:8},
+    {name:'Внедрение CDP',desc:'Единая база',status:'plan',week:16,span:8},
+    {name:'Автоматизация email',desc:'Триггеры',status:'plan',week:20,span:6},
+    {name:'Ретаргетинг',desc:'По сегментам',status:'plan',week:26,span:6},
+    {name:'Анализ эффективности',desc:'ROMI, CAC',status:'plan',week:34,span:6}
+  ];
+  selected = -1;
+  save(); render();
+};
+
+// Export
+document.getElementById('exportPng').onclick = () => {
+  const el = document.getElementById('roadmapCard');
+  // Dynamic load html2canvas, then export
+  if(typeof html2canvas === 'undefined'){
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    s.onload = () => doExport(el);
+    document.body.appendChild(s);
+  } else {
+    doExport(el);
+  }
+};
+
+function doExport(el){
+  html2canvas(el, {backgroundColor:'#fff',scale:2,useCORS:true,logging:false,width:el.scrollWidth,height:el.scrollHeight}).then(canvas => {
     const a = document.createElement('a');
     a.download = 'roadmap.png';
     a.href = canvas.toDataURL('image/png');
     a.click();
-  }).catch(() => {
-    alert('Не удалось создать PNG. Попробуйте скриншот страницы (Ctrl+Shift+S).');
   });
 }
 
-// Export CSV
-function exportCSV(){
-  if(tasks.length === 0) return;
-  let csv = '\uFEFFНазвание,Описание,Квартал,Год,Длительность,Статус\n';
+document.getElementById('exportCsv').onclick = () => {
+  if(!tasks.length) return;
+  let csv = '\uFEFFНазвание,Описание,Неделя,Длительность(нед),Статус\n';
   tasks.forEach(t => {
-    const escCsv = s => '"' + String(s||'').replace(/"/g,'""') + '"';
-    csv += escCsv(t.name) + ',' + escCsv(t.desc||'') + ',' + QUARTERS[t.quarter-1] + ' ' + t.year + ',' + t.year + ',' + (t.span||1) + ',' + STAT_LABELS[t.status] + '\n';
+    const e = s => '"' + String(s||'').replace(/"/g,'""') + '"';
+    csv += e(t.name) + ',' + e(t.desc||'') + ',' + (t.week+1) + ',' + t.span + ',' + STAT_LABEL[t.status] + '\n';
   });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
   a.download = 'roadmap.csv';
   a.click();
-}
+};
 
-// Example
-function loadExample(){
-  tasks = [
-    {name:'Аудит текущих каналов',desc:'Сбор данных по всем каналам',quarter:1,year:2026,span:1,status:'done',id:1},
-    {name:'Стратегия лидогенерации',desc:'Определение ключевых каналов',quarter:2,year:2026,span:1,status:'inprogress',id:2},
-    {name:'Запуск Telegram-канала',desc:'Контент-план, оформление',quarter:2,year:2026,span:1,status:'inprogress',id:3},
-    {name:'SEO-оптимизация сайта',desc:'Технический аудит, контент',quarter:2,year:2026,span:2,status:'plan',id:4},
-    {name:'Внедрение CDP',desc:'Единая база клиентов',quarter:3,year:2026,span:2,status:'plan',id:5},
-    {name:'Автоматизация email-рассылок',desc:'Триггерные сценарии',quarter:3,year:2026,span:1,status:'plan',id:6},
-    {name:'Запуск ретаргетинга',desc:'По всем сегментам',quarter:3,year:2026,span:1,status:'plan',id:7},
-    {name:'Анализ эффективности',desc:'ROMI, CAC, LTV по каналам',quarter:4,year:2026,span:1,status:'plan',id:8}
-  ];
-  nextId = 9;
-  selectedTask = -1;
-  save(); renderAll();
-}
-
-// Keyboard navigation
+// Keyboard
 document.addEventListener('keydown', e => {
-  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
-    if(document.querySelector('.modal-overlay')) return;
-    e.preventDefault();
-    if(tasks.length === 0) return;
-    const dir = e.key === 'ArrowDown' ? 1 : -1;
-    selectedTask = Math.max(0, Math.min(tasks.length - 1, selectedTask + dir));
-    renderTaskList(); renderGantt();
-    // Scroll into view
-    const el = document.querySelector('.task-item.active');
-    if(el) el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(document.getElementById('modalOverlay').style.display === 'flex') {
+    if(e.key === 'Escape') { document.getElementById('modalOverlay').style.display = 'none'; editing = -1; }
+    if(e.key === 'Enter') { document.getElementById('mSave').click(); }
+    return;
   }
-  if(e.key === 'Delete' && selectedTask >= 0 && selectedTask < tasks.length){
-    if(!document.querySelector('.modal-overlay')) deleteTask(selectedTask);
+  
+  if(e.key === 'ArrowDown' && tasks.length > 0){
+    e.preventDefault();
+    const next = Math.min(tasks.length - 1, selected + 1);
+    selectTask(next);
+    const row = document.querySelector('.task-row[data-idx="' + next + '"]');
+    if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  if(e.key === 'ArrowUp' && tasks.length > 0){
+    e.preventDefault();
+    const prev = Math.max(0, selected - 1);
+    selectTask(prev);
+    const row = document.querySelector('.task-row[data-idx="' + prev + '"]');
+    if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  if(e.key === 'Delete' && selected >= 0){
+    if(!confirm('Удалить «' + tasks[selected].name + '»?')) return;
+    tasks.splice(selected, 1);
+    selected = -1;
+    document.getElementById('editBtn').disabled = true;
+    document.getElementById('delBtn').disabled = true;
+    save(); render();
+  }
+  if(e.key === 'Enter' && selected >= 0){
+    openEdit(selected);
   }
 });
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 // Init
-renderAll();
+load();
 
-// If empty, load example
-if(tasks.length === 0) loadExample();
+// Wait for DOM + fill selects then render
+setTimeout(() => {
+  fillWeekSelect(document.getElementById('fStartWeek'), 0);
+  fillWeekSelect(document.getElementById('mStartWeek'), 0);
+  render();
+  
+  // If empty, load example
+  if(tasks.length === 0) document.getElementById('exampleBtn').click();
+}, 100);
 </script>
 </body>
 </html>
