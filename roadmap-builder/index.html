@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8f9fb;--surface:#fff;--text:#111827;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#111827;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif;--cell-w:40px}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}
 .container{max-width:1200px;margin:0 auto;padding:0 20px}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100}
@@ -44,7 +44,7 @@ h2{font-size:.85rem;font-weight:600;margin-bottom:10px}
 
 /* Calendar grid */
 .canvas-wrap{overflow-x:auto;padding:0}
-.calendar{min-width:700px;position:relative}
+.calendar{width:100%;position:relative;table-layout:fixed}
 .calendar thead th{position:sticky;top:0;background:var(--surface);z-index:5;border-bottom:2px solid var(--border)}
 .calendar .month-row th{padding:10px 4px 4px;font-size:.72rem;font-weight:600;color:var(--text2);text-align:center;letter-spacing:.3px}
 .calendar .week-row th{padding:2px 4px 10px;font-size:.6rem;font-weight:500;color:#9ca3af;text-align:center}
@@ -92,7 +92,7 @@ h2{font-size:.85rem;font-weight:600;margin-bottom:10px}
 .week-divider{border-left:1px solid var(--border)}
 .month-divider{border-left:2px solid var(--border)}
 td.marker{width:0;padding:0;border-left:0}
-.td-cell{width:28px;min-width:28px;border-left:1px solid #f3f4f6;text-align:center;font-size:.55rem;color:#e5e7eb;padding:0}
+.td-cell{width:var(--cell-w);border-left:1px solid #f3f4f6;text-align:center;font-size:.55rem;color:#e5e7eb;padding:0}
 
 footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margin-top:24px}
 @media(max-width:640px){.hero{padding:16px 0 8px}h1{font-size:1.1rem}.form-bar .fshort{width:70px}.form-bar .fmid{width:90px}.form-bar .ffull{width:110px}}
@@ -131,7 +131,7 @@ footer{padding:24px 0;text-align:center;color:var(--text2);font-size:.8rem;margi
 <input type="text" id="mapTitle" value="Дорожная карта 2026" placeholder="Название">
 <input type="text" id="mapOwner" value="Отдел маркетинга" placeholder="Владелец" style="flex:0.5">
 <span class="hint">Старт: <input type="month" id="startMonth" value="2026-01" style="width:130px;display:inline;padding:4px 8px"></span>
-<span class="hint">Длительность: <span id="totalWeeks">52</span> нед.</span>
+<span class="hint">Показать: <select id="zoomSelect" style="padding:4px 6px;font-size:.75rem"><option value="26">Полгода (26 нед)</option><option value="52" selected>Год (52 нед)</option><option value="78">1.5 года (78 нед)</option><option value="104">2 года (104 нед)</option></select></span>
 </div>
 
 <div class="form-bar" id="formBar">
@@ -212,8 +212,7 @@ function getStartDate(){
 
 function getWeeks(){
   const start = getStartDate();
-  // Show 52 weeks (1 year) from start
-  const weeks = 52;
+  const weeks = parseInt(document.getElementById('zoomSelect').value) || 52;
   return {start, weeks};
 }
 
@@ -236,6 +235,7 @@ function fillWeekSelect(sel, selectedWeek){
 
 // Render calendar
 function render(){
+  adjustCellWidth();
   const {start, weeks} = getWeeks();
   const tbody = document.getElementById('calBody');
   tbody.innerHTML = '';
@@ -472,9 +472,18 @@ document.getElementById('mCancel').onclick = () => {
 };
 
 // Auto-save on meta changes
-['mapTitle','mapOwner','startMonth'].forEach(id => {
+['mapTitle','mapOwner','startMonth','zoomSelect'].forEach(id => {
   document.getElementById(id).addEventListener('change', () => { save(); fillWeekSelect(document.getElementById('fStartWeek'), 0); render(); });
 });
+
+// Zoom: adjust cell width dynamically
+function adjustCellWidth(){
+  const wrap = document.getElementById('canvasWrap');
+  const {weeks} = getWeeks();
+  const wrapW = wrap.clientWidth - 220; // minus label column
+  const cellW = Math.max(24, Math.min(64, Math.floor(wrapW / weeks)));
+  document.documentElement.style.setProperty('--cell-w', cellW + 'px');
+}
 
 // Clear
 document.getElementById('clearBtn').onclick = () => {
@@ -581,11 +590,15 @@ load();
 setTimeout(() => {
   fillWeekSelect(document.getElementById('fStartWeek'), 0);
   fillWeekSelect(document.getElementById('mStartWeek'), 0);
+  adjustCellWidth();
   render();
   
   // If empty, load example
   if(tasks.length === 0) document.getElementById('exampleBtn').click();
 }, 100);
+
+// Recalc on resize
+window.addEventListener('resize', () => { adjustCellWidth(); render(); });
 </script>
 </body>
 </html>
