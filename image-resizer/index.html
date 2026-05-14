@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Image Resizer — изменение размера фото онлайн</title>
+<meta name="description" content="Бесплатный онлайн-ресaйзер изображений. Изменение размера по ширине, высоте, проценту. Кадрирование. Превью до/после.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+
+h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.hero{padding:48px 0 32px;text-align:center}
+.hero p{color:var(--text2)}
+
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:60px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:var(--accent-light)}
+.dropzone-icon{font-size:3rem;margin-bottom:12px}
+.dropzone-text{color:var(--text2);font-size:.95rem}
+.dropzone-text strong{color:var(--text)}
+.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.mode-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin:20px 0}
+.tab{padding:8px 18px;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);font-family:var(--font)}
+.tab.active{background:var(--accent);color:#fff}
+.tab:hover:not(.active){background:#f3f4f6}
+
+.controls-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px}
+.mode-content{display:none}
+.mode-content.active{display:block}
+
+.param-row{display:flex;flex-wrap:wrap;gap:16px;align-items:end;margin-bottom:12px}
+.param-row:last-child{margin-bottom:0}
+.param-group{display:flex;flex-direction:column;gap:4px}
+.param-group label{font-size:.8rem;font-weight:600;color:var(--text2)}
+.param-group input[type=number]{width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font)}
+.param-group input[type=number]:focus{outline:none;border-color:var(--accent)}
+.param-group .hint{font-size:.75rem;color:var(--text2);margin-top:2px}
+.lock-btn{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;font-size:.85rem;transition:all .15s}
+.lock-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.btn{padding:10px 24px;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+
+.results{display:none}
+.results.show{display:block}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;margin-top:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.stat-card__label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-card__value{font-size:1.3rem;font-weight:800}
+.stat-card__value.green{color:#059669}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.compare-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.compare-card__label{padding:12px 16px;font-weight:600;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.compare-card__label .size{font-weight:400;color:var(--text2)}
+.compare-card img{width:100%;height:auto;display:block}
+.compare-card .dim{font-size:.8rem;color:var(--text2);text-align:center;padding:6px}
+
+.download-bar{display:flex;gap:12px;justify-content:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px}
+
+.info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:48px}
+.info h3{font-size:.95rem;margin-bottom:8px}
+.info ul{list-style:none;font-size:.85rem;color:var(--text2)}
+.info ul li{padding:4px 0;padding-left:20px;position:relative}
+.info ul li::before{content:"•";position:absolute;left:4px;color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+@media(max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .param-row{flex-direction:column}
+  h1{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>📐 Image Resizer</h1>
+<p>Изменение размера и кадрирование изображений онлайн. Прямо в браузере.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="dropzone" id="dropzone">
+<input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+<div class="dropzone-icon">📁</div>
+<div class="dropzone-text">Перетащи изображение сюда или <strong>выбери файл</strong></div>
+<div style="font-size:.8rem;color:var(--text2);margin-top:6px">JPEG / PNG / WebP</div>
+</div>
+
+<div class="mode-tabs" id="modeTabs">
+<button class="tab active" data-mode="wh">Ш×В</button>
+<button class="tab" data-mode="width">По ширине</button>
+<button class="tab" data-mode="height">По высоте</button>
+<button class="tab" data-mode="pct">Процент</button>
+<button class="tab" data-mode="crop">Кадрировать</button>
+</div>
+
+<div class="controls-wrap">
+
+<div class="mode-content active" id="modeWh">
+<div class="param-row">
+<div class="param-group">
+<label>Ширина (px)</label>
+<input type="number" id="whWidth" value="800" min="1" max="10000">
+</div>
+<div class="param-group">
+<label>Высота (px)</label>
+<input type="number" id="whHeight" value="600" min="1" max="10000">
+</div>
+<button class="lock-btn active" id="whLock" title="Сохранять пропорции">🔗</button>
+</div>
+<div class="param-row">
+<button class="btn btn-primary" id="applyWhBtn" disabled>⟳ Применить</button>
+</div>
+</div>
+
+<div class="mode-content" id="modeWidth">
+<div class="param-row">
+<div class="param-group">
+<label>Ширина (px)</label>
+<input type="number" id="wWidth" value="800" min="1" max="10000">
+<div class="hint">Высота подстроится автоматически</div>
+</div>
+</div>
+<div class="param-row">
+<button class="btn btn-primary" id="applyWBtn" disabled>⟳ Применить</button>
+</div>
+</div>
+
+<div class="mode-content" id="modeHeight">
+<div class="param-row">
+<div class="param-group">
+<label>Высота (px)</label>
+<input type="number" id="hHeight" value="600" min="1" max="10000">
+<div class="hint">Ширина подстроится автоматически</div>
+</div>
+</div>
+<div class="param-row">
+<button class="btn btn-primary" id="applyHBtn" disabled>⟳ Применить</button>
+</div>
+</div>
+
+<div class="mode-content" id="modePct">
+<div class="param-row">
+<div class="param-group">
+<label>Процент от оригинала</label>
+<input type="number" id="pctVal" value="50" min="1" max="500">
+<div class="hint">50% = уменьшить вдвое, 200% = увеличить вдвое</div>
+</div>
+</div>
+<div class="param-row">
+<button class="btn btn-primary" id="applyPctBtn" disabled>⟳ Применить</button>
+</div>
+</div>
+
+<div class="mode-content" id="modeCrop">
+<div class="param-row">
+<div class="param-group">
+<label>Слева (px)</label>
+<input type="number" id="cropX" value="0" min="0" max="9999">
+</div>
+<div class="param-group">
+<label>Сверху (px)</label>
+<input type="number" id="cropY" value="0" min="0" max="9999">
+</div>
+<div class="param-group">
+<label>Ширина (px)</label>
+<input type="number" id="cropW" value="400" min="1" max="10000">
+</div>
+<div class="param-group">
+<label>Высота (px)</label>
+<input type="number" id="cropH" value="400" min="1" max="10000">
+</div>
+</div>
+<div class="param-row">
+<button class="btn btn-primary" id="applyCropBtn" disabled>⟳ Применить</button>
+</div>
+</div>
+
+</div>
+
+<div class="results" id="results">
+
+<div class="stats-grid" id="statsGrid"></div>
+
+<div class="compare">
+<div class="compare-card">
+<div class="compare-card__label">Оригинал <span class="size" id="origSize"></span></div>
+<img id="origPreview">
+<div class="dim" id="origDim"></div>
+</div>
+<div class="compare-card">
+<div class="compare-card__label">Результат <span class="size" id="resSize"></span></div>
+<img id="resPreview">
+<div class="dim" id="resDim"></div>
+</div>
+</div>
+
+<div class="download-bar">
+<button class="btn btn-primary" id="downloadBtn">⬇ Скачать</button>
+</div>
+</div>
+
+<div class="info">
+<h3>ℹ️ Как это работает</h3>
+<ul>
+<li>Всё изменение размера происходит в вашем браузере — изображения не отправляются на сервер</li>
+<li>JPEG / PNG / WebP — все популярные форматы</li>
+<li>Режим «Кадрировать» вырезает область из изображения</li>
+<li>Кнопка 🔗 сохраняет пропорции в режиме Ш×В</li>
+<li>При увеличении качество может снизиться (растеризация)</li>
+</ul>
+</div>
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const dropzone=$('dropzone'), fileInput=$('fileInput');
+const results=$('results'), statsGrid=$('statsGrid');
+const origPreview=$('origPreview'), resPreview=$('resPreview');
+const origSize=$('origSize'), resSize=$('resSize'), origDim=$('origDim'), resDim=$('resDim');
+const downloadBtn=$('downloadBtn');
+const origWEl=$('origW'), origHEl=$('origH');
+
+let originalFile=null, resultBlob=null;
+let oW=0, oH=0, rW=0, rH=0;
+
+// Mode switching
+const modeTabs=document.querySelectorAll('.tab');
+const modeContents={
+  wh:$('modeWh'), width:$('modeWidth'), height:$('modeHeight'),
+  pct:$('modePct'), crop:$('modeCrop')
+};
+let currentMode='wh';
+
+modeTabs.forEach(tab=>{
+  tab.onclick=()=>{
+    modeTabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.values(modeContents).forEach(c=>c.classList.remove('active'));
+    modeContents[tab.dataset.mode].classList.add('active');
+    currentMode=tab.dataset.mode;
+  };
+});
+
+// Lock proportions
+const whLock=$('whLock');
+let locked=true;
+whLock.onclick=()=>{locked=!locked;whLock.classList.toggle('active');whLock.textContent=locked?'🔗':'🔓'};
+
+// Auto-adjust proportions when width/height changes (locked mode)
+$('whWidth').oninput=()=>{if(locked && oW>0 && oH>0){$('whHeight').value=Math.round($('whWidth').value*oH/oW)}}
+$('whHeight').oninput=()=>{if(locked && oW>0 && oH>0){$('whWidth').value=Math.round($('whHeight').value*oW/oH)}}
+
+// Drag & Drop
+dropzone.ondragover=e=>{e.preventDefault();dropzone.classList.add('dragover')};
+dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
+dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)handleFile(f)};
+fileInput.onchange=()=>{if(fileInput.files[0])handleFile(fileInput.files[0])};
+
+function handleFile(file){
+  if(!file.type.match(/^image\/(jpeg|png|webp)$/)){alert('Только JPEG/PNG/WebP');return}
+  originalFile=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    origPreview.src=e.target.result;
+    origPreview.onload=()=>{
+      oW=origPreview.naturalWidth;
+      oH=origPreview.naturalHeight;
+      origDim.textContent=oW+'×'+oH+'px';
+      origSize.textContent=fmtSize(file.size);
+      // Enable all apply buttons
+      document.querySelectorAll('.btn-primary[id^=apply]').forEach(b=>b.disabled=false);
+      // Auto-fill crop max values
+      $('cropW').max=oW;$('cropH').max=oH;
+      $('cropX').max=oW-1;$('cropY').max=oH-1;
+      doResize();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function doResize(){
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  
+  let w=oW, h=oH;
+  
+  switch(currentMode){
+    case 'wh':
+      w=parseInt($('whWidth').value)||oW;
+      h=parseInt($('whHeight').value)||oH;
+      break;
+    case 'width':
+      w=parseInt($('wWidth').value)||oW;
+      h=Math.round(oH*w/oW);
+      break;
+    case 'height':
+      h=parseInt($('hHeight').value)||oH;
+      w=Math.round(oW*h/oH);
+      break;
+    case 'pct':
+      const pct=(parseInt($('pctVal').value)||100)/100;
+      w=Math.round(oW*pct);
+      h=Math.round(oH*pct);
+      break;
+    case 'crop':
+      const cx=parseInt($('cropX').value)||0;
+      const cy=parseInt($('cropY').value)||0;
+      const cw=parseInt($('cropW').value)||oW;
+      const ch=parseInt($('cropH').value)||oH;
+      canvas.width=cw;canvas.height=ch;
+      ctx.drawImage(origPreview,cx,cy,cw,ch,0,0,cw,ch);
+      rW=cw;rH=ch;
+      exportCanvas(canvas);
+      return;
+  }
+  
+  canvas.width=w;canvas.height=h;
+  ctx.drawImage(origPreview,0,0,w,h);
+  rW=w;rH=h;
+  exportCanvas(canvas);
+}
+
+function exportCanvas(canvas){
+  const mime=originalFile.type==='image/png'?'image/png':originalFile.type==='image/webp'?'image/webp':'image/jpeg';
+  const q=mime==='image/jpeg'?0.92:0.85;
+  canvas.toBlob(blob=>{
+    if(!blob)return;
+    resultBlob=blob;
+    resPreview.src=URL.createObjectURL(blob);
+    resPreview.onload=()=>{
+      resSize.textContent=fmtSize(blob.size);
+      resDim.textContent=rW+'×'+rH+'px';
+      updateStats();
+      results.classList.add('show');
+    };
+  }, mime, q);
+}
+
+// Apply buttons
+$('applyWhBtn').onclick=doResize;
+$('applyWBtn').onclick=doResize;
+$('applyHBtn').onclick=doResize;
+$('applyPctBtn').onclick=doResize;
+$('applyCropBtn').onclick=doResize;
+
+downloadBtn.onclick=()=>{
+  if(!resultBlob)return;
+  const a=document.createElement('a');
+  const ext=originalFile.name.match(/\.(\w+)$/)?.[1]||'jpg';
+  const name=originalFile.name.replace(/\.[^.]+$/,'')+'_resized.'+ext;
+  a.href=URL.createObjectURL(resultBlob);
+  a.download=name;
+  a.click();
+};
+
+function updateStats(){
+  const rb=resultBlob.size;
+  statsGrid.innerHTML=
+    '<div class="stat-card"><div class="stat-card__label">Размер до</div><div class="stat-card__value">'+oW+'×'+oH+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">Размер после</div><div class="stat-card__value green">'+rW+'×'+rH+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">Вес до</div><div class="stat-card__value">'+fmtSize(originalFile.size)+'</div></div>'+
+    '<div class="stat-card"><div class="stat-card__label">Вес после</div><div class="stat-card__value">'+fmtSize(rb)+'</div></div>';
+}
+
+function fmtSize(b){
+  if(b<1024) return b+' Б';
+  if(b<1048576) return (b/1024).toFixed(1)+' КБ';
+  return (b/1048576).toFixed(2)+' МБ';
+}
+</script>
+</body>
+</html>
