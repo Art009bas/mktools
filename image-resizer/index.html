@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Image Resizer — изменение размера фото онлайн</title>
-<meta name="description" content="Бесплатный онлайн-ресaйзер изображений. Изменение размера по ширине, высоте, проценту. Кадрирование. Превью до/после.">
+<meta name="description" content="Бесплатный онлайн-ресaйзер изображений. Интерактивное кадрирование. Ресайз по ширине, высоте, проценту. Превью до/после.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,8 +32,8 @@ h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
 .dropzone-text strong{color:var(--text)}
 .dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 
-.mode-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin:20px 0}
-.tab{padding:8px 18px;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);font-family:var(--font)}
+.mode-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin:20px 0;overflow-x:auto}
+.tab{padding:8px 18px;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);white-space:nowrap;font-family:var(--font)}
 .tab.active{background:var(--accent);color:#fff}
 .tab:hover:not(.active){background:#f3f4f6}
 
@@ -56,10 +56,29 @@ h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
 .btn-primary:hover{background:var(--accent-hover)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 
+/* Crop area */
+.crop-container{position:relative;display:inline-block;margin:0 auto;width:100%}
+.crop-container img{width:100%;height:auto;display:block;user-select:none;-webkit-user-drag:none}
+.crop-overlay{position:absolute;inset:0;pointer-events:none}
+.crop-overlay.dark{background:rgba(0,0,0,0.5)}
+.crop-box{position:absolute;border:2px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.5);cursor:move;pointer-events:auto}
+.crop-handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:50%}
+.crop-handle.nw{top:-6px;left:-6px;cursor:nw-resize}
+.crop-handle.ne{top:-6px;right:-6px;cursor:ne-resize}
+.crop-handle.sw{bottom:-6px;left:-6px;cursor:sw-resize}
+.crop-handle.se{bottom:-6px;right:-6px;cursor:se-resize}
+.crop-info{position:absolute;bottom:-28px;left:0;font-size:.8rem;color:var(--text2);background:var(--surface);padding:2px 8px;border-radius:4px;white-space:nowrap}
+
+/* Aspect ratio bar */
+.aspect-bar{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px}
+.aspect-btn{padding:4px 12px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;background:var(--surface);cursor:pointer;transition:all .12s;font-family:var(--font)}
+.aspect-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600}
+.aspect-btn:hover:not(.active){background:#f3f4f6}
+
 .results{display:none}
 .results.show{display:block}
 
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;margin-top:20px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
 .stat-card__label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .stat-card__value{font-size:1.3rem;font-weight:800}
@@ -100,7 +119,7 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 <section class="hero">
 <div class="container">
 <h1>📐 Image Resizer</h1>
-<p>Изменение размера и кадрирование изображений онлайн. Прямо в браузере.</p>
+<p>Ресайз и интерактивное кадрирование изображений. Прямо в браузере.</p>
 </div>
 </section>
 
@@ -114,30 +133,43 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 </div>
 
 <div class="mode-tabs" id="modeTabs">
-<button class="tab active" data-mode="wh">Ш×В</button>
+<button class="tab active" data-mode="crop">✂️ Кадрировать</button>
 <button class="tab" data-mode="width">По ширине</button>
 <button class="tab" data-mode="height">По высоте</button>
 <button class="tab" data-mode="pct">Процент</button>
-<button class="tab" data-mode="crop">Кадрировать</button>
+<button class="tab" data-mode="wh">Ш×В точно</button>
 </div>
 
 <div class="controls-wrap">
 
-<div class="mode-content active" id="modeWh">
-<div class="param-row">
-<div class="param-group">
-<label>Ширина (px)</label>
-<input type="number" id="whWidth" value="800" min="1" max="10000">
-</div>
-<div class="param-group">
-<label>Высота (px)</label>
-<input type="number" id="whHeight" value="600" min="1" max="10000">
-</div>
-<button class="lock-btn active" id="whLock" title="Сохранять пропорции">🔗</button>
-</div>
-<div class="param-row">
-<button class="btn btn-primary" id="applyWhBtn" disabled>⟳ Применить</button>
-</div>
+<!-- CROP MODE (default) -->
+<div class="mode-content active" id="modeCrop">
+  <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:8px">
+    <span style="font-weight:600;font-size:.9rem">Соотношение:</span>
+  </div>
+  <div class="aspect-bar" id="aspectBar">
+    <button class="aspect-btn active" data-ar="free">🆓 Свободно</button>
+    <button class="aspect-btn" data-ar="1:1">1:1</button>
+    <button class="aspect-btn" data-ar="4:3">4:3</button>
+    <button class="aspect-btn" data-ar="3:2">3:2</button>
+    <button class="aspect-btn" data-ar="16:9">16:9</button>
+    <button class="aspect-btn" data-ar="2:3">2:3 (вертик)</button>
+    <button class="aspect-btn" data-ar="9:16">9:16 (сторис)</button>
+  </div>
+  <div class="crop-container" id="cropContainer" style="display:none">
+    <img id="cropSource" draggable="false">
+    <div class="crop-overlay" id="cropOverlay"></div>
+    <div class="crop-box" id="cropBox">
+      <div class="crop-handle nw"></div>
+      <div class="crop-handle ne"></div>
+      <div class="crop-handle sw"></div>
+      <div class="crop-handle se"></div>
+    </div>
+    <div class="crop-info" id="cropInfo"></div>
+  </div>
+  <div class="param-row" style="margin-top:40px">
+    <button class="btn btn-primary" id="applyCropBtn" disabled>✂️ Кадрировать</button>
+  </div>
 </div>
 
 <div class="mode-content" id="modeWidth">
@@ -179,27 +211,20 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 </div>
 </div>
 
-<div class="mode-content" id="modeCrop">
+<div class="mode-content" id="modeWh">
 <div class="param-row">
 <div class="param-group">
-<label>Слева (px)</label>
-<input type="number" id="cropX" value="0" min="0" max="9999">
-</div>
-<div class="param-group">
-<label>Сверху (px)</label>
-<input type="number" id="cropY" value="0" min="0" max="9999">
-</div>
-<div class="param-group">
 <label>Ширина (px)</label>
-<input type="number" id="cropW" value="400" min="1" max="10000">
+<input type="number" id="whWidth" value="800" min="1" max="10000">
 </div>
 <div class="param-group">
 <label>Высота (px)</label>
-<input type="number" id="cropH" value="400" min="1" max="10000">
+<input type="number" id="whHeight" value="600" min="1" max="10000">
 </div>
+<button class="lock-btn active" id="whLock" title="Сохранять пропорции">🔗</button>
 </div>
 <div class="param-row">
-<button class="btn btn-primary" id="applyCropBtn" disabled>⟳ Применить</button>
+<button class="btn btn-primary" id="applyWhBtn" disabled>⟳ Применить</button>
 </div>
 </div>
 
@@ -230,11 +255,10 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 <div class="info">
 <h3>ℹ️ Как это работает</h3>
 <ul>
-<li>Всё изменение размера происходит в вашем браузере — изображения не отправляются на сервер</li>
-<li>JPEG / PNG / WebP — все популярные форматы</li>
-<li>Режим «Кадрировать» вырезает область из изображения</li>
-<li>Кнопка 🔗 сохраняет пропорции в режиме Ш×В</li>
-<li>При увеличении качество может снизиться (растеризация)</li>
+<li><strong>✂️ Кадрировать</strong> — перетаскивай область и меняй её размер за углы</li>
+<li>Выбери соотношение сторон или оставь «Свободно»</li>
+<li>Ресайз по ширине/высоте/проценту — пропорции сохраняются</li>
+<li>Всё работает в браузере — изображения никуда не отправляются</li>
 </ul>
 </div>
 </div>
@@ -248,18 +272,27 @@ const results=$('results'), statsGrid=$('statsGrid');
 const origPreview=$('origPreview'), resPreview=$('resPreview');
 const origSize=$('origSize'), resSize=$('resSize'), origDim=$('origDim'), resDim=$('resDim');
 const downloadBtn=$('downloadBtn');
-const origWEl=$('origW'), origHEl=$('origH');
+
+const cropSource=$('cropSource'), cropBox=$('cropBox');
+const cropContainer=$('cropContainer'), cropOverlay=$('cropOverlay'), cropInfo=$('cropInfo');
+const applyCropBtn=$('applyCropBtn');
 
 let originalFile=null, resultBlob=null;
 let oW=0, oH=0, rW=0, rH=0;
+let imgNaturalW=0, imgNaturalH=0; // original image dimensions
+let displayW=0, displayH=0; // displayed image dimensions on screen
+let scaleX=1, scaleY=1; // natural / display
+
+let aspectLock=null; // null = free, '1:1','4:3',etc
+let isDragging=false, isResizing=false, resizeHandle='';
 
 // Mode switching
 const modeTabs=document.querySelectorAll('.tab');
 const modeContents={
-  wh:$('modeWh'), width:$('modeWidth'), height:$('modeHeight'),
-  pct:$('modePct'), crop:$('modeCrop')
+  crop:$('modeCrop'), width:$('modeWidth'), height:$('modeHeight'),
+  pct:$('modePct'), wh:$('modeWh')
 };
-let currentMode='wh';
+let currentMode='crop';
 
 modeTabs.forEach(tab=>{
   tab.onclick=()=>{
@@ -268,22 +301,31 @@ modeTabs.forEach(tab=>{
     Object.values(modeContents).forEach(c=>c.classList.remove('active'));
     modeContents[tab.dataset.mode].classList.add('active');
     currentMode=tab.dataset.mode;
+    if(currentMode==='crop' && oW>0) initCropBox();
   };
 });
 
-// Lock proportions
-const whLock=$('whLock');
-let locked=true;
-whLock.onclick=()=>{locked=!locked;whLock.classList.toggle('active');whLock.textContent=locked?'🔗':'🔓'};
+// Aspect ratio buttons
+document.querySelectorAll('.aspect-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.aspect-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    aspectLock=btn.dataset.ar==='free'?null:btn.dataset.ar;
+    if(oW>0) applyAspectRatio();
+  };
+});
 
-// Auto-adjust proportions when width/height changes (locked mode)
-$('whWidth').oninput=()=>{if(locked && oW>0 && oH>0){$('whHeight').value=Math.round($('whWidth').value*oH/oW)}}
-$('whHeight').oninput=()=>{if(locked && oW>0 && oH>0){$('whWidth').value=Math.round($('whHeight').value*oW/oH)}}
+// Lock for WH mode
+const whLock=$('whLock');
+let whLocked=true;
+whLock.onclick=()=>{whLocked=!whLocked;whLock.classList.toggle('active');whLock.textContent=whLocked?'🔗':'🔓'};
+$('whWidth').oninput=()=>{if(whLocked&&oW>0&&oH>0)$('whHeight').value=Math.round($('whWidth').value*oH/oW)}
+$('whHeight').oninput=()=>{if(whLocked&&oW>0&&oH>0)$('whWidth').value=Math.round($('whHeight').value*oW/oH)}
 
 // Drag & Drop
 dropzone.ondragover=e=>{e.preventDefault();dropzone.classList.add('dragover')};
 dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
-dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)handleFile(f)};
+dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])};
 fileInput.onchange=()=>{if(fileInput.files[0])handleFile(fileInput.files[0])};
 
 function handleFile(file){
@@ -291,64 +333,164 @@ function handleFile(file){
   originalFile=file;
   const reader=new FileReader();
   reader.onload=e=>{
-    origPreview.src=e.target.result;
-    origPreview.onload=()=>{
-      oW=origPreview.naturalWidth;
-      oH=origPreview.naturalHeight;
+    const url=e.target.result;
+    origPreview.src=url;
+    cropSource.src=url;
+    cropSource.onload=()=>{
+      oW=cropSource.naturalWidth;
+      oH=cropSource.naturalHeight;
+      imgNaturalW=oW; imgNaturalH=oH;
       origDim.textContent=oW+'×'+oH+'px';
       origSize.textContent=fmtSize(file.size);
-      // Enable all apply buttons
+      
       document.querySelectorAll('.btn-primary[id^=apply]').forEach(b=>b.disabled=false);
-      // Auto-fill crop max values
-      $('cropW').max=oW;$('cropH').max=oH;
-      $('cropX').max=oW-1;$('cropY').max=oH-1;
-      doResize();
+      initCropBox();
+      results.classList.remove('show');
     }
   };
   reader.readAsDataURL(file);
 }
 
-function doResize(){
+function initCropBox(){
+  cropContainer.style.display='block';
+  // Wait for layout
+  requestAnimationFrame(()=>{
+    displayW=cropSource.clientWidth;
+    displayH=cropSource.clientHeight;
+    scaleX=imgNaturalW/displayW;
+    scaleY=imgNaturalH/displayH;
+    
+    // Default crop: centered 80% of image
+    const cw=displayW*0.8, ch=displayH*0.8;
+    const cx=(displayW-cw)/2, cy=(displayH-ch)/2;
+    setCropBox(cx,cy,cw,ch);
+  });
+}
+
+function setCropBox(x,y,w,h){
+  const maxW=displayW, maxH=displayH;
+  x=Math.max(0,Math.min(x,maxW-w));
+  y=Math.max(0,Math.min(y,maxH-h));
+  w=Math.min(w,maxW-x);
+  h=Math.min(h,maxH-y);
+  cropBox.style.left=x+'px';
+  cropBox.style.top=y+'px';
+  cropBox.style.width=w+'px';
+  cropBox.style.height=h+'px';
+  updateCropInfo(x,y,w,h);
+  return {x,y,w,h};
+}
+
+function updateCropInfo(x,y,w,h){
+  const nx=Math.round(x*scaleX), ny=Math.round(y*scaleY);
+  const nw=Math.round(w*scaleX), nh=Math.round(h*scaleY);
+  cropInfo.textContent=`${nw}×${nh}px · X:${nx} Y:${ny}`;
+  // Store for cropping
+  cropBox._nat={x:nx,y:ny,w:nw,h:nh};
+}
+
+// Mouse handlers
+cropBox.onmousedown=e=>{
+  if(e.target.classList.contains('crop-handle')){
+    isResizing=true;
+    resizeHandle=e.target.className.split(' ')[1]; // nw,ne,sw,se
+  } else {
+    isDragging=true;
+  }
+  e.preventDefault();
+  const rect=cropContainer.getBoundingClientRect();
+  cropBox._start={mx:e.clientX,my:e.clientY,
+    l:parseFloat(cropBox.style.left),t:parseFloat(cropBox.style.top),
+    w:parseFloat(cropBox.style.width),h:parseFloat(cropBox.style.height)};
+};
+
+document.onmousemove=e=>{
+  if(!isDragging&&!isResizing)return;
+  const s=cropBox._start;
+  const dx=e.clientX-s.mx, dy=e.clientY-s.my;
+  
+  if(isDragging){
+    setCropBox(s.l+dx, s.t+dy, s.w, s.h);
+  } else if(isResizing){
+    let l=s.l, t=s.t, w=s.w, h=s.h;
+    if(resizeHandle.includes('e')){w=s.w+dx}
+    if(resizeHandle.includes('w')){l=s.l+dx;w=s.w-dx}
+    if(resizeHandle.includes('s')){h=s.h+dy}
+    if(resizeHandle.includes('n')){t=s.t+dy;h=s.h-dy}
+    if(w<20){if(resizeHandle.includes('w')){l=s.l+s.w-20;w=20}else if(resizeHandle.includes('e')){w=20}}
+    if(h<20){if(resizeHandle.includes('n')){t=s.t+s.h-20;h=20}else if(resizeHandle.includes('s')){h=20}}
+    if(aspectLock){
+      const parts=aspectLock.split(':');
+      const ar=parseInt(parts[0])/parseInt(parts[1]);
+      // Determine which dimension is primary
+      if(resizeHandle.includes('e')||resizeHandle.includes('w')){
+        h=w/ar;
+        if(resizeHandle.includes('n')) t=s.t+s.h-h;
+      } else {
+        w=h*ar;
+        if(resizeHandle.includes('w')) l=s.l+s.w-w;
+      }
+    }
+    setCropBox(l,t,w,h);
+  }
+};
+
+document.onmouseup=()=>{isDragging=false;isResizing=false};
+
+function applyAspectRatio(){
+  if(!aspectLock)return;
+  const parts=aspectLock.split(':');
+  const ar=parseInt(parts[0])/parseInt(parts[1]);
+  const cw=parseFloat(cropBox.style.width);
+  const ch=parseFloat(cropBox.style.height);
+  let w=cw, h=cw/ar;
+  if(h>displayH*0.9){h=displayH*0.9;w=h*ar}
+  if(w>displayW){w=displayW;h=w/ar}
+  const cx=(displayW-w)/2, cy=(displayH-h)/2;
+  setCropBox(cx,cy,w,h);
+}
+
+// Cropping action
+applyCropBtn.onclick=()=>{
+  const nat=cropBox._nat;
+  if(!nat)return;
   const canvas=document.createElement('canvas');
+  canvas.width=nat.w; canvas.height=nat.h;
   const ctx=canvas.getContext('2d');
   ctx.imageSmoothingEnabled=true;
   ctx.imageSmoothingQuality='high';
-  
-  let w=oW, h=oH;
-  
-  switch(currentMode){
-    case 'wh':
-      w=parseInt($('whWidth').value)||oW;
-      h=parseInt($('whHeight').value)||oH;
-      break;
-    case 'width':
-      w=parseInt($('wWidth').value)||oW;
-      h=Math.round(oH*w/oW);
-      break;
-    case 'height':
-      h=parseInt($('hHeight').value)||oH;
-      w=Math.round(oW*h/oH);
-      break;
-    case 'pct':
-      const pct=(parseInt($('pctVal').value)||100)/100;
-      w=Math.round(oW*pct);
-      h=Math.round(oH*pct);
-      break;
-    case 'crop':
-      const cx=parseInt($('cropX').value)||0;
-      const cy=parseInt($('cropY').value)||0;
-      const cw=parseInt($('cropW').value)||oW;
-      const ch=parseInt($('cropH').value)||oH;
-      canvas.width=cw;canvas.height=ch;
-      ctx.drawImage(origPreview,cx,cy,cw,ch,0,0,cw,ch);
-      rW=cw;rH=ch;
-      exportCanvas(canvas);
-      return;
-  }
-  
-  canvas.width=w;canvas.height=h;
-  ctx.drawImage(origPreview,0,0,w,h);
-  rW=w;rH=h;
+  ctx.drawImage(cropSource,nat.x,nat.y,nat.w,nat.h,0,0,nat.w,nat.h);
+  rW=nat.w; rH=nat.h;
+  exportCanvas(canvas);
+};
+
+// Resize modes
+$('applyWBtn').onclick=()=>{
+  const w=parseInt($('wWidth').value)||oW;
+  const h=Math.round(oH*w/oW);
+  resizeTo(w,h);
+};
+$('applyHBtn').onclick=()=>{
+  const h=parseInt($('hHeight').value)||oH;
+  const w=Math.round(oW*h/oH);
+  resizeTo(w,h);
+};
+$('applyPctBtn').onclick=()=>{
+  const pct=(parseInt($('pctVal').value)||100)/100;
+  resizeTo(Math.round(oW*pct),Math.round(oH*pct));
+};
+$('applyWhBtn').onclick=()=>{
+  resizeTo(parseInt($('whWidth').value)||oW, parseInt($('whHeight').value)||oH);
+};
+
+function resizeTo(w,h){
+  const canvas=document.createElement('canvas');
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(cropSource||origPreview,0,0,w,h);
+  rW=w; rH=h;
   exportCanvas(canvas);
 }
 
@@ -362,18 +504,15 @@ function exportCanvas(canvas){
     resPreview.onload=()=>{
       resSize.textContent=fmtSize(blob.size);
       resDim.textContent=rW+'×'+rH+'px';
-      updateStats();
+      statsGrid.innerHTML=
+        '<div class="stat-card"><div class="stat-card__label">Размер до</div><div class="stat-card__value">'+oW+'×'+oH+'</div></div>'+
+        '<div class="stat-card"><div class="stat-card__label">Размер после</div><div class="stat-card__value green">'+rW+'×'+rH+'</div></div>'+
+        '<div class="stat-card"><div class="stat-card__label">Вес до</div><div class="stat-card__value">'+fmtSize(originalFile.size)+'</div></div>'+
+        '<div class="stat-card"><div class="stat-card__label">Вес после</div><div class="stat-card__value">'+fmtSize(blob.size)+'</div></div>';
       results.classList.add('show');
     };
   }, mime, q);
 }
-
-// Apply buttons
-$('applyWhBtn').onclick=doResize;
-$('applyWBtn').onclick=doResize;
-$('applyHBtn').onclick=doResize;
-$('applyPctBtn').onclick=doResize;
-$('applyCropBtn').onclick=doResize;
 
 downloadBtn.onclick=()=>{
   if(!resultBlob)return;
@@ -384,15 +523,6 @@ downloadBtn.onclick=()=>{
   a.download=name;
   a.click();
 };
-
-function updateStats(){
-  const rb=resultBlob.size;
-  statsGrid.innerHTML=
-    '<div class="stat-card"><div class="stat-card__label">Размер до</div><div class="stat-card__value">'+oW+'×'+oH+'</div></div>'+
-    '<div class="stat-card"><div class="stat-card__label">Размер после</div><div class="stat-card__value green">'+rW+'×'+rH+'</div></div>'+
-    '<div class="stat-card"><div class="stat-card__label">Вес до</div><div class="stat-card__value">'+fmtSize(originalFile.size)+'</div></div>'+
-    '<div class="stat-card"><div class="stat-card__label">Вес после</div><div class="stat-card__value">'+fmtSize(rb)+'</div></div>';
-}
 
 function fmtSize(b){
   if(b<1024) return b+' Б';
