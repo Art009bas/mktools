@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mktools - бесплатные маркетинговые инструменты</title>
-  <meta name="description" content="Бесплатные онлайн-калькуляторы и инструменты для маркетинга: ROI, CAC, LTV, конверсия, A/B тесты и другое.">
+  <meta name="description" content="Бесплатные онлайн-калькуляторы и инструменты для маркетологов: ROI, CAC, UTM, конвертеры, анализаторы.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
       --bg: #f8f9fb;
       --surface: #fff;
       --text: #1a1a2e;
-      --text-secondary: #6b7280;
+      --text2: #6b7280;
       --accent: #f97316;
       --accent-hover: #ea580c;
       --accent-light: #fff7ed;
@@ -40,48 +40,69 @@
     header .container { display: flex; align-items: center; justify-content: space-between; }
     .logo { font-weight: 800; font-size: 1.3rem; color: var(--text); text-decoration: none; }
     .logo span { color: var(--accent); }
+    .count { font-size: .85rem; color: var(--text2); }
 
-    .hero { padding: 80px 0 60px; text-align: center; }
-    .hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; }
-    .hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 32px; }
+    .hero { padding: 60px 0 32px; text-align: center; }
+    .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+    .hero p { color: var(--text2); font-size: .95rem; max-width: 540px; margin: 0 auto; }
 
-    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; padding-bottom: 80px; }
+    /* Filters */
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+    .filter-btn {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: .8rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--text2);
+      transition: all .15s;
+      font-family: var(--font);
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; padding-bottom: 80px; }
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
+      padding: 24px;
       text-decoration: none;
       color: inherit;
       transition: all 0.2s;
     }
     .card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-    .card__icon { font-size: 2rem; margin-bottom: 12px; }
-    .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
-    .card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
-    .badge {
+    .card.wip { border-left: 3px solid #fbbf24; }
+    .card.wip:hover { border-left-color: var(--accent); }
+    .card__icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .card h3 { font-size: 1rem; margin-bottom: 6px; }
+    .card p { color: var(--text2); font-size: .83rem; line-height: 1.5; }
+    .card .tags { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tag {
       display: inline-block;
-      padding: 2px 10px;
+      padding: 1px 8px;
       border-radius: 100px;
-      background: var(--accent-light);
-      color: var(--accent);
-      font-size: 0.75rem;
+      font-size: .68rem;
       font-weight: 600;
-      margin-bottom: 12px;
     }
-    .coming-soon { opacity: 0.5; pointer-events: none; }
-    .coming-soon .badge { background: #f3f4f6; color: #9ca3af; }
+    .tag.ready { background: #ecfdf5; color: #059669; }
+    .tag.wip { background: #fef9c3; color: #854d0e; }
+    .tag.cat { background: #eff6ff; color: #2563eb; }
+    .tag.new { background: var(--accent-light); color: var(--accent); }
 
     footer {
       border-top: 1px solid var(--border);
       padding: 40px 0;
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
+      color: var(--text2);
+      font-size: .85rem;
     }
+    footer a { color: var(--accent); }
 
     @media (max-width: 640px) {
-      .hero h1 { font-size: 1.8rem; }
+      .hero h1 { font-size: 1.5rem; }
       .tools-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -90,221 +111,105 @@
   <header>
     <div class="container">
       <a href="/" class="logo"><span>mk</span>tools</a>
+      <span class="count" id="totalCount"></span>
     </div>
   </header>
 
   <section class="hero">
     <div class="container">
-      <h1>📊 Бесплатные маркетинговые инструменты</h1>
-      <p>Калькуляторы, утилиты и анализаторы для маркетологов. Без регистрации, без смс.</p>
+      <h1>📊 Маркетинговые инструменты</h1>
+      <p>Калькуляторы, утилиты и анализаторы. Без регистрации.</p>
     </div>
   </section>
 
   <div class="container">
-    <div class="tools-grid">
-      <a href="/mktools/messenger-links/" class="card">
-        <div class="card__icon">💬</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Ссылки мессенджеров</h3>
-        <p>Telegram + WhatsApp: предустановленный текст, UTM-метки и параметр start для Telegram ботов.</p>
-      </a>
-
-      <a href="/mktools/utm-generator/" class="card">
-        <div class="card__icon">📱</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <h3>UTM-генератор</h3>
-        <p>Создание UTM-меток для рекламных кампаний. Копирование, история, сохранение в браузере.</p>
-      </a>
-
-      <a href="/mktools/emoji-catalog/" class="card">
-        <div class="card__icon">😊</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef9c3;color:#854d0e;">Новинка</span>
-        <h3>Каталог эмодзи 😎</h3>
-        <p>Полный каталог эмодзи с поиском, категориями, историей копирования. Юзабилити.</p>
-      </a>
-
-      <a href="/mktools/seo-analyzer/" class="card">
-        <div class="card__icon">🔍</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef9c3;color:#854d0e;">Новинка</span>
-        <h3>SEO-анализатор</h3>
-        <p>Проверка мета-тегов, заголовков, структуры URL, изображений и скорости загрузки.</p>
-      </a>
-
-      <a href="/mktools/roi-calculator/" class="card">
-        <div class="card__icon">💰</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef9c3;color:#854d0e;">Новинка</span>
-        <h3>ROI-калькулятор</h3>
-        <p>Расчёт ROI, ROMI, CAC, LTV, точки безубыточности и маржинальности.</p>
-      </a>
-
-      <a href="/mktools/text-analyzer/" class="card">
-        <div class="card__icon">📝</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <h3>Анализ текста</h3>
-        <p>Проверка на уникальность, водность, тошноту, признаки ИИ и SEO-метрики.</p>
-      </a>
-
-      <a href="/mktools/image-optimizer/" class="card">
-        <div class="card__icon">🖼️</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Image Optimizer</h3>
-        <p>Сжатие JPEG/PNG в браузере. Регулировка качества, ресайз, превью до/после.</p>
-      </a>
-
-      <a href="/mktools/image-resizer/" class="card">
-        <div class="card__icon">📐</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Image Resizer</h3>
-        <p>Ресайз по ширине/высоте/проценту. Кадрирование. Превью до/после.</p>
-      </a>
-
-      <a href="/mktools/image-converter/" class="card">
-        <div class="card__icon">🔄</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Image Converter</h3>
-        <p>Конвертация JPEG PNG WebP. Пакетная обработка. Ресайз. ZIP-архив.</p>
-      </a>
-
-      <a href="/mktools/markdown-converter/" class="card">
-        <div class="card__icon">📝</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Markdown Converter</h3>
-        <p>HTML ↔ Markdown. Живое превью. Копирование и скачивание.</p>
-      </a>
-
-      <a href="/mktools/photo-editor/" class="card">
-        <div class="card__icon">🎨</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Photo Editor</h3>
-        <p>Мини-Canva: текст на фото, фигуры, слои, обрезка, заливка. В браузере.</p>
-      </a>
-
-      <a href="/mktools/table-converter/" class="card">
-        <div class="card__icon">📄</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Table Converter</h3>
-        <p>JSON / CSV / XML / YAML / TXT. Табличный просмотр. Загрузка файлов.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">👤</div>
-        <span class="badge">Скоро</span>
-        <h3>Калькулятор CAC</h3>
-        <p>Стоимость привлечения клиента с учётом всех каналов и расходов.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">💎</div>
-        <span class="badge">Скоро</span>
-        <h3>LTV калькулятор</h3>
-        <p>Пожизненная ценность клиента: прогноз доходов и удержания.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">📈</div>
-        <span class="badge">Скоро</span>
-        <h3>Конверсия (CR)</h3>
-        <p>Калькулятор конверсии: визиты → лиды → продажи, микроконверсии.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">🧪</div>
-        <span class="badge">Скоро</span>
-        <h3>A/B тест калькулятор</h3>
-        <p>Статистическая значимость A/B тестов, размер выборки, доверительные интервалы.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">📊</div>
-        <span class="badge">Скоро</span>
-        <h3>CPL / CPA / CPM</h3>
-        <p>Калькуляторы стоимости лида, действия и тысячи показов.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">📋</div>
-        <span class="badge">Скоро</span>
-        <h3>Бюджет рекламы</h3>
-        <p>Планирование медиабюджета: распределение по каналам, прогноз охватов.</p>
-      </a>
-
-      <a href="#" class="card">
-        <div class="card__icon">🔍</div>
-        <span class="badge">Скоро</span>
-        <h3>SEO анализатор</h3>
-        <p>Базовая SEO-диагностика: мета-теги, скорость, структура URL.</p>
-      </a>
-
-      <a href="/mktools/checklist/" class="card">
-        <div class="card__icon">✅</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Чек-лист маркетолога</h3>
-        <p>Интерактивные списки: запуск рекламы, контент, SEO, аналитика, email. Прогресс в браузере.</p>
-      </a>
-
-      <a href="/mktools/roadmap-builder/" class="card">
-        <div class="card__icon">🗺</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Roadmap Builder</h3>
-        <p>Визуальный конструктор дорожных карт. Gantt-диаграмма по кварталам. Экспорт PNG/CSV.</p>
-      </a>
-
-      <a href="#" class="card coming-soon">
-        <div class="card__icon">🎯</div>
-        <span class="badge">В планах</span>
-        <h3>Квиз-конструктор</h3>
-        <p>Сбор лидов через опросы и квизы на сайте.</p>
-      </a>
-
-
-      <a href="/mktools/roadmap-builder/" class="card">
-        <div class="card__icon">🗺</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Roadmap Builder</h3>
-        <p>Визуальный конструктор дорожных карт. Gantt-диаграмма по кварталам. Экспорт PNG/CSV.</p>
-      </a>
-
-      <a href="#" class="card coming-soon">
-        <div class="card__icon">🤖</div>
-        <span class="badge">В планах</span>
-        <h3>Чек-лист маркетолога</h3>
-        <p>Интерактивные чек-листы по запуску рекламы и аналитике.</p>
-      </a>
-
-      <a href="/mktools/roadmap-builder/" class="card">
-        <div class="card__icon">🗺</div>
-        <span class="badge" style="background:#ecfdf5;color:#059669;">Готово</span>
-        <span class="badge" style="background:#fef3c7;color:#d97706;margin-left:4px;">Новинка</span>
-        <h3>Roadmap Builder</h3>
-        <p>Визуальный конструктор дорожных карт. Gantt-диаграмма по кварталам. Экспорт PNG/CSV.</p>
-      </a>
-
-      <a href="#" class="card coming-soon">
-        <div class="card__icon">⚡</div>
-        <span class="badge">В планах</span>
-        <h3>Калькулятор НДС</h3>
-        <p>Расчёт НДС для маркетинговых услуг и агентств.</p>
-      </a>
-    </div>
+    <div class="filters" id="filters"></div>
+    <div class="tools-grid" id="grid"></div>
   </div>
 
   <footer>
     <div class="container">
-      <p><a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener" style="color:var(--accent);">mktools</a> - открытый проект. Идеи и пулл-реквесты приветствуются.</p>
+      <p><a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — открытый проект</p>
     </div>
   </footer>
+
+<script>
+const TOOLS = [
+  // ── Готовые ──
+  {name:'UTM-генератор',icon:'📱',url:'/mktools/utm-generator/',cat:'Реклама',desc:'Создание UTM-меток. Копирование, история, сохранение.',st:'ready',isNew:false},
+  {name:'Ссылки мессенджеров',icon:'💬',url:'/mktools/messenger-links/',cat:'Реклама',desc:'Telegram, WhatsApp: предустановленный текст, UTM, параметр start.',st:'ready',isNew:false},
+  {name:'ROI-калькулятор',icon:'💰',url:'/mktools/roi-calculator/',cat:'Аналитика',desc:'ROI, ROMI, CAC, LTV, точка безубыточности, маржинальность.',st:'ready',isNew:false},
+  {name:'SEO-анализатор',icon:'🔍',url:'/mktools/seo-analyzer/',cat:'SEO',desc:'Мета-теги, заголовки, URL, изображения, скорость.',st:'ready',isNew:false},
+  {name:'Анализ текста',icon:'📝',url:'/mktools/text-analyzer/',cat:'Контент',desc:'Уникальность, водность, тошнота, признаки ИИ, SEO-метрики.',st:'ready',isNew:false},
+  {name:'Каталог эмодзи',icon:'😊',url:'/mktools/emoji-catalog/',cat:'Контент',desc:'Полный каталог эмодзи с поиском, категориями, историей.',st:'ready',isNew:false},
+  {name:'Image Optimizer',icon:'🖼️',url:'/mktools/image-optimizer/',cat:'Медиа',desc:'Сжатие JPEG/PNG, ресайз, превью до/после.',st:'ready',isNew:false},
+  {name:'Image Resizer',icon:'📐',url:'/mktools/image-resizer/',cat:'Медиа',desc:'Ресайз по ширине/высоте/проценту. Кадрирование.',st:'ready',isNew:false},
+  {name:'Image Converter',icon:'🔄',url:'/mktools/image-converter/',cat:'Медиа',desc:'JPEG · PNG · WebP. Пакетная. ZIP-архив.',st:'ready',isNew:false},
+  {name:'Markdown Converter',icon:'📝',url:'/mktools/markdown-converter/',cat:'Контент',desc:'HTML ↔ Markdown. Живое превью.',st:'ready',isNew:false},
+  {name:'Table Converter',icon:'📄',url:'/mktools/table-converter/',cat:'Утилиты',desc:'JSON / CSV / XML / YAML / TXT. Табличный просмотр.',st:'ready',isNew:false},
+
+  // ── В разработке ──
+  {name:'Photo Editor',icon:'🎨',url:'/mktools/photo-editor/',cat:'Медиа',desc:'Мини-Canva: текст на фото, фигуры, слои, обрезка.',st:'wip',isNew:false},
+  {name:'Чек-лист маркетолога',icon:'✅',url:'/mktools/checklist/',cat:'Утилиты',desc:'Интерактивные чек-листы: реклама, контент, SEO, email.',st:'wip',isNew:false},
+  {name:'Roadmap Builder',icon:'🗺',url:'/mktools/roadmap-builder/',cat:'Утилиты',desc:'Конструктор дорожных карт. Gantt-диаграмма. Экспорт PNG/CSV.',st:'wip',isNew:false},
+
+  // ── В планах ──
+  {name:'Калькулятор CAC',icon:'👤',url:'#',cat:'Аналитика',desc:'Стоимость привлечения клиента по каналам.',st:'plan'},
+  {name:'LTV калькулятор',icon:'💎',url:'#',cat:'Аналитика',desc:'Пожизненная ценность клиента.',st:'plan'},
+  {name:'Конверсия (CR)',icon:'📈',url:'#',cat:'Аналитика',desc:'Визиты → лиды → продажи.',st:'plan'},
+  {name:'A/B тест калькулятор',icon:'🧪',url:'#',cat:'Аналитика',desc:'Статзначимость, размер выборки.',st:'plan'},
+  {name:'CPL / CPA / CPM',icon:'📊',url:'#',cat:'Реклама',desc:'Калькуляторы стоимости.',st:'plan'},
+  {name:'Бюджет рекламы',icon:'📋',url:'#',cat:'Реклама',desc:'Планирование медиабюджета.',st:'plan'},
+  {name:'Квиз-конструктор',icon:'🎯',url:'#',cat:'Утилиты',desc:'Сбор лидов через опросы.',st:'plan'},
+];
+
+const CATEGORIES = ['Все','Аналитика','Реклама','Контент','Медиа','SEO','Утилиты'];
+let activeCat = 'Все';
+
+function render(cat){
+  activeCat = cat;
+  document.getElementById('totalCount').textContent = TOOLS.filter(t=>t.st!=='plan').length + ' инструментов';
+  
+  // Filters
+  const fc = document.getElementById('filters');
+  fc.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (c === cat ? ' active' : '');
+    btn.textContent = c;
+    btn.onclick = () => render(c);
+    fc.appendChild(btn);
+  });
+  
+  // Grid
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const filtered = cat === 'Все' ? TOOLS : TOOLS.filter(t => t.cat === cat);
+  
+  filtered.forEach(t => {
+    const coming = t.st === 'plan' || t.st === 'coming';
+    const a = document.createElement('a');
+    a.href = t.url || '#';
+    if(coming) a.className = 'card';
+    else a.className = 'card' + (t.st === 'wip' ? ' wip' : '');
+    if(coming) a.style.opacity = '.45';
+    
+    let tags = '';
+    if(t.st === 'ready') tags += '<span class="tag ready">Готово</span>';
+    if(t.st === 'wip') tags += '<span class="tag wip">Разрабатывается</span>';
+    if(coming) tags += '<span class="tag" style="background:#f3f4f6;color:#9ca3af">В планах</span>';
+    if(t.isNew) tags += '<span class="tag new">Новинка</span>';
+    
+    a.innerHTML =
+      '<div class="tags">' + tags + '</div>' +
+      '<div class="card__icon">' + t.icon + '</div>' +
+      '<h3>' + t.name + '</h3>' +
+      '<p>' + t.desc + '</p>';
+    grid.appendChild(a);
+  });
+}
+
+render('Все');
+</script>
 </body>
 </html>
