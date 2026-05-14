@@ -66,9 +66,7 @@ header .container{display:flex;align-items:center;justify-content:space-between}
 .grid-line.thick{border-left-color:var(--border)}
 
 /* Task label embedded in row */
-.task-label{position:absolute;left:4px;top:0;height:44px;display:flex;align-items:center;gap:5px;font-size:.82rem;font-weight:500;pointer-events:none;z-index:8;max-width:160px;overflow:hidden}
-.task-label .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.task-label .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* (task-label removed) */
 
 /* Task bar — positioned in pixels */
 .task-bar{position:absolute;height:26px;top:9px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 8px;font-size:.68rem;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:5;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -288,9 +286,6 @@ function render(){
       g += '<div class="grid-line" style="left:'+(j*pw)+'px;width:0'+l+'"></div>';
     }
     g += '</div>';
-    
-    // Task label embedded in row
-    g += '<div class="task-label"><span class="dot" style="background:'+(SC[t.status]||'#6366f1')+'"></span><span class="name">'+e(t.name)+'</span></div>';
     
     rw.innerHTML = g;
     
