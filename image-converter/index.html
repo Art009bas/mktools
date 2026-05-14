@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Image Converter — конвертация изображений онлайн</title>
+<meta name="description" content="Бесплатный онлайн-конвертер изображений. Конвертация JPEG PNG WebP. Пакетная обработка. Настройка качества и размера.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.hero{padding:48px 0 32px;text-align:center}
+.hero p{color:var(--text2)}
+
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:50px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:var(--accent-light)}
+.dropzone-icon{font-size:2.5rem;margin-bottom:8px}
+.dropzone-text{color:var(--text2);font-size:.9rem}
+.dropzone-text strong{color:var(--text)}
+.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dropzone input[multiple]{} /* hint */
+
+.settings{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin:20px 0}
+.settings-row{display:flex;flex-wrap:wrap;gap:16px;align-items:end;margin-bottom:12px}
+.settings-row:last-child{margin-bottom:0}
+.setting{display:flex;flex-direction:column;gap:4px}
+.setting label{font-size:.8rem;font-weight:600;color:var(--text2)}
+.setting select,.setting input[type=number]{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font);background:var(--surface);min-width:100px}
+.setting select:focus,.setting input:focus{outline:none;border-color:var(--accent)}
+.setting .hint{font-size:.75rem;color:var(--text2);margin-top:2px}
+.setting input[type=range]{width:120px;accent-color:var(--accent)}
+.setting .val{font-weight:700;color:var(--text);min-width:28px;display:inline-block;text-align:right}
+
+.btn{padding:10px 28px;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:#f3f4f6;color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e5e7eb}
+
+.file-list{display:none;margin-bottom:20px}
+.file-list.show{display:block}
+.file-list h3{font-size:.95rem;margin-bottom:12px;display:flex;justify-content:space-between}
+.file-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px}
+.file-item__preview{width:40px;height:40px;border-radius:4px;object-fit:cover;background:#f3f4f6;flex-shrink:0}
+.file-item__info{flex:1;min-width:0}
+.file-item__name{font-size:.85rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item__meta{font-size:.75rem;color:var(--text2)}
+.file-item__status{font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0}
+.file-item__status.pending{color:var(--text2);background:#f3f4f6}
+.file-item__status.done{color:#059669;background:#ecfdf5}
+.file-item__status.error{color:#dc2626;background:#fef2f2}
+
+.results{display:none}
+.results.show{display:block}
+
+.convert-bar{display:flex;gap:12px;align-items:center;justify-content:center;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;flex-wrap:wrap}
+.convert-bar .total{font-size:.85rem;color:var(--text2)}
+
+.download-all{display:flex;gap:12px;justify-content:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;flex-wrap:wrap}
+
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;position:relative}
+.preview-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#f3f4f6}
+.preview-card__info{padding:8px 10px}
+.preview-card__name{font-size:.75rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview-card__meta{font-size:.7rem;color:var(--text2);margin-top:2px}
+.preview-card .chk{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,0.9);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.7rem;color:var(--text2)}
+.preview-card .chk.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:48px}
+.info h3{font-size:.95rem;margin-bottom:8px}
+.info ul{list-style:none;font-size:.85rem;color:var(--text2)}
+.info ul li{padding:4px 0;padding-left:20px;position:relative}
+.info ul li::before{content:"•";position:absolute;left:4px;color:var(--accent)}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+@media(max-width:640px){
+  .settings-row{flex-direction:column}
+  h1{font-size:1.4rem}
+  .preview-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>🔄 Image Converter</h1>
+<p>Конвертация JPEG ↔ PNG ↔ WebP. Пакетная обработка. Ресайз и качество.</p>
+</div>
+</section>
+
+<div class="container">
+
+<div class="dropzone" id="dropzone">
+<input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
+<div class="dropzone-icon">📁</div>
+<div class="dropzone-text">Перетащи изображения сюда или <strong>выбери файлы</strong></div>
+<div style="font-size:.8rem;color:var(--text2);margin-top:4px">Можно выбрать несколько. JPEG / PNG / WebP</div>
+</div>
+
+<div class="settings">
+<div class="settings-row">
+<div class="setting">
+<label>Конвертировать в</label>
+<select id="formatSelect">
+<option value="image/jpeg">JPEG</option>
+<option value="image/png">PNG</option>
+<option value="image/webp">WebP</option>
+</select>
+</div>
+<div class="setting">
+<label>Качество</label>
+<div style="display:flex;align-items:center;gap:8px">
+<input type="range" id="qualitySlider" min="10" max="100" value="85">
+<span class="val" id="qualityVal">85</span>%
+</div>
+</div>
+<div class="setting">
+<label>Ресайз</label>
+<select id="resizeMode">
+<option value="none">Без ресайза</option>
+<option value="width">По ширине</option>
+<option value="height">По высоте</option>
+<option value="max">Макс. сторона</option>
+</select>
+</div>
+<div class="setting">
+<label>Значение (px)</label>
+<input type="number" id="resizeVal" value="1920" min="10" max="10000" disabled>
+</div>
+</div>
+<div class="settings-row" style="justify-content:space-between;align-items:center">
+<div style="display:flex;gap:12px;align-items:center">
+<label style="font-size:.85rem;display:flex;align-items:center;gap:6px;cursor:pointer">
+<input type="checkbox" id="keepOrig" checked> <span style="color:var(--text2)">Сохранять оригиналы</span>
+</label>
+</div>
+<button class="btn btn-primary" id="convertBtn" disabled>🔄 Конвертировать (<span id="fileCount">0</span>)</button>
+</div>
+</div>
+
+<div class="file-list" id="fileList">
+<h3>Загружено <span style="color:var(--text2);font-weight:400" id="fileListCount"></span></h3>
+<div id="fileItems"></div>
+</div>
+
+<div class="results" id="results">
+<div class="convert-bar">
+<div class="total">Сконвертировано: <strong id="doneCount">0</strong> из <strong id="totalCount">0</strong></div>
+<div style="font-size:.85rem;color:var(--text2)" id="totalSavings"></div>
+</div>
+<div class="preview-grid" id="previewGrid"></div>
+<div class="download-all">
+<button class="btn btn-primary" id="downloadAllBtn">⬇ Скачать все</button>
+<button class="btn btn-secondary" id="downloadZipBtn">📦 Скачать ZIP-архивом</button>
+</div>
+</div>
+
+<div class="info">
+<h3>ℹ️ Как это работает</h3>
+<ul>
+<li>Выбирай один или несколько файлов — конвертация пакетная</li>
+<li>Поддерживаемые форматы: JPEG, PNG, WebP</li>
+<li>Настрой качество (JPEG/WebP) и опциональный ресайз</li>
+<li>Файл с прозрачностью (PNG) при конвертации в JPEG будет предупреждён</li>
+<li>Всё в браузере — ничего не загружается на сервер</li>
+<li>Для ZIP-архива используется JSZip (CDN)</li>
+</ul>
+</div>
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const dropzone=$('dropzone'), fileInput=$('fileInput');
+const formatSelect=$('formatSelect'), qualitySlider=$('qualitySlider'), qualityVal=$('qualityVal');
+const resizeMode=$('resizeMode'), resizeVal=$('resizeVal');
+const convertBtn=$('convertBtn'), fileCount=$('fileCount');
+const fileList=$('fileList'), fileItems=$('fileItems'), fileListCount=$('fileListCount');
+const results=$('results'), previewGrid=$('previewGrid');
+const doneCount=$('doneCount'), totalCount=$('totalCount'), totalSavings=$('totalSavings');
+const downloadAllBtn=$('downloadAllBtn'), downloadZipBtn=$('downloadZipBtn');
+const keepOrig=$('keepOrig');
+
+const files=[]; // {id, file, preview, converted:Blob|null, status:'pending'|'done'|'error'}
+let fileIdCounter=0;
+
+qualitySlider.oninput=()=>qualityVal.textContent=qualitySlider.value;
+resizeMode.onchange=()=>{resizeVal.disabled=resizeMode.value==='none'};
+
+// Drag & Drop
+dropzone.ondragover=e=>{e.preventDefault();dropzone.classList.add('dragover')};
+dropzone.ondragleave=()=>dropzone.classList.remove('dragover');
+dropzone.ondrop=e=>{e.preventDefault();dropzone.classList.remove('dragover');addFiles(e.dataTransfer.files)};
+fileInput.onchange=()=>{if(fileInput.files.length)addFiles(fileInput.files)};
+
+function addFiles(fileList){
+  for(const f of fileList){
+    if(!f.type.match(/^image\/(jpeg|png|webp)$/))continue;
+    const id=++fileIdCounter;
+    const entry={id, file:f, converted:null, status:'pending'};
+    files.push(entry);
+    
+    const reader=new FileReader();
+    reader.onload=e=>{
+      entry.dataUrl=e.target.result;
+      entry.preview=e.target.result;
+      renderFileList();
+      updateUI();
+    };
+    reader.readAsDataURL(f);
+  }
+  renderFileList();
+  updateUI();
+}
+
+function renderFileList(){
+  fileItems.innerHTML='';
+  if(files.length===0){fileList.classList.remove('show');results.classList.remove('show');return}
+  fileList.classList.add('show');
+  fileListCount.textContent=files.length+' файлов · '+
+    files.reduce((s,f)=>s+f.file.size,0).toLocaleString()+' Б';
+  
+  files.forEach((entry,i)=>{
+    const div=document.createElement('div');
+    div.className='file-item';
+    const ext=entry.file.name.split('.').pop().toUpperCase();
+    div.innerHTML=
+      '<img class="file-item__preview" src="'+(entry.preview||'')+'">'+
+      '<div class="file-item__info">'+
+        '<div class="file-item__name">'+entry.file.name+'</div>'+
+        '<div class="file-item__meta">'+fmtSize(entry.file.size)+' · '+ext+'</div>'+
+      '</div>'+
+      '<div class="file-item__status '+(entry.status==='done'?'done':entry.status==='error'?'error':'pending')+'">'+
+        (entry.status==='done'?'✓ '+(entry.converted?fmtSize(entry.converted.size):''):
+         entry.status==='error'?'✗ Ошибка':'⏳ Ожидает')+
+      '</div>'+
+      '<button class="btn btn-secondary btn-sm" style="padding:4px 10px;font-size:.75rem" data-remove="'+i+'">✕</button>';
+    div.querySelector('[data-remove]').onclick=()=>{
+      files.splice(i,1);
+      renderFileList();
+      updateUI();
+      results.classList.remove('show');
+    };
+    fileItems.appendChild(div);
+  });
+}
+
+function updateUI(){
+  const pending=files.filter(f=>f.status==='pending').length;
+  const total=files.length;
+  fileCount.textContent=total;
+  convertBtn.disabled=total===0||pending===0;
+}
+
+// Convert
+convertBtn.onclick=async()=>{
+  const fmt=formatSelect.value;
+  const q=parseInt(qualitySlider.value)/100;
+  const rm=resizeMode.value;
+  const rv=parseInt(resizeVal.value)||0;
+  const keep=keepOrig.checked;
+  
+  results.classList.remove('show');
+  previewGrid.innerHTML='';
+  let done=0, total=files.length;
+  let origTotal=0, convTotal=0;
+  
+  for(const entry of files){
+    if(entry.status==='done'){done++;continue}
+    if(!entry.dataUrl)continue;
+    
+    const img=new Image();
+    img.src=entry.dataUrl;
+    await new Promise(r=>img.onload=r);
+    
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality='high';
+    
+    let w=img.naturalWidth, h=img.naturalHeight;
+    if(rm==='width'&&rv>0){h=Math.round(h*rv/w);w=rv}
+    else if(rm==='height'&&rv>0){w=Math.round(w*rv/h);h=rv}
+    else if(rm==='max'&&rv>0){const m=Math.max(w,h);if(m>rv){w=Math.round(w*rv/m);h=Math.round(h*rv/m)}}
+    
+    canvas.width=w;canvas.height=h;
+    ctx.clearRect(0,0,w,h);
+    
+    // Handle transparency for JPEG
+    let mime=fmt;
+    if(fmt==='image/jpeg'){
+      // Fill white background for JPEG
+      ctx.fillStyle='#fff';
+      ctx.fillRect(0,0,w,h);
+    }
+    ctx.drawImage(img,0,0,w,h);
+    
+    try{
+      const blob=await new Promise(r=>canvas.toBlob(r,mime,q));
+      if(!blob){entry.status='error';continue}
+      
+      if(keep){
+        entry.converted=blob;
+        entry.status='done';
+        origTotal+=entry.file.size;
+        convTotal+=blob.size;
+      } else {
+        entry.converted=blob;
+        entry.status='done';
+        origTotal+=entry.file.size;
+        convTotal+=blob.size;
+      }
+      
+      // Show preview card
+      const card=document.createElement('div');
+      card.className='preview-card';
+      const origS=fmtSize(entry.file.size);
+      const convS=fmtSize(blob.size);
+      const savedPct=entry.file.size>0?Math.round((1-blob.size/entry.file.size)*100):0;
+      card.innerHTML=
+        '<img src="'+URL.createObjectURL(blob)+'">'+
+        '<div class="preview-card__info">'+
+          '<div class="preview-card__name">'+entry.file.name.replace(/\.[^.]+$/,'')+'.'+getExt(mime)+'</div>'+
+          '<div class="preview-card__meta">'+origS+' → '+convS+' <span style="color:'+(savedPct>0?'#059669':'#6b7280')+'">('+(savedPct>0?'-'+savedPct:'0')+'%)</span></div>'+
+        '</div>';
+      previewGrid.appendChild(card);
+      
+      done++;
+      doneCount.textContent=done;
+      totalCount.textContent=total;
+    }catch(e){
+      entry.status='error';
+    }
+    
+    renderFileList();
+    updateUI();
+  }
+  
+  doneCount.textContent=done;
+  totalCount.textContent=total;
+  const savings=origTotal-convTotal;
+  const pct=origTotal>0?Math.round(savings/origTotal*100):0;
+  totalSavings.textContent='Экономия: '+fmtSize(savings)+' ('+pct+'%)';
+  results.classList.add('show');
+};
+
+function getExt(mime){
+  return mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg';
+}
+
+// Download all
+downloadAllBtn.onclick=()=>{
+  const done=files.filter(f=>f.status==='done'&&f.converted);
+  done.forEach(entry=>{
+    const a=document.createElement('a');
+    const ext=getExt(formatSelect.value);
+    const name=entry.file.name.replace(/\.[^.]+$/,'')+'.'+ext;
+    a.href=URL.createObjectURL(entry.converted);
+    a.download=name;
+    a.click();
+  });
+};
+
+// Download as ZIP
+downloadZipBtn.onclick=async()=>{
+  if(typeof JSZip==='undefined'){alert('JSZip не загрузился. Проверьте интернет.');return}
+  const zip=new JSZip();
+  const ext=getExt(formatSelect.value);
+  const done=files.filter(f=>f.status==='done'&&f.converted);
+  
+  done.forEach(entry=>{
+    const name=entry.file.name.replace(/\.[^.]+$/,'')+'.'+ext;
+    zip.file(name, entry.converted);
+  });
+  
+  const blob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='converted_images.zip';
+  a.click();
+};
+
+function fmtSize(b){
+  if(b<1024) return b+' Б';
+  if(b<1048576) return (b/1024).toFixed(1)+' КБ';
+  return (b/1048576).toFixed(2)+' МБ';
+}
+</script>
+</body>
+</html>
