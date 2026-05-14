@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Photo Editor — мини-графический редактор онлайн</title>
+<meta name="description" content="Бесплатный онлайн-редактор изображений: текст на фото, фигуры, заливка, обрезка, работа со слоями.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#222240;--surface2:#2a2a4a;--text:#e8e8f0;--text2:#8888a8;--accent:#f97316;--accent-hover:#ea580c;--border:#3a3a5a;--radius:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:0 16px}
+header{background:var(--surface);padding:12px 0;border-bottom:1px solid var(--border)}
+header .container{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:700;font-size:1rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.8rem}
+.back:hover{color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:220px 1fr 260px;gap:12px;padding:12px 0;min-height:calc(100vh-120px)}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}}
+
+/* Toolbar */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.panel h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:10px}
+.tool-group{margin-bottom:16px}
+.tool-group:last-child{margin-bottom:0}
+.tool-group label{display:block;font-size:.75rem;color:var(--text2);margin-bottom:4px}
+.tool-group input[type=text]{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.8rem;font-family:var(--font)}
+.tool-group input[type=text]:focus{outline:none;border-color:var(--accent)}
+.tool-group input[type=range]{width:100%;accent-color:var(--accent);margin:2px 0}
+.tool-group input[type=color]{width:100%;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);cursor:pointer;padding:2px}
+.tool-group select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.8rem;font-family:var(--font)}
+.tools-row{display:flex;gap:4px;flex-wrap:wrap}
+.tool-btn{width:36px;height:36px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text2);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tool-btn:hover{border-color:var(--accent);color:var(--text)}
+.tool-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tool-btn.wide{width:auto;padding:0 14px;font-size:.75rem;gap:4px}
+
+/* Canvas area */
+.canvas-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column}
+.canvas-area .topbar{display:flex;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.canvas-area .topbar button{font-size:.75rem}
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;position:relative;overflow:hidden;min-height:500px}
+.canvas-stage{position:relative;overflow:hidden}
+canvas{display:block;cursor:crosshair}
+
+/* Layers */
+.layer-list{}
+.layer-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid transparent;border-radius:6px;cursor:pointer;font-size:.78rem;margin-bottom:2px}
+.layer-item:hover{background:var(--surface2)}
+.layer-item.active{border-color:var(--accent);background:var(--surface2)}
+.layer-item__icon{width:20px;text-align:center;font-size:.7rem}
+.layer-item__name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer-item__vis{cursor:pointer;color:var(--text2);font-size:.7rem}
+.layer-item__vis:hover{color:var(--text)}
+.layer-actions{display:flex;gap:4px;margin-top:8px}
+
+input[type=file]{display:none}
+
+/* Modals */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-width:300px;max-width:500px}
+.modal h2{font-size:1rem;margin-bottom:12px}
+.modal button{margin-top:12px;padding:8px 20px;border:none;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;font-family:var(--font);background:var(--accent);color:#fff}
+.modal button:hover{background:var(--accent-hover)}
+.modal input[type=text]{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.9rem;font-family:var(--font);margin-bottom:8px}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<a href="/mktools/" class="back">← Назад</a>
+</div>
+</header>
+
+<div class="container">
+<div class="layout">
+  
+  <!-- Left: Tools -->
+  <div class="panel" style="overflow-y:auto">
+    <div class="tool-group">
+      <h3>Файл</h3>
+      <div class="tools-row">
+        <button class="tool-btn wide" onclick="document.getElementById('bgUpload').click()">🖼 Фон</button>
+        <button class="tool-btn wide" onclick="document.getElementById('imgUpload').click()">➕ Изображение</button>
+        <button class="tool-btn wide" onclick="document.getElementById('bgUpload').click()">📷</button>
+      </div>
+      <input type="file" id="bgUpload" accept="image/*" onchange="loadBg(event)">
+      <input type="file" id="imgUpload" accept="image/*" onchange="loadImage(event)">
+    </div>
+
+    <div class="tool-group">
+      <h3>Инструменты</h3>
+      <div class="tools-row">
+        <button class="tool-btn" id="toolSelect" onclick="setTool('select')" title="Выделение">👆</button>
+        <button class="tool-btn" id="toolText" onclick="setTool('text')" title="Текст">T</button>
+        <button class="tool-btn" id="toolRect" onclick="setTool('rect')" title="Прямоугольник">□</button>
+        <button class="tool-btn" id="toolCircle" onclick="setTool('circle')" title="Круг">○</button>
+        <button class="tool-btn" id="toolLine" onclick="setTool('line')" title="Линия">╱</button>
+        <button class="tool-btn" id="toolCrop" onclick="setTool('crop')" title="Обрезка">✂</button>
+      </div>
+    </div>
+
+    <div class="tool-group" id="styleGroup">
+      <h3>Стиль</h3>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1">
+          <label>Заливка</label>
+          <input type="color" id="fillColor" value="#f97316">
+        </div>
+        <div style="flex:1">
+          <label>Обводка</label>
+          <input type="color" id="strokeColor" value="#ffffff">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <div style="flex:1">
+          <label>Размер</label>
+          <input type="range" id="strokeWidth" min="1" max="20" value="3">
+        </div>
+        <div style="flex:1">
+          <label>Прозрачность</label>
+          <input type="range" id="opacity" min="0" max="1" step="0.05" value="1">
+        </div>
+      </div>
+      <div style="margin-top:6px">
+        <label>Шрифт</label>
+        <select id="fontSelect">
+          <option value="Inter">Inter</option>
+          <option value="Arial">Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Impact">Impact</option>
+          <option value="Comic Sans MS">Comic Sans MS</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <div style="flex:1">
+          <label>Размер шрифта</label>
+          <input type="range" id="fontSize" min="10" max="120" value="36">
+        </div>
+      </div>
+    </div>
+    
+    <div class="tool-group">
+      <h3>Правка</h3>
+      <div class="tools-row">
+        <button class="tool-btn wide" onclick="undo()">↩ Отмена</button>
+        <button class="tool-btn wide" onclick="redo()">↪ Повтор</button>
+      </div>
+      <div class="tools-row" style="margin-top:4px">
+        <button class="tool-btn wide" onclick="duplicateLayer()">📋 Дублировать</button>
+        <button class="tool-btn wide" onclick="deleteSelected()" style="color:#ef4444">🗑 Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Canvas -->
+  <div class="canvas-area">
+    <div class="topbar">
+      <span style="font-size:.75rem;color:var(--text2)" id="statusBar">Загрузите фон или начните рисовать</span>
+      <div style="flex:1"></div>
+      <button class="tool-btn wide" onclick="exportPNG()">⬇ Скачать PNG</button>
+      <button class="tool-btn wide" onclick="exportJPG()">⬇ Скачать JPG</button>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-stage" id="canvasStage">
+        <canvas id="mainCanvas" width="800" height="600"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Layers -->
+  <div class="panel" style="overflow-y:auto">
+    <div class="tool-group">
+      <h3>Слои</h3>
+      <div class="layer-list" id="layerList"></div>
+      <div class="layer-actions">
+        <button class="tool-btn wide" onclick="moveLayer(-1)">⬆ Вверх</button>
+        <button class="tool-btn wide" onclick="moveLayer(1)">⬇ Вниз</button>
+      </div>
+    </div>
+    <div class="tool-group" id="layerProps" style="display:none">
+      <h3>Свойства</h3>
+      <div class="setting" style="margin-bottom:6px">
+        <label>X: <input type="number" id="propX" style="width:70px" onchange="updateProp()"></label>
+        <label style="margin-left:8px">Y: <input type="number" id="propY" style="width:70px" onchange="updateProp()"></label>
+      </div>
+      <div class="setting">
+        <label>Ширина: <input type="number" id="propW" style="width:70px" onchange="updateProp()"></label>
+        <label style="margin-left:8px">Высота: <input type="number" id="propH" style="width:70px" onchange="updateProp()"></label>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const canvas=$('mainCanvas'), ctx=canvas.getContext('2d');
+const W=800,H=600;
+canvas.width=W;canvas.height=H;
+
+let layers=[], selected=-1, tool='select', isDrawing=false, startX,startY;
+let undoStack=[], redoStack=[];
+let dragLayer=false, dragOffX=0,dragOffY=0;
+let cropStart=null;
+
+function $(id){return document.getElementById(id)}
+
+// Layer management
+function addLayer(type,data){
+  const layer={id:Date.now()+Math.random(),type,data,visible:true,x:0,y:0,w:W,h:H,opacity:1};
+  layers.push(layer);
+  selected=layers.length-1;
+  renderLayers();
+  saveState();
+  render();
+}
+
+function renderLayers(){
+  const list=$('layerList');
+  list.innerHTML='';
+  for(let i=layers.length-1;i>=0;i--){
+    const l=layers[i];
+    const div=document.createElement('div');
+    div.className='layer-item'+(i===selected?' active':'');
+    const icon=l.type==='bg'?'🖼':l.type==='image'?'🖼':l.type==='text'?'T':l.type==='rect'?'□':l.type==='circle'?'○':'╱';
+    div.innerHTML='<span class="layer-item__icon">'+icon+'</span><span class="layer-item__name">'+(l.data?.name||l.type)+'</span><span class="layer-item__vis" data-i="'+i+'">'+(l.visible?'👁':'👁‍🗨')+'</span>';
+    div.onclick=e=>{if(e.target.dataset.i!==undefined){layers[parseInt(e.target.dataset.i)].visible=!layers[parseInt(e.target.dataset.i)].visible;renderLayers();render()}else{selected=i;renderLayers();updateProps()}};
+    list.appendChild(div);
+  }
+  $('layerProps').style.display=(selected>=0&&selected<layers.length)?'block':'none';
+}
+
+// Undo / Redo
+function saveState(){
+  if(isDrawing)return;
+  undoStack.push(JSON.stringify(layers));
+  if(undoStack.length>50)undoStack.shift();
+  redoStack=[];
+}
+
+function undo(){if(undoStack.length>1){redoStack.push(undoStack.pop());layers=JSON.parse(undoStack[undoStack.length-1]);selected=layers.length-1;renderLayers();render()}}
+function redo(){if(redoStack.length){undoStack.push(redoStack.pop());layers=JSON.parse(undoStack[undoStack.length-1]);selected=layers.length-1;renderLayers();render()}}
+
+// Tools
+function setTool(t){tool=t;document.querySelectorAll('.tool-btn[id^=tool]').forEach(b=>b.classList.remove('active'));var b=$('tool'+t.charAt(0).toUpperCase()+t.slice(1));if(b)b.classList.add('active');canvas.style.cursor=t==='select'?'default':t==='crop'?'crosshair':'crosshair'}
+setTool('select');
+
+// Canvas mouse handlers
+canvas.onmousedown=e=>{
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(W/rect.width);
+  const y=(e.clientY-rect.top)*(H/rect.height);
+  
+  if(tool==='select'){
+    // Hit test top-down
+    for(let i=layers.length-1;i>=0;i--){
+      const l=layers[i];
+      if(!l.visible)continue;
+      if(l.type==='bg')continue;
+      if(x>=l.x&&x<=l.x+l.w&&y>=l.y&&y<=l.y+l.h){
+        selected=i;renderLayers();updateProps();
+        dragLayer=true;dragOffX=x-l.x;dragOffY=y-l.y;
+        return;
+      }
+    }
+    selected=-1;renderLayers();$('layerProps').style.display='none';
+    return;
+  }
+  
+  if(tool==='crop'){
+    cropStart={x,y};
+    isDrawing=true;
+    return;
+  }
+  
+  isDrawing=true;
+  startX=x;startY=y;
+};
+
+canvas.onmousemove=e=>{
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(W/rect.width);
+  const y=(e.clientY-rect.top)*(H/rect.height);
+  
+  if(dragLayer&&selected>=0){
+    const l=layers[selected];
+    if(l.type!=='bg'){
+      l.x=x-dragOffX;l.y=y-dragOffY;
+      render();updateProps();
+    }
+    return;
+  }
+  
+  if(!isDrawing)return;
+  
+  if(tool==='crop'&&cropStart){
+    // Show crop preview
+    render();
+    ctx.save();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    ctx.strokeRect(cropStart.x,cropStart.y,x-cropStart.x,y-cropStart.y);
+    ctx.restore();
+    return;
+  }
+  
+  render();
+  const l=layers[selected];
+  if(l&&l.type==='text'&&selected>=0){render();redrawText(l);return}
+  
+  ctx.save();
+  ctx.strokeStyle=$('strokeColor').value;
+  ctx.fillStyle=$('fillColor').value;
+  ctx.lineWidth=parseInt($('strokeWidth').value);
+  
+  if(tool==='rect'){
+    ctx.fillRect(startX,startY,x-startX,y-startY);
+    ctx.strokeRect(startX,startY,x-startX,y-startY);
+  } else if(tool==='circle'){
+    const rx=Math.abs(x-startX)/2,ry=Math.abs(y-startY)/2;
+    const cx=(startX+x)/2,cy=(startY+y)/2;
+    ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  } else if(tool==='line'){
+    ctx.beginPath();ctx.moveTo(startX,startY);ctx.lineTo(x,y);ctx.stroke();
+  }
+  ctx.restore();
+};
+
+canvas.onmouseup=e=>{
+  if(dragLayer){dragLayer=false;saveState();return}
+  if(!isDrawing)return;
+  isDrawing=false;
+  
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(W/rect.width);
+  const y=(e.clientY-rect.top)*(H/rect.height);
+  
+  if(tool==='crop'&&cropStart){
+    const cx=Math.min(cropStart.x,x),cy=Math.min(cropStart.y,y);
+    const cw=Math.abs(x-cropStart.x),ch=Math.abs(y-cropStart.y);
+    if(cw>10&&ch>10){
+      // Crop all layers
+      const imgData=ctx.getImageData(cx,cy,cw,ch);
+      canvas.width=cw;canvas.height=ch;
+      ctx.putImageData(imgData,0,0);
+      layers.unshift({id:Date.now(),type:'bg',data:{name:'Фон'},visible:true,x:0,y:0,w:cw,h:ch,opacity:1});
+      layers=layers.filter(l=>l.type!=='bg');
+      selected=0;
+      renderLayers();render();
+      cropStart=null;setTool('select');
+      $('statusBar').textContent='Обрезано: '+cw+'×'+ch+'px';
+      saveState();
+    }
+    cropStart=null;
+    return;
+  }
+  
+  const sx=Math.min(startX,x), sy=Math.min(startY,y);
+  const sw=Math.abs(x-startX), sh=Math.abs(y-startY);
+  if(sw<3&&sh<3){
+    // It's a click — add text
+    if(tool==='text'){
+      showTextDialog(sx,sy);
+      return;
+    }
+    return;
+  }
+  
+  let layer;
+  if(tool==='rect')layer={id:Date.now(),type:'rect',data:{fill:$('fillColor').value,stroke:$('strokeColor').value,width:parseInt($('strokeWidth').value)},x:sx,y:sy,w:sw,h:sh,opacity:parseFloat($('opacity').value),visible:true};
+  else if(tool==='circle')layer={id:Date.now(),type:'circle',data:{fill:$('fillColor').value,stroke:$('strokeColor').value,width:parseInt($('strokeWidth').value)},x:sx,y:sy,w:sw,h:sh,opacity:parseFloat($('opacity').value),visible:true};
+  else if(tool==='line')layer={id:Date.now(),type:'line',data:{stroke:$('strokeColor').value,width:parseInt($('strokeWidth').value)},x:startX,y:startY,w:x-startX,h:y-startY,opacity:parseFloat($('opacity').value),visible:true};
+  if(layer){layers.push(layer);selected=layers.length-1;renderLayers();render();saveState()}
+};
+
+function showTextDialog(x,y){
+  const overlay=document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML='<div class="modal"><h2>✏️ Добавить текст</h2><input type="text" id="textInput" placeholder="Ваш текст..." autofocus><button onclick="addText(\''+x+'\',\''+y+'\')">Добавить</button><button onclick="this.closest(\'.modal-overlay\').remove()" style="margin-left:8px;background:var(--surface2)">Отмена</button></div>';
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.querySelector('input').focus(),100);
+  overlay.querySelector('input').onkeydown=e=>{if(e.key==='Enter')addText(x,y)};
+}
+
+function addText(x,y){
+  const text=document.getElementById('textInput')?.value;
+  if(!text)return;
+  const font=$('fontSelect').value, size=parseInt($('fontSize').value);
+  ctx.font=size+'px '+font;
+  const m=ctx.measureText(text);
+  const layer={id:Date.now(),type:'text',data:{text,font,size,fill:$('fillColor').value,stroke:$('strokeColor').value},x:parseFloat(x),y:parseFloat(y),w:m.width+20,h:size+20,opacity:1,visible:true};
+  layers.push(layer);selected=layers.length-1;
+  document.querySelector('.modal-overlay')?.remove();
+  renderLayers();render();saveState();
+}
+
+// Rendering
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const l of layers){
+    if(!l.visible)continue;
+    ctx.save();
+    ctx.globalAlpha=l.opacity;
+    if(l.type==='bg'){
+      if(l.data?.img)ctx.drawImage(l.data.img,0,0,canvas.width,canvas.height);
+      else if(l.data?.color){ctx.fillStyle=l.data.color;ctx.fillRect(0,0,canvas.width,canvas.height)}
+    } else if(l.type==='image'&&l.data?.img){
+      ctx.drawImage(l.data.img,l.x,l.y,l.w,l.h);
+    } else if(l.type==='rect'){
+      ctx.fillStyle=l.data.fill;ctx.fillRect(l.x,l.y,l.w,l.h);
+      ctx.strokeStyle=l.data.stroke;ctx.lineWidth=l.data.width;ctx.strokeRect(l.x,l.y,l.w,l.h);
+    } else if(l.type==='circle'){
+      ctx.beginPath();ctx.ellipse(l.x+l.w/2,l.y+l.h/2,Math.abs(l.w)/2,Math.abs(l.h)/2,0,0,Math.PI*2);
+      ctx.fillStyle=l.data.fill;ctx.fill();ctx.strokeStyle=l.data.stroke;ctx.lineWidth=l.data.width;ctx.stroke();
+    } else if(l.type==='line'){
+      ctx.beginPath();ctx.moveTo(l.x,l.y);ctx.lineTo(l.x+l.w,l.y+l.h);
+      ctx.strokeStyle=l.data.stroke;ctx.lineWidth=l.data.width;ctx.stroke();
+    } else if(l.type==='text'){
+      redrawText(l);
+    }
+    ctx.restore();
+  }
+  // Selection border
+  if(selected>=0&&selected<layers.length&&layers[selected].type!=='bg'){
+    const l=layers[selected];
+    ctx.save();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.strokeRect(l.x-2,l.y-2,l.w+4,l.h+4);
+    ctx.restore();
+  }
+}
+
+function redrawText(l){
+  ctx.font=l.data.size+'px '+l.data.font;
+  ctx.fillStyle=l.data.fill;
+  ctx.textBaseline='top';
+  fillTextWithStroke(ctx,l.data.text,l.x,l.y,l.data.stroke,2);
+}
+
+function fillTextWithStroke(ctx,t,x,y,stroke,w){
+  if(stroke&&w>0){
+    ctx.save();
+    ctx.strokeStyle=stroke;
+    ctx.lineWidth=w;
+    ctx.strokeText(t,x,y);
+    ctx.restore();
+  }
+  ctx.fillText(t,x,y);
+}
+
+// Load background
+function loadBg(e){
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    const l={id:Date.now(),type:'bg',data:{img,name:'Фон: '+f.name},visible:true,x:0,y:0,w:canvas.width,h:canvas.height,opacity:1};
+    // Remove existing bg
+    layers=layers.filter(l=>l.type!=='bg');
+    layers.unshift(l);
+    selected=0;
+    canvas.width=img.naturalWidth>W?W:img.naturalWidth;
+    canvas.height=img.naturalHeight>H?H:img.naturalHeight;
+    l.w=canvas.width;l.h=canvas.height;
+    renderLayers();render();saveState();
+    $('statusBar').textContent='Фон: '+f.name+' · '+canvas.width+'×'+canvas.height;
+  };
+  img.src=URL.createObjectURL(f);
+}
+
+function loadImage(e){
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.naturalWidth,h=img.naturalHeight;
+    const max=300;if(w>max){h=h*max/w;w=max}
+    if(h>max){w=w*max/h;h=max}
+    const l={id:Date.now(),type:'image',data:{img,name:'Слой: '+f.name},visible:true,x:100,y:100,w,h,opacity:1};
+    layers.push(l);selected=layers.length-1;
+    renderLayers();render();saveState();
+    $('statusBar').textContent='Изображение добавлено';
+  };
+  img.src=URL.createObjectURL(f);
+}
+
+// Move / duplicate / delete
+function moveLayer(dir){
+  if(selected<1||selected>=layers.length||layers[selected].type==='bg')return;
+  const ni=selected+dir;
+  if(ni<0||ni>=layers.length)return;
+  [layers[selected],layers[ni]]=[layers[ni],layers[selected]];
+  selected=ni;renderLayers();render();saveState();
+}
+
+function duplicateLayer(){
+  if(selected<0||selected>=layers.length)return;
+  const l=JSON.parse(JSON.stringify(layers[selected]));
+  l.id=Date.now();l.x+=20;l.y+=20;
+  if(l.data?.img){const img=l.data.img;l.data.img=img}
+  layers.push(l);selected=layers.length-1;
+  renderLayers();render();saveState();
+}
+
+function deleteSelected(){
+  if(selected<0||selected>=layers.length||layers[selected].type==='bg')return;
+  layers.splice(selected,1);selected=Math.min(selected,layers.length-1);
+  renderLayers();render();saveState();
+}
+
+// Export
+function exportPNG(){canvas.toBlob(b=>downloadBlob(b,'image.png'),'image/png')}
+function exportJPG(){canvas.toBlob(b=>downloadBlob(b,'image.jpg'),'image/jpeg',0.9)}
+
+function downloadBlob(b,n){
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();
+}
+
+// Props
+function updateProps(){
+  if(selected<0||selected>=layers.length)return;
+  const l=layers[selected];
+  l.x=parseInt($('propX').value)||l.x;
+  l.y=parseInt($('propY').value)||l.y;
+  l.w=parseInt($('propW').value)||l.w;
+  l.h=parseInt($('propH').value)||l.h;
+  render();
+}
+
+function updatePropsUI(){
+  if(selected<0||selected>=layers.length)return;
+  const l=layers[selected];
+  $('propX').value=Math.round(l.x);
+  $('propY').value=Math.round(l.y);
+  $('propW').value=Math.round(l.w);
+  $('propH').value=Math.round(l.h);
+}
+
+// Init
+function init(){
+  // Transparent checkerboard background
+  layers.push({id:0,type:'bg',data:{color:'#f0f0f0',name:'Фон'},visible:true,x:0,y:0,w:W,h:H,opacity:1});
+  renderLayers();render();
+}
+init();
+</script>
+</body>
+</html>
