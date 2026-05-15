@@ -86,6 +86,7 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:12px;font-size:.85rem;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
 .toast.show{opacity:1}
 </style>
+  <link rel="canonical" href="https://art009bas.github.io/mktools/markdown-converter/">
 </head>
 <body>
 <header>
@@ -97,7 +98,7 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color
 
 <section class="hero">
 <div class="container">
-<h1>📝 Markdown Converter</h1>
+<h1>Markdown Converter — HTML и Markdown</h1>
 <p>Конвертируй HTML в Markdown, Markdown в HTML и простой текст. С живым превью.</p>
 </div>
 </section>
@@ -268,7 +269,7 @@ sampleBtn.onclick=()=>{
     inputArea.value=`# Заголовок первого уровня\n\nЭто **жирный текст** и *курсив*. А это [ссылка](https://example.com).\n\n## Список покупок\n\n- 🍎 Яблоки\n- 🥛 Молоко\n- 🍞 Хлеб\n\n### Цитата\n\n> Маркетинг — это не битва продуктов, это битва восприятия.\n\n#### Таблица\n\n| Город | Заявок | Продаж |\n|-------|--------|--------|\n| Нск   | 125    | 6      |\n| Кем   | 87     | 4      |\n\n\`\`\`python\nprint("Hello, маркетинг!")\n\`\`\`\n\n- [x] Сделать отчёт\n- [ ] Запустить рекламу\n- [ ] Проверить лиды\n`;
     doConvert();
   } else if(currentMode==='html2md'){
-    inputArea.value=`<h1>Заголовок</h1>\n<p>Это <strong>жирный</strong> и <em>курсив</em>.</p>\n<ul>\n<li>Пункт 1</li>\n<li>Пункт 2</li>\n</ul>\n<p>Подробнее на <a href="https://example.com">нашем сайте</a>.</p>`;
+    inputArea.value=`<h1>Markdown Converter — HTML в Markdown</h1>\n<p>Это <strong>жирный</strong> и <em>курсив</em>.</p>\n<ul>\n<li>Пункт 1</li>\n<li>Пункт 2</li>\n</ul>\n<p>Подробнее на <a href="https://example.com">нашем сайте</a>.</p>`;
     doConvert();
   } else {
     inputArea.value='# Привет\n\nЭто **просто** *текст* без разметки.\n\n[ссылка](https://example.com) превратится в текст.';
