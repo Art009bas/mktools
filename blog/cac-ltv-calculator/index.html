@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CAC и LTV: формулы, примеры, норма — блог mktools</title>
+<meta name="description" content="Customer Acquisition Cost и Lifetime Value: как считать, какие нормы для турфирмы, когда бить тревогу. Реальные примеры.">
+<script type="application/ld+json">{
+"@context":"https://schema.org","@type":"Article","headline":"CAC и LTV: подробный разбор формул с примерами","description":"Что такое CAC и LTV на конкретных цифрах. Нормы для турфирмы, интернет-магазина, услуг.","author":{"@type":"Person","name":"Артём Б."},"datePublished":"2026-04-22"}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--border:#e5e7eb;--radius:16px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.8}
+.container{max-width:700px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;text-decoration:none;color:var(--text)}.logo span{color:var(--accent)}
+nav a{font-size:.85rem;color:var(--text2);text-decoration:none;margin-left:14px}
+nav a:hover{color:var(--accent)}
+.breadcrumbs{font-size:.8rem;color:var(--text2);padding:20px 0 8px}.breadcrumbs a{color:var(--text2);text-decoration:none}.breadcrumbs a:hover{color:var(--accent)}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:12px;line-height:1.3}.meta{font-size:.82rem;color:var(--text2);margin-bottom:24px}
+main{padding:0 0 48px}
+h2{font-size:1.2rem;font-weight:700;margin:28px 0 10px}
+h3{font-size:1rem;font-weight:600;margin:20px 0 8px}
+p{margin-bottom:14px;color:var(--text2)}
+ul{margin-bottom:14px;padding-left:20px}
+li{margin-bottom:6px;color:var(--text2)}
+.callout{background:#fff7ed;border-left:3px solid var(--accent);padding:14px 18px;margin:16px 0;border-radius:0 8px 8px 0;font-size:.9rem}
+hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+.read-also{background:#f9fafb;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin:16px 0}
+.read-also a{color:var(--accent);text-decoration:none;display:block;margin:4px 0}
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<nav><a href="/mktools/about/">О проекте</a><a href="/mktools/blog/">Блог</a></nav>
+</div></header>
+<main class="container">
+<div class="breadcrumbs"><a href="/mktools/">Главная</a> / <a href="/mktools/blog/">Блог</a> / CAC и LTV</div>
+<h1>CAC и LTV: подробный разбор формул с примерами</h1>
+<div class="meta">22 апреля 2026 · 7 мин</div>
+
+<p>Две метрики, по которым инвесторы оценивают бизнес за 5 минут. CAC — сколько стоит привлечь клиента. LTV — сколько он заплатит за всё время.</p>
+<p>Если CAC выше LTV — бизнес умирает. Медленно, но гарантированно.</p>
+
+<h2>CAC: что входит в расходы</h2>
+<p>CAC считается просто: все маркетинговые и sales-расходы делим на количество новых клиентов. Но есть нюанс — что именно считать расходом.</p>
+
+<p><strong>Входят:</strong></p>
+<ul>
+<li>Бюджет рекламы (Яндекс.Директ, VK, TG Ads, таргет)</li>
+<li>Зарплата маркетолога и продажников (пропорционально времени)</li>
+<li>Подписки на инструменты (CRM, сервисы аналитики, коллтрекинг)</li>
+<li>Аутсорс (дизайнеры, копирайтеры, таргетологи)</li>
+</ul>
+
+<p><strong>Не входят:</strong></p>
+<ul>
+<li>Аренда офиса и коммуналка</li>
+<li>Зарплата бухгалтера и директора</li>
+<li>Себестоимость продукта (для турфирмы — стоимость тура у оператора)</li>
+</ul>
+
+<p>Пример для турфирмы «Мой горящий тур». Потратили на рекламу 340 тыс. в месяц, зарплата маркетолога 80 тыс., подписки 12 тыс. Итого 432 тыс. Получили 36 новых клиентов. CAC = 432 000 / 36 = <strong>12 000 руб</strong>.</p>
+
+<h2>LTV: как посчитать</h2>
+<p>Средний чек первой покупки — 85 тыс. Повторная покупка в течение года — 65% клиентов. Средний чек повторной — 95 тыс. LTV = 85 + 0.65×95 = 146 750 руб.</p>
+<p>Можно считать сложнее — с дисконтированием и горизонтом в 3-5 лет. Но для оперативных решений хватит этого. LTV должен быть минимум в 3 раза больше CAC. В нашем примере: 146 750 / 12 000 = 12.2 — отличный показатель.</p>
+
+<h2>Когда CAC высокий, а LTV низкий</h2>
+<p>Три варианта:</p>
+<ul>
+<li><strong>Проблема с рекламой</strong> — таргетинг не тот, креативы слабые, посадочные страницы не конвертят. Проверьте UTM-метки через <a href="/mktools/utm-generator/">UTM-генератор</a>, чтобы убедиться, что данные в CRM корректны</li>
+<li><strong>Проблема с продуктом</strong> — клиенты приходят, но не возвращаются. LTV = 1 покупка. Тут метрики не помогут, нужно менять продукт</li>
+<li><strong>Проблема с учётом</strong> — вы считаете не все каналы или не те расходы. Проверьте структуру в <a href="/mktools/roi-calculator/">ROI-калькуляторе</a>, он раскладывает все статьи затрат</li>
+</ul>
+
+<h2>Нормы для разных ниш</h2>
+<ul>
+<li><strong>Турфирмы</strong> — CAC 8-25 тыс., LTV/CAC 4-8</li>
+<li><strong>Интернет-магазины (FMCG)</strong> — CAC 400-800 руб, LTV/CAC 3-6</li>
+<li><strong>SaaS</strong> — CAC 150-500$, LTV/CAC 5-10</li>
+<li><strong>B2B услуги</strong> — CAC 50-200 тыс., LTV/CAC 3-5</li>
+</ul>
+
+<hr>
+
+<p>Если ваши цифры укладываются в эти рамки — всё хорошо. Если нет — берите <a href="/mktools/roi-calculator/">калькулятор</a> и пересчитывайте помесячно. Часто проблема в сезонности: CAC в январе в 2 раза выше, чем в мае. Поэтому считать надо минимум за 3-4 месяца.</p>
+
+<div class="read-also">
+<strong>Читайте также:</strong>
+<a href="/mktools/blog/what-is-romi/">ROMI, ROI и CAC: что считать маркетологу на пальцах</a>
+<a href="/mktools/blog/seo-for-marketers/">SEO для маркетологов: чек-лист и инструменты</a>
+</div>
+</main>
+<footer><div class="container"><a href="/mktools/">mktools</a> · <a href="/mktools/about/">О проекте</a> · <a href="/mktools/blog/">Блог</a></div></footer>
+</body>
+</html>

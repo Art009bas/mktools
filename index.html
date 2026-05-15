@@ -41,6 +41,8 @@
     .logo { font-weight: 800; font-size: 1.3rem; color: var(--text); text-decoration: none; }
     .logo span { color: var(--accent); }
     .count { font-size: .85rem; color: var(--text2); }
+    .nav-links a { font-size: .85rem; color: var(--text2); text-decoration: none; margin-left: 16px; }
+    .nav-links a:hover { color: var(--accent); }
 
     .hero { padding: 60px 0 32px; text-align: center; }
     .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
@@ -92,6 +94,14 @@
     .tag.cat { background: #eff6ff; color: #2563eb; }
     .tag.new { background: var(--accent-light); color: var(--accent); }
 
+    .blog-section { margin: 0 auto 48px; max-width: 800px; }
+    .blog-section h2 { font-size: 1.1rem; margin-bottom: 16px; }
+    .blog-posts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:640px){.blog-posts{grid-template-columns:1fr}}
+    .blog-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-decoration: none; color: inherit; transition: all .12s; }
+    .blog-card:hover { border-color: var(--accent); }
+    .blog-card .title { font-size: .85rem; font-weight: 600; margin-bottom: 4px; }
+    .blog-card .meta { font-size: .72rem; color: var(--text2); }
     footer {
       border-top: 1px solid var(--border);
       padding: 40px 0;
@@ -111,7 +121,7 @@
   <header>
     <div class="container">
       <a href="/" class="logo"><span>mk</span>tools</a>
-      <span class="count" id="totalCount"></span>
+      <div class="nav-links"><a href="/mktools/about/">О проекте</a><a href="/mktools/blog/">Блог</a><span class="count" id="totalCount" style="margin-left:12px"></span></div>
     </div>
   </header>
 
@@ -125,11 +135,33 @@
   <div class="container">
     <div class="filters" id="filters"></div>
     <div class="tools-grid" id="grid"></div>
+
+    <div class="blog-section">
+      <h2>📝 Из блога</h2>
+      <div class="blog-posts">
+        <a class="blog-card" href="/mktools/blog/marketing-tools-compared/">
+          <div class="title">UTM, A/B тесты, ROMI: обзор инструментов</div>
+          <div class="meta">Чем заменить дорогие подписки</div>
+        </a>
+        <a class="blog-card" href="/mktools/blog/cac-ltv-calculator/">
+          <div class="title">CAC и LTV: формулы с примерами</div>
+          <div class="meta">Нормы по нишам, пример турфирмы</div>
+        </a>
+        <a class="blog-card" href="/mktools/blog/what-is-romi/">
+          <div class="title">ROMI, ROI и CAC на пальцах</div>
+          <div class="meta">Что считать маркетологу</div>
+        </a>
+        <a class="blog-card" href="/mktools/blog/seo-for-marketers/">
+          <div class="title">SEO для маркетологов</div>
+          <div class="meta">Чек-лист из 7 пунктов</div>
+        </a>
+      </div>
+    </div>
   </div>
 
   <footer>
     <div class="container">
-      <p><a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — открытый проект</p>
+      <p><a href="https://github.com/Art009bas/mktools" target="_blank" rel="noopener">mktools</a> — <a href="/mktools/about/">О проекте</a> · <a href="/mktools/blog/">Блог</a> · открытый проект</p>
     </div>
   </footer>
 
