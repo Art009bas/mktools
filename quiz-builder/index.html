@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Квиз-конструктор — создание опросов для лидогенерации онлайн</title>
+<meta name="description" content="Конструктор квизов для сбора лидов. Drag-and-drop редактор, варианты вопросов, логика, экспорт кода для вставки на сайт.">
+<link rel="canonical" href="https://art009bas.github.io/mktools/quiz-builder/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Квиз-конструктор","applicationCategory":"Marketing","operatingSystem":"Web"}</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--text)}.logo span{color:var(--accent)}
+nav a{font-size:.85rem;color:var(--text2);text-decoration:none;margin-left:14px}
+nav a:hover{color:var(--accent)}
+h1{font-size:1.4rem;font-weight:800;margin:28px 0 4px}
+.hero p{color:var(--text2);font-size:.9rem;margin-bottom:20px}
+
+.layout{display:grid;grid-template-columns:1fr 240px;gap:20px;padding-bottom:48px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+
+/* Editor */
+.editor-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.editor-panel h3{font-size:.85rem;font-weight:700;margin-bottom:14px}
+
+label{display:block;font-size:.82rem;font-weight:600;margin-bottom:4px;color:var(--text)}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;font-family:var(--font);margin-bottom:12px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:50px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all.12s}
+.btn:hover{background:var(--accent-hover)}
+.btn-sm{padding:5px 12px;font-size:.78rem}
+.btn-secondary{background:#f3f4f6;color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#e5e7eb}
+.btn-danger{background:#fee2e2;color:#dc2626}
+.btn-danger:hover{background:#fecaca}
+
+/* Questions list */
+.q-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:all.12s;position:relative}
+.q-card:hover{border-color:var(--accent)}
+.q-card.active{border-color:var(--accent);border-width:2px;padding:11px 13px}
+.q-card .q-type{font-size:.68rem;color:var(--text2);margin-bottom:2px}
+.q-card .q-title{font-size:.82rem;font-weight:600}
+.q-card .q-count{font-size:.72rem;color:var(--text2);margin-top:2px}
+.q-card .q-del{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:#ccc;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center}
+.q-card .q-del:hover{background:#fee2e2;color:#dc2626}
+
+/* Options */
+.opt-row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
+.opt-row input{flex:1;margin-bottom:0}
+.opt-row .btn-sm{flex-shrink:0}
+
+/* Preview */
+.preview-panel{position:sticky;top:100px}
+.preview-panel h3{font-size:.85rem;font-weight:700;margin-bottom:12px}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;font-size:.85rem;min-height:300px}
+.preview-box .q{font-weight:600;margin-bottom:10px}
+.preview-box .opt{display:block;padding:8px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer;transition:all.12s}
+.preview-box .opt:hover{border-color:var(--accent)}
+.preview-box .opt.selected{border-color:var(--accent);background:var(--accent-light)}
+.preview-box .opt-text{display:block;padding:10px 12px;border:1px solid var(--border);border-radius:6px;width:100%;font-family:var(--font);font-size:.85rem}
+.preview-box .preview-nav{display:flex;justify-content:space-between;margin-top:16px;gap:8px}
+.preview-box .preview-nav .btn{flex:1;text-align:center}
+.preview-box .result{text-align:center;padding:20px}
+.preview-box .result h4{font-size:1rem;margin-bottom:6px}
+.preview-box .result p{color:var(--text2);font-size:.8rem;margin-bottom:4px}
+
+/* Export */
+.export-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:20px}
+.export-panel h3{font-size:.85rem;font-weight:700;margin-bottom:10px}
+.export-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.export-tab{padding:6px 14px;border:1px solid var(--border);border-radius:100px;font-size:.78rem;cursor:pointer;background:var(--surface);color:var(--text2);font-family:var(--font);transition:all.12s}
+.export-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.export-tab:hover{border-color:var(--accent)}
+.export-output{background:#f9fafb;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-family:monospace;font-size:.78rem;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto;margin-bottom:10px}
+.copy-btn{padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.82rem;font-weight:600;cursor:pointer;font-family:var(--font)}
+
+footer{border-top:1px solid var(--border);padding:32px 0;margin-top:40px;text-align:center;color:var(--text2);font-size:.82rem}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container">
+<a href="/mktools/" class="logo"><span>mk</span>tools</a>
+<nav><a href="/mktools/about/">О проекте</a><a href="/mktools/blog/">Блог</a></nav>
+</div></header>
+<main class="container">
+<h1>📋 Квиз-конструктор</h1>
+<p class="hero">Создайте опрос для сбора лидов. Перетащите вопросы, настройте варианты, получите код для вставки на сайт.</p>
+
+<div class="layout">
+<div>
+  <div class="editor-panel">
+    <h3>📌 Настройки квиза</h3>
+    <label>Название квиза</label>
+    <input type="text" id="quizTitle" value="Подберите тур мечты" oninput="updatePreview()">
+    <label>Заголовок результата</label>
+    <input type="text" id="resultTitle" value="Ваш результат" oninput="updatePreview()">
+    <label>Текст результата (HTML)</label>
+    <textarea id="resultText" rows="3" oninput="updatePreview()">Мы подобрали для вас 3 лучших варианта. Скоро свяжемся!</textarea>
+    <div class="row">
+      <div><label>Кнопка</label><input type="text" id="btnText" value="Далее" oninput="updatePreview()"></div>
+      <div><label>Кнопка финала</label><input type="text" id="finalBtnText" value="Получить подборку" oninput="updatePreview()"></div>
+    </div>
+  </div>
+
+  <div class="editor-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin-bottom:0">📝 Вопросы</h3>
+      <button class="btn btn-sm" onclick="addQuestion()">+ Добавить вопрос</button>
+    </div>
+    <div class="q-list" id="qList"></div>
+    <div id="qEditor" style="display:none">
+      <hr style="margin:12px 0;border:none;border-top:1px solid var(--border)">
+      <label>Текст вопроса</label>
+      <input type="text" id="qText" oninput="updateQuestion()">
+      <label>Тип ответа</label>
+      <select id="qType" onchange="changeQType()">
+        <option value="radio">Один вариант</option>
+        <option value="checkbox">Несколько вариантов</option>
+        <option value="text">Текстовый ответ</option>
+        <option value="email">Email</option>
+        <option value="phone">Телефон</option>
+      </select>
+      <div id="optionsEditor">
+        <label>Варианты ответа</label>
+        <div id="optionsList"></div>
+        <button class="btn btn-sm btn-secondary" onclick="addOption()" style="margin-top:4px">+ Вариант</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-panel" id="exportPanel">
+    <h3>📦 Экспорт</h3>
+    <div class="export-tabs" id="exportTabs">
+      <span class="export-tab active" onclick="switchExport('html',this)">HTML-виджет</span>
+      <span class="export-tab" onclick="switchExport('json',this)">JSON (данные)</span>
+      <span class="export-tab" onclick="switchExport('js',this)">JavaScript</span>
+    </div>
+    <div class="export-output" id="exportOutput"></div>
+    <button class="copy-btn" onclick="copyExport()">📋 Копировать</button>
+  </div>
+</div>
+
+<div class="preview-panel">
+  <h3>👁️ Предпросмотр</h3>
+  <div class="preview-box" id="preview">
+    <div id="previewContent"></div>
+  </div>
+</div>
+</div>
+</main>
+
+<footer><div class="container">
+<a href="/mktools/">mktools</a> · <a href="/mktools/about/">О проекте</a> · <a href="/mktools/blog/">Блог</a>
+</div></footer>
+
+<script>
+let questions = [
+  { id:'q1', text:'Куда планируете поездку?', type:'radio', options:['Турция','Египет','Таиланд','ОАЭ','Другое'] },
+  { id:'q2', text:'Когда планируете вылет?', type:'radio', options:['На этой неделе','Через 1-2 недели','Через месяц','Пока не знаю'] },
+  { id:'q3', text:'На сколько человек?', type:'text', options:[] },
+  { id:'q4', text:'Ваш телефон для связи', type:'phone', options:[] },
+];
+let selectedQ = 0;
+let previewStep = 0;
+let previewAnswers = {};
+
+function uid(){return 'q'+Date.now()+Math.random().toString(36).slice(2,6)}
+
+function renderQList(){
+  const el = document.getElementById('qList');
+  el.innerHTML = '';
+  const types = { radio:'Один вариант', checkbox:'Несколько', text:'Текст', email:'Email', phone:'Телефон' };
+  questions.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className = 'q-card' + (i===selectedQ?' active':'');
+    if(i===selectedQ) div.onclick = ()=>{selectQ(i)};
+    else div.onclick = ()=>{selectedQ=i;renderQList();openQEditor();updatePreview()};
+    div.innerHTML = `<div class="q-type">${types[q.type]||q.type}</div>
+      <div class="q-title">${q.text||'(без названия)'}</div>
+      <div class="q-count">${q.options.length ? q.options.length+' вариантов' : 'свободный ввод'}</div>
+      <button class="q-del" onclick="event.stopPropagation();delQ(${i})">✕</button>`;
+    el.appendChild(div);
+  });
+}
+
+function delQ(i){
+  questions.splice(i,1);
+  if(selectedQ>=questions.length) selectedQ=Math.max(0,questions.length-1);
+  if(questions.length===0){questions.push({id:'q1',text:'Новый вопрос',type:'radio',options:['Вариант 1']});selectedQ=0}
+  renderQList();openQEditor();updatePreview();
+}
+
+function selectQ(i){selectedQ=i;renderQList();openQEditor()}
+
+function openQEditor(){
+  if(questions.length===0)return;
+  const ed = document.getElementById('qEditor');
+  ed.style.display='block';
+  const q = questions[selectedQ];
+  document.getElementById('qText').value = q.text;
+  document.getElementById('qType').value = q.type;
+  renderOptions();
+  updatePreview();
+}
+
+function updateQuestion(){
+  const q = questions[selectedQ];
+  if(!q)return;
+  q.text = document.getElementById('qText').value;
+  q.type = document.getElementById('qType').value;
+  renderOptions();
+  renderQList();
+  updatePreview();
+}
+
+function changeQType(){
+  updateQuestion();
+}
+
+function renderOptions(){
+  const q = questions[selectedQ];
+  if(!q)return;
+  const container = document.getElementById('optionsEditor');
+  const list = document.getElementById('optionsList');
+  if(q.type==='radio'||q.type==='checkbox'){
+    container.style.display='block';
+    list.innerHTML = '';
+    q.options.forEach((opt,i)=>{
+      const div = document.createElement('div');
+      div.className='opt-row';
+      div.innerHTML = `<input value="${opt.replace(/"/g,'&quot;')}" oninput="updOpt(${i},this.value)"><button class="btn-sm btn-secondary" onclick="delOpt(${i})">✕</button>`;
+      list.appendChild(div);
+    });
+  }else{
+    container.style.display='none';
+  }
+}
+
+function updOpt(i,v){questions[selectedQ].options[i]=v;updatePreview()}
+
+function addOption(){
+  const q = questions[selectedQ];
+  if(!q)return;
+  q.options.push('Вариант '+(q.options.length+1));
+  renderOptions();
+  updatePreview();
+}
+
+function delOpt(i){
+  const q = questions[selectedQ];
+  q.options.splice(i,1);
+  if(q.options.length===0) q.options.push('Вариант 1');
+  renderOptions();
+  updatePreview();
+}
+
+function addQuestion(){
+  questions.push({ id:uid(), text:'Новый вопрос', type:'radio', options:['Вариант 1','Вариант 2'] });
+  selectedQ = questions.length-1;
+  renderQList();
+  openQEditor();
+}
+
+// Preview
+function updatePreview(){
+  renderQList();
+  const cnt = document.getElementById('previewContent');
+  const title = document.getElementById('quizTitle').value || 'Квиз';
+  const btn = document.getElementById('btnText').value || 'Далее';
+  const fbtn = document.getElementById('finalBtnText').value || 'Готово';
+  const rTitle = document.getElementById('resultTitle').value || 'Ваш результат';
+  const rText = document.getElementById('resultText').value || '';
+
+  if(previewStep >= questions.length){
+    cnt.innerHTML = `<div class="result"><h4>${rTitle}</h4><p>${rText}</p><button class="btn btn-sm" onclick="resetPreview()">🔄 Пройти заново</button></div>`;
+    return;
+  }
+
+  const q = questions[previewStep];
+  if(!q){cnt.innerHTML='<p style="color:var(--text2)">Добавьте вопросы</p>';return}
+  let html = `<div class="q">${previewStep+1}. ${q.text}</div>`;
+
+  const val = previewAnswers[q.id] || '';
+  if(q.type==='radio'){
+    q.options.forEach(o=>{
+      const sel = val===o?' selected':'';
+      html += `<div class="opt${sel}" onclick="previewAnswer('${q.id}','${o.replace(/'/g,"\\'")}','radio')">${o}</div>`;
+    });
+  }else if(q.type==='checkbox'){
+    const arr = Array.isArray(previewAnswers[q.id])?previewAnswers[q.id]:[];
+    q.options.forEach(o=>{
+      const sel = arr.includes(o)?' selected':'';
+      html += `<div class="opt${sel}" onclick="previewCheckbox('${q.id}','${o.replace(/'/g,"\\'")}')">${o}</div>`;
+    });
+  }else{
+    html += `<input class="opt-text" placeholder="Введите ответ" value="${val.replace(/"/g,'&quot;')}" oninput="previewAnswers['${q.id}']=this.value">`;
+  }
+
+  html += `<div class="preview-nav"><button class="btn btn-sm btn-secondary" onclick="prevStep()" ${previewStep===0?'disabled style="opacity:.4"':''}>← Назад</button><button class="btn btn-sm" onclick="nextStep()">${btn} →</button></div>`;
+  cnt.innerHTML = html;
+}
+
+function previewAnswer(id,val){
+  previewAnswers[id]=val;
+  const q = questions[previewStep];
+  if(q && q.type==='radio') setTimeout(nextStep,200);
+  updatePreview();
+}
+
+function previewCheckbox(id,val){
+  if(!Array.isArray(previewAnswers[id])) previewAnswers[id]=[];
+  const arr = previewAnswers[id];
+  const idx = arr.indexOf(val);
+  if(idx>-1) arr.splice(idx,1); else arr.push(val);
+  updatePreview();
+}
+
+function nextStep(){
+  previewStep++;
+  updatePreview();
+}
+
+function prevStep(){
+  if(previewStep>0) previewStep--;
+  updatePreview();
+}
+
+function resetPreview(){
+  previewStep=0;
+  previewAnswers={};
+  updatePreview();
+}
+
+// Export
+let exportMode = 'html';
+
+function switchExport(mode,el){
+  exportMode=mode;
+  document.querySelectorAll('.export-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderExport();
+}
+
+function renderExport(){
+  const out = document.getElementById('exportOutput');
+  const title = document.getElementById('quizTitle').value || 'Квиз';
+  const btn = document.getElementById('btnText').value || 'Далее';
+  const fbtn = document.getElementById('finalBtnText').value || 'Готово';
+  const rTitle = document.getElementById('resultTitle').value || 'Ваш результат';
+  const rText = document.getElementById('resultText').value || '';
+
+  if(exportMode === 'json'){
+    out.textContent = JSON.stringify({title,questions,result:{title:rTitle,text:rText},buttons:{next:btn,final:fbtn}},null,2);
+    return;
+  }
+
+  if(exportMode === 'js'){
+    out.textContent = `// Quiz data — import in your JS
+const quizData = ${JSON.stringify({title,questions,result:{title:rTitle,text:rText},buttons:{next:btn,final:fbtn}},null,2)};
+
+function renderQuiz(data, containerId){
+  let step = 0, answers = {};
+  const el = document.getElementById(containerId);
+  // call renderStep() with your own render logic
+  console.log('quiz loaded', data.title);
+}`;
+    return;
+  }
+
+  // HTML
+  let qHtml = '';
+  questions.forEach((q,i)=>{
+    let opts = '';
+    if(q.type==='radio'||q.type==='checkbox'){
+      q.options.forEach(o=>{
+        const type = q.type==='checkbox'?'checkbox':'radio';
+        const name = 'q'+i;
+        opts += `<label style="display:block;padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:6px;cursor:pointer">
+          <input type="${type}" name="${name}" value="${o.replace(/"/g,'&quot;')}" onchange="quizAnswers[${i}]=this.value" style="margin-right:8px">${o}
+        </label>`;
+      });
+    }else{
+      opts = `<input type="${q.type}" placeholder="Введите ответ" onchange="quizAnswers[${i}]=this.value" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:.85rem;font-family:inherit">`;
+    }
+    const hide = i===0?'':' style="display:none"';
+    qHtml += `<div class="quiz-step" data-step="${i}"${hide}>
+      <div class="quiz-q">${i+1}. ${q.text}</div>
+      <div class="quiz-opts">${opts}</div>
+    </div>`;
+  });
+
+  const html = `<!-- Quiz widget by mktools -->
+<div id="quiz-widget" style="max-width:500px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:28px;font-family:system-ui,-apple-system,sans-serif;line-height:1.5">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:2rem;margin-bottom:6px">📋</div>
+    <h3 style="margin:0;font-size:1.1rem">${title}</h3>
+  </div>
+  <div id="quiz-steps">${qHtml}</div>
+  <div id="quiz-result" style="display:none;text-align:center;padding:20px">
+    <h4 style="margin-bottom:8px">${rTitle}</h4>
+    <p style="color:#6b7280;font-size:.9rem;margin-bottom:12px">${rText}</p>
+    <button onclick="quizReset()" style="padding:10px 20px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:.85rem">🔄 Пройти заново</button>
+  </div>
+  <div id="quiz-nav" style="display:flex;gap:8px;margin-top:16px">
+    <button id="quiz-prev" onclick="quizPrev()" style="flex:1;padding:10px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-family:inherit;display:none">← Назад</button>
+    <button id="quiz-next" onclick="quizNext()" style="flex:1;padding:10px;background:#f97316;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit">${btn} →</button>
+    <button id="quiz-finish" onclick="quizFinish()" style="flex:1;padding:10px;background:#f97316;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;display:none">${fbtn}</button>
+  </div>
+  <div style="margin-top:12px;text-align:center;font-size:.72rem;color:#9ca3af">Создано в <a href="https://art009bas.github.io/mktools/quiz-builder/" style="color:#f97316">mktools</a></div>
+</div>
+
+<script>
+const quizAnswers = {};
+let qStep = 0;
+const qTotal = ${questions.length};
+
+function showQ(idx){
+  document.querySelectorAll('.quiz-step').forEach((el,i)=>{
+    el.style.display = i===idx ? 'block' : 'none';
+  });
+  document.getElementById('quiz-prev').style.display = idx>0 ? 'block' : 'none';
+  const isLast = idx >= qTotal-1;
+  document.getElementById('quiz-next').style.display = isLast ? 'none' : 'block';
+  document.getElementById('quiz-finish').style.display = isLast ? 'block' : 'none';
+}
+
+function quizNext(){
+  if(qStep < qTotal-1){ qStep++; showQ(qStep); }
+}
+function quizPrev(){
+  if(qStep > 0){ qStep--; showQ(qStep); }
+}
+function quizFinish(){
+  document.getElementById('quiz-steps').style.display = 'none';
+  document.getElementById('quiz-nav').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  // Here you can send quizAnswers to your backend
+  console.log('Quiz answers:', quizAnswers);
+}
+function quizReset(){
+  for(let k in quizAnswers) delete quizAnswers[k];
+  qStep = 0;
+  document.getElementById('quiz-steps').style.display = 'block';
+  document.getElementById('quiz-nav').style.display = 'flex';
+  document.getElementById('quiz-result').style.display = 'none';
+  showQ(0);
+}
+showQ(0);
+<\/script>`;
+
+  out.textContent = html;
+}
+
+function copyExport(){
+  const txt = document.getElementById('exportOutput').textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Скопировано!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  });
+}
+
+// Init
+renderQList();
+openQEditor();
+updatePreview();
+renderExport();
+</script>
+
+<section style="max-width:700px;margin:0 auto;padding:20px 24px 48px;color:var(--text2);font-size:.85rem;line-height:1.7">
+<h2 style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px">Как использовать квиз-конструктор</h2>
+<p>Квизы — один из самых конверсионных форматов для сбора лидов. Люди охотнее отвечают на 4-5 вопросов, чем заполняют форму с 10 полями.</p>
+<p>Сценарии: подбор тура по параметрам, калькулятор стоимости, тест на знание продукта, опрос для сегментации аудитории.</p>
+<p>Готовый HTML-виджет можно вставить на любой сайт — работает без фреймворков. JSON подходит для загрузки в конструкторы (Tilda, Readymag) через Embed. JavaScript-формат — для React/Vue проектов.</p>
+</section>
+</body>
+</html>
