@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROMI: что это такое и как рассчитать — формула, примеры, нормы</title>
+  <meta name="description" content="ROMI (Return on Marketing Investment) — коэффициент окупаемости маркетинга. Формула расчёта, пример для турфирмы, нормы по нишам, отличия от ROI. Бесплатный калькулятор.">
+  <meta name="keywords" content="ROMI, ROI маркетинг, окупаемость рекламы, формула ROMI, расчёт ROMI, что такое ROMI">
+  <link rel="canonical" href="https://mktgtools.ru/blog/posts/chto-takoe-romi-i-kak-schitat/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta property="og:title" content="ROMI: что это такое и как рассчитать — формула, примеры, нормы">
+  <meta property="og:description" content="ROMI — ключевой показатель маркетолога. Формула, пример для турфирмы, нормы по нишам, отличия от ROI, бесплатный калькулятор.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://mktgtools.ru/blog/posts/chto-takoe-romi-i-kak-schitat/">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="mktgtools">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "ROMI: что это такое и как рассчитать",
+    "description": "ROMI (Return on Marketing Investment) — коэффициент окупаемости маркетинга. Формула расчёта, пример для турфирмы, нормы по нишам.",
+    "author": { "@type": "Organization", "name": "mktgtools" },
+    "publisher": { "@type": "Organization", "name": "mktgtools" },
+    "datePublished": "2026-05-18",
+    "image": "https://mktgtools.ru/og-romi.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://mktgtools.ru/" },
+      { "@type": "ListItem", "position": 2, "name": "Блог", "item": "https://mktgtools.ru/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "ROMI: расчёт и нормы", "item": "https://mktgtools.ru/blog/posts/chto-takoe-romi-i-kak-schitat/" }
+    ]
+  }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f8f9fb; --surface: #fff; --text: #1a1a2e; --text2: #6b7280;
+      --accent: #f97316; --accent-hover: #ea580c; --border: #e5e7eb;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 20px 0; position: sticky; top: 0; z-index: 100;
+    }
+    header .container { display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-weight: 800; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-links a { font-size: .85rem; color: var(--text2); text-decoration: none; margin-left: 16px; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .article { padding: 40px 0 60px; }
+    .article h1 { font-size: 1.8rem; margin-bottom: 12px; line-height: 1.3; }
+    .article .meta { font-size: .85rem; color: var(--text2); margin-bottom: 28px; display: flex; gap: 16px; }
+    .article h2 { font-size: 1.3rem; margin: 36px 0 12px; }
+    .article h3 { font-size: 1.1rem; margin: 28px 0 8px; }
+    .article p { color: #374151; line-height: 1.8; font-size: 1rem; margin-bottom: 14px; }
+    .article ul, .article ol { padding-left: 24px; margin-bottom: 14px; }
+    .article li { color: #374151; line-height: 1.7; margin-bottom: 6px; }
+    .article a { color: var(--accent); font-weight: 600; }
+    .article blockquote {
+      border-left: 3px solid var(--accent); padding: 12px 20px;
+      background: var(--accent-light); border-radius: 0 8px 8px 0;
+      margin: 20px 0; font-style: italic;
+    }
+    .article .cta-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; margin: 28px 0; text-align: center;
+    }
+    .article .cta-box p { margin-bottom: 12px; }
+    .article .cta-btn {
+      display: inline-block; background: var(--accent); color: #fff;
+      padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;
+      transition: .15s;
+    }
+    .article .cta-btn:hover { background: var(--accent-hover); }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+    table th, table td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+    table th { background: var(--accent-light); font-weight: 700; }
+
+    .tag { display: inline-block; padding: 4px 12px; background: var(--accent-light); color: var(--accent); border-radius: 100px; font-size: .75rem; font-weight: 600; text-decoration: none; margin: 2px; }
+    .tag:hover { background: var(--accent); color: #fff; }
+
+    footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; color: var(--text2); font-size: .85rem; }
+    footer a { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .article h1 { font-size: 1.4rem; }
+      .container { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="/" class="logo"><span>mk</span>tools</a>
+      <div class="nav-links">
+        <a href="/about/">О проекте</a>
+        <a href="/blog/">Блог</a>
+        <a href="/">Инструменты</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="article">
+    <div class="container">
+      <div class="meta">
+        <span>📅 18 мая 2026</span>
+        <span>⏱ 5 минут</span>
+        <span>📂 <a href="/blog/" style="color:var(--text2)">Маркетинг</a></span>
+      </div>
+      <h1>ROMI: что это такое и как рассчитать</h1>
+
+      <p>ROMI (Return on Marketing Investment) — это коэффициент, который показывает, окупились ли ваши вложения в маркетинг. Если ROMI больше 100% — вы заработали. Если меньше — потратили больше, чем получили.</p>
+
+      <p>В этой статье разберём формулу, примеры для турфирмы и интернет-магазина, нормы по нишам и главную ошибку: чем ROMI отличается от ROI.</p>
+
+      <h2>Формула ROMI</h2>
+      <p>Базовый расчёт:</p>
+      <p style="font-size:1.2rem;font-weight:700;background:var(--accent-light);padding:16px;border-radius:8px;text-align:center">
+        ROMI = (Доход от маркетинга − Расходы на маркетинг) ÷ Расходы на маркетинг × 100%
+      </p>
+      <p>Пример: потратили на Яндекс.Директ 100 000 ₽, получили заказов на 250 000 ₽.</p>
+      <p>ROMI = (250 000 − 100 000) ÷ 100 000 × 100% = <strong>150%</strong></p>
+      <p>Это значит: каждый вложенный рубль принёс 1,5 рубля прибыли (сверху вернули рубль + 50 копеек).</p>
+
+      <h2>ROMI vs ROI: в чём разница</h2>
+      <table>
+        <tr><th>Показатель</th><th>Что учитывает</th><th>Формула</th></tr>
+        <tr><td>ROI</td><td>Всё: зарплаты, ПО, налоги</td><td>(Прибыль − Инвестиции) ÷ Инвестиции</td></tr>
+        <tr><td>ROMI</td><td>Только маркетинговые затраты</td><td>(Доход от М − Затраты на М) ÷ Затраты на М</td></tr>
+      </table>
+      <p>Простыми словами: ROI считает директор (окупаемость всего бизнеса), ROMI считает маркетолог (окупаемость рекламы).</p>
+
+      <div class="cta-box">
+        <p>📊 <strong>Посчитайте ROMI прямо сейчас</strong></p>
+        <p>Бесплатный калькулятор с разбивкой по месяцам и графиками</p>
+        <a class="cta-btn" href="/roi-calculator/">Рассчитать ROMI →</a>
+      </div>
+
+      <h2>Нормы ROMI по нишам</h2>
+      <table>
+        <tr><th>Ниша</th><th>Норма ROMI</th><th>Комментарий</th></tr>
+        <tr><td>Туризм</td><td>120–200%</td><td>Маржинальность высокая, но сезонность</td></tr>
+        <tr><td>E-commerce</td><td>130–250%</td><td>Зависит от среднего чека</td></tr>
+        <tr><td>Услуги B2B</td><td>200–400%</td><td>Длинная сделка, высокий чек</td></tr>
+        <tr><td>Образование</td><td>150–300%</td><td>Высокий LTV студента</td></tr>
+        <tr><td>Приложения</td><td>100–180%</td><td>Низкая конверсия, высокий объём</td></tr>
+      </table>
+      <p>ROMI ниже 100% — вы в минусе. Выше 300% — либо вы гений, либо неправильно считаете расходы.</p>
+
+      <h2>Как повысить ROMI</h2>
+      <ul>
+        <li><strong>Понизить CAC</strong> — дешёвые каналы, ретаргетинг, органический трафик</li>
+        <li><strong>Поднять средний чек</strong> — апсейлы, кросс-сейлы, пакетные предложения</li>
+        <li><strong>Улучшить конверсию</strong> — A/B тесты лендингов, форм, CTA</li>
+        <li><strong>Отключить неэффективные каналы</strong> — считайте ROMI отдельно для каждого источника</li>
+      </ul>
+
+      <p>Посчитайте ROMI для своего бизнеса в <a href="/roi-calculator/">калькуляторе ROI/ROMI</a>. Он считает с разбивкой по месяцам и строит график динамики.</p>
+
+      <p>Читайте также: <a href="/blog/what-is-romi/">ROMI, ROI и CAC на пальцах</a> — для новичков, <a href="/blog/cac-ltv-calculator/">CAC и LTV: формулы и примеры</a>.</p>
+
+      <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border)">
+        <strong>Теги:</strong>
+        <a class="tag" href="/blog/">#маркетинг</a>
+        <a class="tag" href="/blog/">#аналитика</a>
+        <a class="tag" href="/blog/">#ROMI</a>
+        <a class="tag" href="/roi-calculator/">#калькулятор</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><a href="/">mktgtools</a> — <a href="/about/">О проекте</a> · <a href="/blog/">Блог</a></p>
+    </div>
+  </footer>
+</body>
+</html>
