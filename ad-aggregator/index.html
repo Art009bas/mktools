@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Агрегатор рекламных кампаний — учёт и аналитика Директ, ВК, Telegram | mktools</title>
+<meta name="description" content="Учёт расходов, лидов и продаж по источникам: Яндекс Директ, ВК таргет, Telegram, Авито. ROMI, CPL, CAC, LTV, динамика, рекомендации. Бесплатно.">
+<meta property="og:title" content="Агрегатор рекламных кампаний — аналитика для маркетолога | mktools">
+<meta property="og:description" content="Учёт РК по источникам: Директ, ВК, ТГ, Авито. ROMI, CPL, CAC, графики, рекомендации.">
+<meta property="og:url" content="https://mktgtools.ru/ad-aggregator/">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://mktgtools.ru/ad-aggregator/">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--green:#10b981;--red:#ef4444;--blue:#3b82f6;--yellow:#f59e0b;--purple:#8b5cf6;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.logo{font-weight:800;font-size:1.1rem;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.nav{display:flex;gap:12px;align-items:center}
+.nav a{color:var(--text2);text-decoration:none;font-size:.82rem}.nav a:hover{color:var(--accent)}
+h1{font-size:1.2rem;font-weight:800}
+.hero{padding:20px 0 10px;text-align:center}
+.hero p{color:var(--text2);font-size:.82rem;max-width:600px;margin:0 auto}
+.breadcrumbs{font-size:.78rem;color:var(--text2);margin-bottom:4px;text-align:left}
+.breadcrumbs a{color:var(--text2);text-decoration:none}.breadcrumbs a:hover{color:var(--accent)}
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px;overflow-x:auto}
+.tab{padding:7px 13px;border:none;border-radius:6px;font-size:.77rem;font-weight:500;cursor:pointer;transition:all .12s;background:transparent;color:var(--text2);font-family:var(--font);white-space:nowrap}
+.tab.active{background:var(--accent);color:#fff}.tab:hover:not(.active){background:#f3f4f6}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-card .num{font-size:1.3rem;font-weight:800}
+.stat-card .num.green{color:var(--green)}.stat-card .num.red{color:var(--red)}.stat-card .num.blue{color:var(--blue)}
+.stat-card .label{font-size:.68rem;color:var(--text2);margin-top:1px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.chart-card h3{font-size:.82rem;font-weight:600;margin-bottom:6px}
+.bar-chart{display:flex;flex-direction:column;gap:2px}
+.bar-row{display:flex;align-items:center;gap:5px;font-size:.7rem}
+.bar-row .name{width:70px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.bar-row .bar{flex:1;height:18px;background:#f3f4f6;border-radius:4px;overflow:hidden}
+.bar-row .bar-fill{height:100%;border-radius:4px;transition:width .3s;display:flex;align-items:center;padding-left:5px;font-size:.6rem;color:#fff;font-weight:600}
+.bar-row .val{width:32px;font-weight:600;text-align:right;flex-shrink:0;font-size:.68rem}
+.chart-canvas-wrap{width:100%;height:200px;position:relative}
+.chart-canvas-wrap canvas{width:100%!important;height:100%!important}
+.empty-chart{display:flex;align-items:center;justify-content:center;height:200px;color:var(--text2);font-size:.78rem}
+.controls{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.controls select,.controls input{padding:5px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.75rem;font-family:var(--font);background:var(--surface);outline:none}
+.controls select:focus,.controls input:focus{border-color:var(--accent)}
+.controls .btn{padding:5px 12px;border:none;border-radius:var(--radius-sm);font-size:.73rem;font-weight:500;cursor:pointer;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text)}.btn-secondary:hover{background:#e5e7eb}
+.btn-sm{padding:3px 8px;font-size:.68rem}.btn-danger{background:var(--red);color:#fff}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:.74rem}
+th{text-align:left;padding:6px 8px;background:#f9fafb;border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);white-space:nowrap;cursor:pointer}
+th:hover{color:var(--text)}td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover{background:#f9fafb}
+.form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;align-items:center;justify-content:center;padding:16px}
+.form-overlay.open{display:flex}
+.form-modal{background:var(--surface);border-radius:var(--radius);padding:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.form-modal h2{font-size:.95rem;font-weight:700;margin-bottom:10px}
+.form-group{margin-bottom:8px}
+.form-group label{display:block;font-size:.72rem;font-weight:500;color:var(--text2);margin-bottom:2px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.77rem;font-family:var(--font);outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-actions{display:flex;gap:6px;margin-top:10px;justify-content:flex-end}
+.rec-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px}
+.rec-block h3{font-size:.85rem;font-weight:600;margin-bottom:6px}
+.rec-item{display:flex;gap:8px;align-items:flex-start;padding:4px 0;font-size:.75rem;border-bottom:1px solid var(--border)}
+.rec-item:last-child{border-bottom:none}
+.rec-item .ri-icon{flex-shrink:0;width:18px;text-align:center}
+.rec-item .ri-text{flex:1;color:var(--text2)}
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.settings-section h3{font-size:.85rem;font-weight:600;margin-bottom:8px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:500px){.settings-grid{grid-template-columns:1fr}}
+.coach-msg{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:.78rem;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.coach-msg .cm-icon{font-size:1.2rem;flex-shrink:0}
+.strategy-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:8px}
+.strategy-card h3{font-size:.85rem;font-weight:600;margin-bottom:4px}
+.strategy-card .sc-meta{font-size:.72rem;color:var(--text2);margin-bottom:4px}
+.strategy-card .sc-detail{font-size:.74rem;color:var(--text);line-height:1.5}
+.strategy-card .sc-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:.65rem;font-weight:500;margin-right:3px;background:var(--accent-light);color:var(--accent)}
+footer{border-top:1px solid var(--border);padding:20px 0;text-align:center;color:var(--text2);font-size:.75rem;margin-top:20px}
+footer a{color:var(--accent);text-decoration:none}
+.copied-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:6px 16px;border-radius:8px;font-size:.75rem;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+.copied-toast.show{opacity:1}
+.empty{text-align:center;padding:30px;color:var(--text2);font-size:.82rem}
+</style></head><body>
+<header><div class="container">
+<a href="/" class="logo"><span>mk</span>tools</a>
+<div class="nav">
+  <a href="/">Инструменты</a>
+  <a href="/ad-aggregator/">Агрегатор РК</a>
+  <a href="/lead-analyzer/">Лиды</a>
+</div>
+</div></header>
+<section class="hero"><div class="container">
+<div class="breadcrumbs"><a href="/">Главная</a><span>/</span>Агрегатор рекламных кампаний</div>
+<h1>Агрегатор рекламных кампаний</h1>
+<p>Учёт и аналитика по источникам: Яндекс Директ, ВК таргет, Telegram, Авито и другие. ROMI, CPL, CAC, LTV, динамика, рекомендации стратегий.</p>
+</div></section>
+<div class="container"><div id="coach"></div><div class="tabs" id="tabs"></div><div id="tabContent"></div></div>
+<footer><div class="container">
+<a href="/">mktools</a> · <a href="/ad-aggregator/">Агрегатор РК</a> · <a href="/lead-analyzer/">Менеджер лидов</a> · данные не уходят с устройства
+</div></footer>
+<div class="copied-toast" id="toast"></div>
+
+<div class="form-overlay" id="formOverlay">
+<div class="form-modal">
+<h2 id="formTitle">Добавить запись</h2>
+<form id="entryForm" onsubmit="return false">
+<input type="hidden" id="editId">
+<div class="form-group"><label>Кампания / Название</label><input type="text" id="fCampaign" placeholder="Томск_Поиск_Июнь" required></div>
+<div class="form-row">
+<div class="form-group"><label>Платформа</label><select id="fPlatform"></select></div>
+<div class="form-group"><label>Город</label><select id="fCity"></select></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Дата старта</label><input type="date" id="fDate" required></div>
+<div class="form-group"><label>Тип кампании</label><select id="fType"></select></div>
+</div>
+<div class="form-group"><label>Настройки кампании</label><input type="text" id="fSettings" placeholder="Поиск+РСЯ, бюджет 20к/день, 50 ключей"></div>
+<div class="form-row">
+<div class="form-group"><label>Расход (руб)</label><input type="number" id="fCost" step="0.01" required></div>
+<div class="form-group"><label>Показы</label><input type="number" id="fImpressions" step="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Клики</label><input type="number" id="fClicks" step="1"></div>
+<div class="form-group"><label>Лиды</label><input type="number" id="fLeads" step="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Продажи</label><input type="number" id="fSales" step="1"></div>
+<div class="form-group"><label>Доход (руб)</label><input type="number" id="fRevenue" step="0.01"></div>
+</div>
+<div class="form-group"><label>Комментарий / Стратегия</label><textarea id="fComment" placeholder="Какие ключи, аудитории, креативы, что тестировали..."></textarea></div>
+<div class="form-actions"><button type="button" class="btn-secondary" onclick="closeForm()">Отмена</button><button type="button" class="btn-primary" onclick="saveEntry()">Сохранить</button></div>
+</form></div></div>
+
+<script>
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=a,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109294994','ym');ym(109294994,'init',{ssr:true,webvisor:true,clickmap:true,accurateTrackBounce:true,trackLinks:true});
+</script>
+<script>
+const PLATFORMS=[{id:'yadirect',label:'Я.Директ',icon:'🔍'},{id:'vktarget',label:'ВК таргет',icon:'💙'},{id:'telegram',label:'Telegram',icon:'✈️'},{id:'avito',label:'Авито',icon:'📦'},{id:'yandexmaps',label:'Я.Карты',icon:'🗺'},{id:'2gis',label:'2ГИС',icon:'📍'},{id:'yapro',label:'Я.Про',icon:'⭐'},{id:'promo',label:'ПромоСтраницы',icon:'📄'},{id:'other',label:'Другое',icon:'📌'}];
+const CITIES=['','Новосибирск','Томск','Тюмень','Челябинск','Кемерово','Прокопьевск','Барнаул','Омск','Красноярск','Москва'];
+const TYPES=['','Поиск','РСЯ','Поиск+РСЯ','Ретаргетинг','Медийная','Таргет','Geo','Квиз','Лендинг'];
+const SK='mkt_ads_data',SKS='mkt_ads_settings';
+let entries=[],settings={avgCheck:50000,margin:15,targetROI:100,targetCPL:1000},activeTab='dashboard';
+
+function loadData(){try{const r=localStorage.getItem(SK);if(r)entries=JSON.parse(r);const s=localStorage.getItem(SKS);if(s)settings={...settings,...JSON.parse(s)}}catch(e){}if(!Array.isArray(entries))entries=[]}
+function saveData(){try{localStorage.setItem(SK,JSON.stringify(entries))}catch(e){}try{localStorage.setItem(SKS,JSON.stringify(settings))}catch(e){}renderAll()}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function getToday(){return new Date().toISOString().slice(0,10)}
+
+function openForm(id){
+  const ov=document.getElementById('formOverlay');
+  ['fPlatform','fCity','fType'].forEach(sid=>{
+    const s=document.getElementById(sid);s.innerHTML='';
+    const items=sid==='fPlatform'?PLATFORMS:(sid==='fCity'?CITIES:TYPES);
+    items.forEach(v=>{const o=document.createElement('option');const vl=typeof v==='string'?{id:v,label:v}:v;o.value=vl.id||vl;o.textContent=vl.label||vl;s.appendChild(o)})
+  });
+  if(id){
+    const e=entries.find(x=>x.id===id);if(!e)return;
+    document.getElementById('formTitle').textContent='Редактировать';
+    ['editId','fCampaign','fPlatform','fCity','fDate','fType','fSettings','fCost','fImpressions','fClicks','fLeads','fSales','fRevenue','fComment'].forEach(f=>{
+      const el=document.getElementById(f);
+      if(f==='fPlatform'||f==='fCity'||f==='fType'){el.value=e[f.replace('f',f[0].toLowerCase()+f.slice(1))]||'';return}
+      const key=f==='editId'?'id':f.replace('f',f[1].toLowerCase()+f.slice(2));
+      el.value=e[key]||(f==='fDate'?getToday():'')
+    });
+  } else {
+    document.getElementById('formTitle').textContent='Добавить запись';
+    ['editId','fCampaign','fPlatform','fCity','fDate','fType','fSettings','fCost','fImpressions','fClicks','fLeads','fSales','fRevenue','fComment'].forEach(f=>{
+      const el=document.getElementById(f);
+      if(f==='fPlatform')el.value='yadirect';
+      else if(f==='fDate')el.value=getToday();
+      else if(f==='editId')el.value='';
+      else if(['fCity','fType','fCampaign','fSettings','fCost','fImpressions','fClicks','fLeads','fSales','fRevenue','fComment'].includes(f))el.value='';
+    });
+  }
+  ov.classList.add('open');
+}
+function closeForm(){document.getElementById('formOverlay').classList.remove('open')}
+
+function saveEntry(){
+  const data={
+    campaign:document.getElementById('fCampaign').value.trim(),
+    platform:document.getElementById('fPlatform').value,
+    city:document.getElementById('fCity').value,
+    date:document.getElementById('fDate').value||getToday(),
+    type:document.getElementById('fType').value,
+    settings:document.getElementById('fSettings').value.trim(),
+    cost:parseFloat(document.getElementById('fCost').value)||0,
+    impressions:parseInt(document.getElementById('fImpressions').value)||0,
+    clicks:parseInt(document.getElementById('fClicks').value)||0,
+    leads:parseInt(document.getElementById('fLeads').value)||0,
+    sales:parseInt(document.getElementById('fSales').value)||0,
+    revenue:parseFloat(document.getElementById('fRevenue').value)||0,
+    comment:document.getElementById('fComment').value.trim()
+  };
+  if(!data.campaign||data.cost<=0){alert('Название и расход обязательны');return}
+  const id=document.getElementById('editId').value;
+  data.cpc=data.clicks>0?data.cost/data.clicks:0;
+  data.cpl=data.leads>0?data.cost/data.leads:0;
+  data.cac=data.sales>0?data.cost/data.sales:0;
+  data.romi=data.cost>0?((data.revenue-data.cost)/data.cost*100):0;
+  if(id){const idx=entries.findIndex(x=>x.id===id);if(idx>=0)entries[idx]={...entries[idx],...data,updatedAt:new Date().toISOString()}}
+  else{data.id=genId();data.createdAt=new Date().toISOString();data.updatedAt=data.createdAt;entries.push(data)}
+  closeForm();saveData()
+}
+function deleteEntry(id){if(!confirm('Удалить?'))return;entries=entries.filter(x=>x.id!==id);saveData()}
+
+function renderAll(){
+  const c=document.getElementById('coach'),total=entries.length;
+  if(total===0)c.innerHTML='<div class="coach-msg"><span class="cm-icon">💡</span><div><strong>Как начать:</strong> Заполните настройки (средний чек, маржа), добавляйте записи по кампаниям. Дашборд покажет ROMI, CPL, динамику и  рекомендации.</div></div>';
+  else if(total<3)c.innerHTML='<div class="coach-msg"><span class="cm-icon">🚀</span><div>Добавьте ещё кампаний для сравнительной аналитики.</div></div>';
+  else c.style.display='none';
+  const tc=document.getElementById('tabs');
+  tc.innerHTML=[{id:'dashboard',icon:'',label:'Дашборд'},{id:'entries',icon:'',label:'Кампании',badge:total},{id:'add',icon:'',label:'Добавить'},{id:'strategies',icon:'',label:'Стратегии'},{id:'settings',icon:'',label:'Настройки'}].map(t=>'<button class="tab'+(activeTab===t.id?' active':'')+'" onclick="switchTab(\''+t.id+'\')">'+t.label+(t.badge?' <span class="badge">'+t.badge+'</span>':'')+'</button>').join('');
+  renderActiveTab()
+}
+function switchTab(t){activeTab=t;renderAll()}
+function renderActiveTab(){const c=document.getElementById('tabContent');if(activeTab==='dashboard')renderDashboard(c);else if(activeTab==='entries')renderEntries(c);else if(activeTab==='add'){c.innerHTML='';openForm()}else if(activeTab==='strategies')renderStrategies(c);else if(activeTab==='settings')renderSettings(c)}
+
+function renderDashboard(c){
+  if(!entries.length){c.innerHTML='<div class="empty">Нет данных. Добавьте кампании.</div>';return}
+  const tc=entries.reduce((s,e)=>s+e.cost,0),tl=entries.reduce((s,e)=>s+(e.leads||0),0),ts=entries.reduce((s,e)=>s+(e.sales||0),0),tr=entries.reduce((s,e)=>s+(e.revenue||0),0),tcl=entries.reduce((s,e)=>s+(e.clicks||0),0),tim=entries.reduce((s,e)=>s+(e.impressions||0),0);
+  const cpl=tl>0?tc/tl:0,romi=tc>0?((tr-tc)/tc*100):0,cr=tl>0?(ts/tl*100):0,cac=ts>0?tc/ts:0,ctr=tim>0?(tcl/tim*100):0,avg=ts>0?tr/ts:0,ltv=avg*(settings.margin/100)*2;
+  let html='<div class="stats-grid">'+
+    '<div class="stat-card"><div class="num blue">'+Math.round(tc).toLocaleString('ru')+'</div><div class="label">Расход</div></div>'+
+    '<div class="stat-card"><div class="num">'+tl+'</div><div class="label">Лиды</div><div class="sub" style="font-size:.65rem;color:var(--text2)">'+tcl+' кликов</div></div>'+
+    '<div class="stat-card"><div class="num">'+ts+'</div><div class="label">Продажи</div><div class="sub">'+cr.toFixed(1)+'% CR</div></div>'+
+    '<div class="stat-card"><div class="num green">'+Math.round(tr).toLocaleString('ru')+'</div><div class="label">Доход</div></div>'+
+    '<div class="stat-card"><div class="num '+(romi>=0?'green':'red')+'">'+romi.toFixed(0)+'%</div><div class="label">ROMI</div></div>'+
+    '<div class="stat-card"><div class="num">'+Math.round(cpl).toLocaleString('ru')+'</div><div class="label">CPL</div></div>'+
+    '<div class="stat-card"><div class="num">'+Math.round(cac).toLocaleString('ru')+'</div><div class="label">CAC</div></div>'+
+    '<div class="stat-card"><div class="num">'+ctr.toFixed(2)+'%</div><div class="label">CTR</div></div>'+
+    '</div><div class="charts-grid">';
+  // By platform
+  const pm={};entries.forEach(e=>{const k=e.platform||'other';if(!pm[k])pm[k]={c:0,s:0,l:0,r:0};pm[k].c+=e.cost;pm[k].s+=e.sales||0;pm[k].l+=e.leads||0;pm[k].r+=e.revenue||0});
+  const ps=Object.entries(pm).sort((a,b)=>b[1].c-a[1].c),mc=ps.length?Math.max(...ps.map(x=>x[1].c)):1;
+  html+='<div class="chart-card"><h3>Расход по платформам</h3><div class="bar-chart">';
+  ps.forEach(([k,v])=>{const p=PLATFORMS.find(x=>x.id===k),r=v.c>0?((v.r-v.c)/v.c*100).toFixed(0):0;html+='<div class="bar-row"><span class="name">'+(p?p.icon+' '+p.label:k)+'</span><div class="bar"><div class="bar-fill" style="width:'+(v.c/mc*100)+'%;background:'+(r>=0?'var(--green)':'var(--red)')+'">'+Math.round(v.c).toLocaleString('ru')+'</div></div><span class="val">'+r+'%</span></div>'});
+  html+='</div></div>';
+  // By city
+  const cm2={};entries.forEach(e=>{const k=e.city||'Без города';if(!cm2[k])cm2[k]={c:0,s:0,l:0,r:0};cm2[k].c+=e.cost;cm2[k].s+=e.sales||0;cm2[k].l+=e.leads||0;cm2[k].r+=e.revenue||0});
+  const cs=Object.entries(cm2).sort((a,b)=>b[1].c-a[1].c),mcc=cs.length?Math.max(...cs.map(x=>x[1].c)):1;
+  html+='<div class="chart-card"><h3>Расход по городам</h3><div class="bar-chart">';
+  cs.forEach(([k,v])=>{html+='<div class="bar-row"><span class="name">'+k+'</span><div class="bar"><div class="bar-fill" style="width:'+(v.c/mcc*100)+'%;background:var(--accent)">'+Math.round(v.c).toLocaleString('ru')+'</div></div><span class="val">'+v.s+'п</span></div>'});
+  html+='</div></div>';
+  // Type
+  const tm={};entries.forEach(e=>{const k=e.type||'Без типа';if(!tm[k])tm[k]={c:0,s:0,l:0,r:0};tm[k].c+=e.cost;tm[k].s+=e.sales||0;tm[k].l+=e.leads||0;tm[k].r+=e.revenue||0});
+  const ts2=Object.entries(tm).sort((a,b)=>b[1].c-a[1].c),mt=ts2.length?Math.max(...ts2.map(x=>x[1].c)):1;
+  html+='<div class="chart-card"><h3>По типу</h3><div class="bar-chart">';
+  ts2.forEach(([k,v])=>{const r=v.c>0?((v.r-v.c)/v.c*100).toFixed(0):0;html+='<div class="bar-row"><span class="name">'+k+'</span><div class="bar"><div class="bar-fill" style="width:'+(v.c/mt*100)+'%;background:var(--purple)">'+Math.round(v.c).toLocaleString('ru')+'</div></div><span class="val">'+r+'%</span></div>'});
+  html+='</div></div>';
+  // CPL by platform
+  html+='<div class="chart-card"><h3>CPL по платформам</h3><div class="bar-chart">';
+  ps.forEach(([k,v])=>{const p=PLATFORMS.find(x=>x.id===k),cpl2=v.l>0?(v.c/v.l):0;html+='<div class="bar-row"><span class="name">'+(p?p.icon:k)+'</span><div class="bar"><div class="bar-fill" style="width:'+Math.min(100,(cpl2/2000*100))+'%;background:'+(cpl2<=settings.targetCPL?'var(--green)':'var(--red)')+'">'+Math.round(cpl2).toLocaleString('ru')+'</div></div><span class="val">'+v.l+'л</span></div>'});
+  html+='</div></div></div>';
+  c.innerHTML=html
+}
+
+// ===== ENTRIES TABLE =====
+let sf='date',sd=-1,fs_='',fc='',fp_='';
+function renderEntries(c){
+  let html='<div class="controls"><button class="btn btn-primary" onclick="openForm()">+ Добавить</button><button class="btn btn-secondary" onclick="exportCSV()">CSV</button><button class="btn btn-secondary" onclick="importCSV()">Импорт</button><select onchange="fs_=this.value;renderLeads2()"><option value="">Все платформы</option>'+PLATFORMS.map(p=>'<option value="'+p.id+'">'+p.label+'</option>').join('')+'</select><select onchange="fc=this.value;renderLeads2()"><option value="">Все города</option>'+CITIES.filter(x=>x).map(c2=>'<option value="'+c2+'">'+c2+'</option>').join('')+'</select></div>';
+  let filtered=entries.filter(e=>{if(fs_&&e.platform!==fs_)return false;if(fc&&e.city!==fc)return false;return true});
+  filtered.sort((a,b)=>{let va=a[sf]||'',vb=b[sf]||'';if(sf==='date'||sf==='cost'||sf==='revenue'){va=a[sf]||0;vb=b[sf]||0}return va<vb?-1*sd:va>vb?1*sd:0});
+  html+='<div class="table-wrap"><table><thead><tr><th onclick="sortBy2(\'campaign\')">Кампания</th><th onclick="sortBy2(\'platform\')">Платформа</th><th onclick="sortBy2(\'city\')">Город</th><th onclick="sortBy2(\'date\')">Дата</th><th onclick="sortBy2(\'type\')">Тип</th><th onclick="sortBy2(\'cost\')">Расход</th><th>CPC</th><th>CPL</th><th>Лиды</th><th>Продажи</th><th>Доход</th><th>ROMI</th><th></th></tr></thead><tbody>';
+  if(!filtered.length)html+='<tr><td colspan="13"><div class="empty">Нет записей</div></td></tr>';
+  else filtered.forEach(e=>{
+    const p=PLATFORMS.find(x=>x.id===e.platform);
+    html+='<tr><td style="font-weight:500">'+e.campaign+'</td><td>'+(p?p.icon+' '+p.label:e.platform)+'</td><td>'+(e.city||'-')+'</td><td>'+e.date+'</td><td>'+(e.type||'-')+'</td><td>'+Math.round(e.cost).toLocaleString('ru')+'</td><td>'+(e.cpc?Math.round(e.cpc).toLocaleString('ru'):'-')+'</td><td>'+(e.cpl?Math.round(e.cpl).toLocaleString('ru'):'-')+'</td><td>'+(e.leads||0)+'</td><td>'+(e.sales||0)+'</td><td>'+(e.revenue?Math.round(e.revenue).toLocaleString('ru'):'-')+'</td><td style="color:'+(e.romi>=0?'var(--green)':'var(--red)')+'">'+e.romi.toFixed(0)+'%</td><td><button class="btn btn-secondary btn-sm" onclick="openForm(\''+e.id+'\')">E</button> <button class="btn-danger btn-sm" onclick="deleteEntry(\''+e.id+'\')">D</button></td></tr>'
+  });
+  html+='</tbody></table></div>';
+  c.innerHTML=html
+}
+// fix: override the filter handlers  
+function renderLeads2(){renderEntries(document.getElementById('tabContent'))}
+function sortBy2(f){if(sf===f)sd*=-1;else{sf=f;sd=-1}renderEntries(document.getElementById('tabContent'))}
+
+function importCSV(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.csv,.tsv,.txt';
+  inp.onchange=async e=>{
+    const text=await e.target.files[0].text(),lines=text.split('\n').filter(l=>l.trim());
+    if(lines.length<2){alert('Файл пуст');return}
+    const se=lines[0].split(';').length>3?';':lines[0].split(',').length>3?',':'\t';
+    const h=lines[0].split(se).map(x=>x.trim().toLowerCase());const idx={};
+    ['кампания','название','campaign','платформа','platform','город','city','дата','date','расход','cost','показы','impressions','клики','clicks','лиды','leads','продажи','sales','доход','revenue','комментарий','comment','настройки','settings','тип','type'].forEach(k=>{const i=h.findIndex(x=>x.includes(k[0]));if(i>=0)idx[k]=i});
+    let added=0;
+    for(let i=1;i<lines.length;i++){
+      const cols=lines[i].split(se).map(x=>x.trim().replace(/^["']|["']$/g,''));
+      const campaign=cols[idx['кампания']!==undefined?idx['кампания']:idx['название']!==undefined?idx['название']:idx['campaign']!==undefined?idx['campaign']:-1]||'';
+      const cost=parseFloat((cols[idx['расход']!==undefined?idx['расход']:idx['cost']!==undefined?idx['cost']:-1]||'0').replace(/[^\d.,]/g,'').replace(',','.'))||0;
+      if(!campaign&&!cost)continue;
+      const pIdx=idx['платформа']!==undefined?idx['платформа']:idx['platform']!==undefined?idx['platform']:-1;
+      const platform=PLATFORMS.find(x=>x.label.includes(cols[pIdx])||cols[pIdx].includes(x.label));
+      entries.push({
+        id:genId(),campaign,city:cols[idx['город']!==undefined?idx['город']:-1]||'',date:cols[idx['дата']!==undefined?idx['дата']:-1]||getToday(),
+        platform:platform?platform.id:'other',type:cols[idx['тип']!==undefined?idx['тип']:-1]||'',
+        settings:cols[idx['настройки']!==undefined?idx['настройки']:-1]||'',
+        cost,impressions:parseInt(cols[idx['показы']!==undefined?idx['показы']:-1])||0,clicks:parseInt(cols[idx['клики']!==undefined?idx['клики']:-1])||0,
+        leads:parseInt(cols[idx['лиды']!==undefined?idx['лиды']:-1])||0,sales:parseInt(cols[idx['продажи']!==undefined?idx['продажи']:-1])||0,
+        revenue:parseFloat((cols[idx['доход']!==undefined?idx['доход']:-1]||'0').replace(/[^\d.,]/g,'').replace(',','.'))||0,
+        comment:cols[idx['комментарий']!==undefined?idx['комментарий']:-1]||'',
+        createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+      });added++
+    }
+    saveData();alert('Импортировано: '+added+' записей')
+  };inp.click()
+}
+function exportCSV(){
+  let csv='кампания;платформа;город;дата;тип;расход;показы;клики;лиды;продажи;доход;настройки;комментарий\n';
+  entries.forEach(e=>{const p=PLATFORMS.find(x=>x.id===e.platform);csv+=[e.campaign,p?p.label:e.platform,e.city,e.date,e.type||'',e.cost,e.impressions||0,e.clicks||0,e.leads||0,e.sales||0,e.revenue||0,(e.settings||'').replace(/;/g,','),(e.comment||'').replace(/;/g,',')].join(';')+'\n'});
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ads_export.csv';a.click();URL.revokeObjectURL(a.href)
+}
+
+function renderStrategies(c){
+  // Strategy recommendations based on data
+  let html='<div class="rec-block"><h3>Анализ стратегий</h3>';
+  if(entries.length<3){html+='<div class="empty">Добавьте 3+ кампании для анализа стратегий</div></div>';c.innerHTML=html;return}
+  
+  // Best platform
+  const pm={};entries.forEach(e=>{const k=e.platform;if(!pm[k])pm[k]={c:0,s:0,l:0,r:0,n:0};pm[k].c+=e.cost;pm[k].s+=e.sales||0;pm[k].l+=e.leads||0;pm[k].r+=e.revenue||0;pm[k].n++});
+  const bestPlat=Object.entries(pm).sort((a,b)=>(b[1].s/b[1].c)-(a[1].s/a[1].c))[0];
+  const worstPlat=Object.entries(pm).sort((a,b)=>(a[1].s/a[1].c)-(b[1].s/b[1].c))[0];
+  const bestCity={};entries.forEach(e=>{const k=e.city||'Без города';if(!bestCity[k])bestCity[k]={c:0,s:0};bestCity[k].c+=e.cost;bestCity[k].s+=e.sales||0});
+  const bc=Object.entries(bestCity).sort((a,b)=>(b[1].s/b[1].c)-(a[1].s/a[1].c))[0];
+  
+  const pBest=PLATFORMS.find(x=>x.id===(bestPlat?bestPlat[0]:''));
+  const pWorst=PLATFORMS.find(x=>x.id===(worstPlat?worstPlat[0]:''));
+  
+  html+='<div style="margin-bottom:8px;font-size:.78rem;color:var(--text2)">На основе '+entries.length+' кампаний</div>';
+  html+='<div class="rec-item"><span class="ri-icon">1</span><div class="ri-text"><strong>Лучшая платформа:</strong> '+(pBest?pBest.icon+' '+pBest.label:bestPlat?bestPlat[0]:'')+' — эффективность '+(bestPlat?(bestPlat[1].s/bestPlat[1].c*100).toFixed(1):'')+'% (продажи/расход)</div></div>';
+  html+='<div class="rec-item"><span class="ri-icon">2</span><div class="ri-text"><strong>Худшая:</strong> '+(pWorst?pWorst.icon+' '+pWorst.label:worstPlat?worstPlat[0]:'')+' — '+(worstPlat?(worstPlat[1].s/worstPlat[1].c*100).toFixed(1):'')+'%</div></div>';
+  html+='<div class="rec-item"><span class="ri-icon">3</span><div class="ri-text"><strong>Лучший город:</strong> '+(bc?bc[0]:'')+' — '+(bc?(bc[1].s/bc[1].c*100).toFixed(1):'')+'%</div></div>';
+  html+='</div>';
+
+  // Recommendations
+  const recs=[];
+  const totalROMI=entries.reduce((s,e)=>s+e.cost,0)>0?((entries.reduce((s,e)=>s+e.revenue,0)-entries.reduce((s,e)=>s+e.cost,0))/entries.reduce((s,e)=>s+e.cost,0)*100):0;
+  if(totalROMI<settings.targetROI)recs.push({icon:'',text:'Общий ROMI '+totalROMI.toFixed(0)+'% ниже цели '+settings.targetROI+'%. Пересмотрите бюджет на платформы с ROMI ниже 0%.'});
+  const avgCPL=entries.reduce((s,e)=>s+(e.leads||0),0)>0?entries.reduce((s,e)=>s+e.cost,0)/entries.reduce((s,e)=>s+(e.leads||0),0):0;
+  if(avgCPL>settings.targetCPL)recs.push({icon:'',text:'Средний CPL '+Math.round(avgCPL).toLocaleString('ru')+' выше целевого '+Math.round(settings.targetCPL).toLocaleString('ru')+'. Оптимизируйте ставки и аудитории.'});
+  // Low Clicks
+  const lowCTR=entries.filter(e=>e.impressions>100&&(e.clicks||0)/e.impressions<0.01);
+  if(lowCTR.length)recs.push({icon:'',text:''+lowCTR.length+' кампаний с CTR <1%. Проверьте креативы и ключевые слова: '+lowCTR.slice(0,2).map(e=>e.campaign).join(', ')});
+  // High cost no sales
+  const noSales=entries.filter(e=>e.cost>10000&&!e.sales);
+  if(noSales.length)recs.push({icon:'',text:''+noSales.length+' кампаний с расходом >10к без продаж: '+noSales.slice(0,2).map(e=>e.campaign).join(', ')+'. Рекомендуется остановить или изменить стратегию.'});
+  // Best strategy
+  const bestType={};entries.forEach(e=>{const k=e.type||'Без типа';if(!bestType[k])bestType[k]={c:0,s:0,r:0};bestType[k].c+=e.cost;bestType[k].s+=e.sales||0;bestType[k].r+=e.revenue||0});
+  const bt=Object.entries(bestType).filter(([k,v])=>v.s>0).sort((a,b)=>b[1].s/a[1].s-a[1].c/b[1].c)[0];
+  if(bt)recs.push({icon:'4',text:'Лучшая стратегия: тип "'+bt[0]+'" — '+bt[1].s+' продаж при расходе '+Math.round(bt[1].c).toLocaleString('ru')+'.' })
+
+  // Cost by type chart
+  html+='<div class="chart-card"><h3>Эффективность по типам</h3><div class="bar-chart">';
+  Object.entries(bestType).sort((a,b)=>b[1].c-a[1].c).forEach(([k,v])=>{if(!v.c)return;const eff=v.c>0?(v.s/v.c*100).toFixed(1):0;html+='<div class="bar-row"><span class="name">'+k+'</span><div class="bar"><div class="bar-fill" style="width:'+Math.min(100,eff*10)+'%;background:var(--blue)">'+eff+'%</div></div><span class="val">'+v.s+'п</span></div>'});
+  html+='</div></div>';
+
+  if(recs.length){
+    html+='<div class="rec-block"><h3>Рекомендации</h3>';
+    recs.forEach((r,i)=>{html+='<div class="rec-item"><span class="ri-icon">'+(i+1)+'</span><div class="ri-text">'+r.text+'</div></div>'});
+    html+='</div>';
+  }
+
+  // Strategy cards
+  html+='<h3 style="font-size:.85rem;font-weight:600;margin-bottom:6px;margin-top:14px">Тестированные стратегии</h3>';
+  const strats={};
+  entries.forEach(e=>{
+    const k=e.comment&&e.comment.length>20?e.comment.slice(0,80):'';
+    if(!k)return;
+    if(!strats[k])strats[k]={entries:[e]};
+    else strats[k].entries.push(e)
+  });
+  Object.entries(strats).slice(0,5).forEach(([k,v])=>{
+    const totalC=v.entries.reduce((s,e)=>s+e.cost,0),totalS=v.entries.reduce((s,e)=>s+(e.sales||0),0),totalR=v.entries.reduce((s,e)=>s+(e.revenue||0),0),romi2=totalC>0?((totalR-totalC)/totalC*100).toFixed(0):0;
+    html+='<div class="strategy-card"><h3>'+k.slice(0,60)+(k.length>60?'...':'')+'</h3><div class="sc-meta">'+v.entries.length+' запусков, расход '+Math.round(totalC).toLocaleString('ru')+', продаж '+totalS+', ROMI '+romi2+'%</div></div>'
+  });
+
+  c.innerHTML=html
+}
+
+function renderSettings(c){
+  c.innerHTML='<div class="settings-section"><h3>Целевые показатели</h3><div class="settings-grid">'+
+    '<div class="form-group"><label>Средний чек (руб)</label><input type="number" id="sAvgCheck" value="'+settings.avgCheck+'" onchange="settings.avgCheck=parseFloat(this.value)||50000;saveData()"></div>'+
+    '<div class="form-group"><label>Маржа (%)</label><input type="number" id="sMargin" value="'+settings.margin+'" onchange="settings.margin=parseFloat(this.value)||15;saveData()"></div>'+
+    '<div class="form-group"><label>Целевой ROMI (%)</label><input type="number" id="sTargetROI" value="'+settings.targetROI+'" onchange="settings.targetROI=parseFloat(this.value)||100;saveData()"></div>'+
+    '<div class="form-group"><label>Целевой CPL (руб)</label><input type="number" id="sTargetCPL" value="'+settings.targetCPL+'" onchange="settings.targetCPL=parseFloat(this.value)||1000;saveData()"></div>'+
+    '</div></div>'+
+    '<div class="settings-section"><h3>Данные</h3><div><p style="font-size:.78rem;color:var(--text2)">Записей: '+entries.length+'. </p><button class="btn btn-danger btn-sm" onclick="if(confirm(\'Удалить все данные?\')){entries=[];saveData()}">Очистить все данные</button></div></div>'
+}
+
+loadData();renderAll();
+</script>
+</body>
+</html>
