@@ -149,11 +149,11 @@ footer a{color:var(--accent);text-decoration:none}
 const PLATFORMS=[{id:'yadirect',label:'Я.Директ',icon:'🔍'},{id:'vktarget',label:'ВК таргет',icon:'💙'},{id:'telegram',label:'Telegram',icon:'✈️'},{id:'avito',label:'Авито',icon:'📦'},{id:'yandexmaps',label:'Я.Карты',icon:'🗺'},{id:'2gis',label:'2ГИС',icon:'📍'},{id:'yapro',label:'Я.Про',icon:'⭐'},{id:'promo',label:'ПромоСтраницы',icon:'📄'},{id:'other',label:'Другое',icon:'📌'}];
 const CITIES=['','Новосибирск','Томск','Тюмень','Челябинск','Кемерово','Прокопьевск','Барнаул','Омск','Красноярск','Москва'];
 const TYPES=['','Поиск','РСЯ','Поиск+РСЯ','Ретаргетинг','Медийная','Таргет','Geo','Квиз','Лендинг'];
-const SK='mkt_ads_data',SKS='mkt_ads_settings';
-let entries=[],settings={avgCheck:50000,margin:15,targetROI:100,targetCPL:1000},activeTab='dashboard';
+const SK='mkt_ads_data',SKS='mkt_ads_settings',SKC='mkt_ads_creatives';
+let entries=[],settings={avgCheck:50000,margin:15,targetROI:100,targetCPL:1000},activeTab='dashboard',creatives=[];
 
-function loadData(){try{const r=localStorage.getItem(SK);if(r)entries=JSON.parse(r);const s=localStorage.getItem(SKS);if(s)settings={...settings,...JSON.parse(s)}}catch(e){}if(!Array.isArray(entries))entries=[]}
-function saveData(){try{localStorage.setItem(SK,JSON.stringify(entries))}catch(e){}try{localStorage.setItem(SKS,JSON.stringify(settings))}catch(e){}renderAll()}
+function loadData(){try{const r=localStorage.getItem(SK);if(r)entries=JSON.parse(r);const s=localStorage.getItem(SKS);if(s)settings={...settings,...JSON.parse(s)};const k=localStorage.getItem(SKC);if(k)creatives=JSON.parse(k)}catch(e){}if(!Array.isArray(entries))entries=[];if(!Array.isArray(creatives))creatives=[]}
+function saveData(){try{localStorage.setItem(SK,JSON.stringify(entries))}catch(e){}try{localStorage.setItem(SKS,JSON.stringify(settings))}catch(e){}try{localStorage.setItem(SKC,JSON.stringify(creatives))}catch(e){}renderAll()}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
 function getToday(){return new Date().toISOString().slice(0,10)}
 
@@ -221,11 +221,11 @@ function renderAll(){
   else if(total<3)c.innerHTML='<div class="coach-msg"><span class="cm-icon">🚀</span><div>Добавьте ещё кампаний для сравнительной аналитики.</div></div>';
   else c.style.display='none';
   const tc=document.getElementById('tabs');
-  tc.innerHTML=[{id:'dashboard',icon:'',label:'Дашборд'},{id:'entries',icon:'',label:'Кампании',badge:total},{id:'add',icon:'',label:'Добавить'},{id:'strategies',icon:'',label:'Стратегии'},{id:'settings',icon:'',label:'Настройки'}].map(t=>'<button class="tab'+(activeTab===t.id?' active':'')+'" onclick="switchTab(\''+t.id+'\')">'+t.label+(t.badge?' <span class="badge">'+t.badge+'</span>':'')+'</button>').join('');
+  tc.innerHTML=[{id:'dashboard',icon:'',label:'Дашборд'},{id:'entries',icon:'',label:'Кампании',badge:total},{id:'creatives',icon:'',label:'Креативы',badge:creatives.length},{id:'add',icon:'',label:'Добавить'},{id:'strategies',icon:'',label:'Стратегии'},{id:'settings',icon:'',label:'Настройки'}].map(t=>'<button class="tab'+(activeTab===t.id?' active':'')+'" onclick="switchTab(\''+t.id+'\')">'+t.label+(t.badge?' <span class="badge">'+t.badge+'</span>':'')+'</button>').join('');
   renderActiveTab()
 }
 function switchTab(t){activeTab=t;renderAll()}
-function renderActiveTab(){const c=document.getElementById('tabContent');if(activeTab==='dashboard')renderDashboard(c);else if(activeTab==='entries')renderEntries(c);else if(activeTab==='add'){c.innerHTML='';openForm()}else if(activeTab==='strategies')renderStrategies(c);else if(activeTab==='settings')renderSettings(c)}
+function renderActiveTab(){const c=document.getElementById('tabContent');if(activeTab==='dashboard')renderDashboard(c);else if(activeTab==='entries')renderEntries(c);else if(activeTab==='creatives')renderCreatives(c);else if(activeTab==='add'){c.innerHTML='';openForm()}else if(activeTab==='strategies')renderStrategies(c);else if(activeTab==='settings')renderSettings(c)}
 
 function renderDashboard(c){
   if(!entries.length){c.innerHTML='<div class="empty">Нет данных. Добавьте кампании.</div>';return}
@@ -395,6 +395,63 @@ function renderSettings(c){
     '<div class="form-group"><label>Целевой CPL (руб)</label><input type="number" id="sTargetCPL" value="'+settings.targetCPL+'" onchange="settings.targetCPL=parseFloat(this.value)||1000;saveData()"></div>'+
     '</div></div>'+
     '<div class="settings-section"><h3>Данные</h3><div><p style="font-size:.78rem;color:var(--text2)">Записей: '+entries.length+'. </p><button class="btn btn-danger btn-sm" onclick="if(confirm(\'Удалить все данные?\')){entries=[];saveData()}">Очистить все данные</button></div></div>'
+}
+
+// === CREATIVES ===
+function renderCreatives(c){
+  let html='<div class="controls"><button class="btn btn-primary" onclick="openCreativeForm()">+ Креатив</button><button class="btn btn-secondary" onclick="exportCreativesCSV()">CSV</button><select onchange="cfp=this.value;renderC()"><option value="">Все платформы</option>'+PLATFORMS.map(p=>'<option value="'+p.id+'">'+p.label+'</option>').join('')+'</select><select onchange="cfs=this.value;renderC()"><option value="">Все статусы</option><option value="active">Активен</option><option value="paused">Пауза</option><option value="stopped">Остановлен</option></select></div>';
+  let f=creatives.filter(e=>{if(cfp&&e.platform!==cfp)return false;if(cfs&&e.status!==cfs)return false;return true});
+  if(!f.length){html+='<div class="empty">Нет креативов. Добавьте первый!</div>';c.innerHTML=html;return}
+  html+='<div class="table-wrap"><table><thead><tr><th>Название</th><th>Платформа</th><th>Кампания</th><th>Заголовок</th><th>Текст</th><th>Тип</th><th>Статус</th><th>Показы</th><th>CTR</th><th></th></tr></thead><tbody>';
+  f.forEach(e=>{
+    const p=PLATFORMS.find(x=>x.id===e.platform);
+    const ctr2=e.impressions>0?((e.clicks||0)/e.impressions*100).toFixed(2):0;
+    html+='<tr><td style="font-weight:500">'+e.name+'</td><td>'+(p?p.icon+' '+p.label:e.platform)+'</td><td>'+(e.campaign||'-')+'</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+e.headline+'">'+(e.headline||'-')+'</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+e.body+'">'+(e.body||'-')+'</td><td>'+(e.creativeType||e.format||'Текст')+'</td><td>'+statusBadge(e.status)+'</td><td>'+(e.impressions||0)+'</td><td>'+ctr2+'%</td><td><button class="btn btn-secondary btn-sm" onclick="openCreativeForm(\''+e.id+'\')">E</button> <button class="btn-danger btn-sm" onclick="deleteCreative(\''+e.id+'\')">D</button></td></tr>'
+  });
+  html+='</tbody></table></div>';
+  c.innerHTML=html
+}
+function statusBadge(s){if(s==='active')return '<span style="color:var(--green);font-weight:500">Активен</span>';if(s==='paused')return '<span style="color:var(--yellow);font-weight:500">Пауза</span>';return '<span style="color:var(--red);font-weight:500">'+s+'</span>'}
+let cfp='',cfs='';
+function renderC(){renderCreatives(document.getElementById('tabContent'))}
+function deleteCreative(id){if(!confirm('Удалить креатив?'))return;creatives=creatives.filter(x=>x.id!==id);saveData()}
+
+function openCreativeForm(id){
+  const ov=document.createElement('div');ov.className='form-overlay';ov.id='cfOverlay';
+  let html='<div class="form-modal"><h2>'+(id?'Редактировать креатив':'Новый креатив')+'</h2><form onsubmit="return false">';
+  html+='<input type="hidden" id="cfId" value="'+(id||'')+'">';
+  const e=id?creatives.find(x=>x.id===id):null;
+  html+='<div class="form-group"><label>Название креатива</label><input type="text" id="cfName" value="'+(e?e.name:'')+'" placeholder="Баннер_Томск_Июнь" required></div>';
+  html+='<div class="form-row"><div class="form-group"><label>Платформа</label><select id="cfPlatform">'+PLATFORMS.map(p=>'<option value="'+p.id+'"'+(e&&e.platform===p.id?' selected':'')+'>'+p.icon+' '+p.label+'</option>').join('')+'</select></div>';
+  const allCampaigns=[...new Set(entries.filter(ee=>!id||ee.campaign!==(e||{}).campaign).map(ee=>ee.campaign))];
+  html+='<div class="form-group"><label>Кампания</label><input type="text" id="cfCampaign" list="campList" value="'+(e?e.campaign||'':'')+'" placeholder="Выберите или введите"><datalist id="campList">'+allCampaigns.map(c2=>'<option value="'+c2+'">').join('')+'</datalist></div></div>';
+  html+='<div class="form-row"><div class="form-group"><label>Статус</label><select id="cfStatus"><option value="active"'+(e&&e.status==='active'?' selected':'')+'>Активен</option><option value="paused"'+(e&&e.status==='paused'?' selected':'')+'>Пауза</option><option value="stopped"'+(e&&e.status==='stopped'?' selected':'')+'>Остановлен</option></select></div>';
+  html+='<div class="form-group"><label>Тип креатива</label><select id="cfType"><option value="Текст"'+(e&&e.creativeType==='Текст'?' selected':'')+'>Текст</option><option value="Текст+Картинка"'+(e&&e.creativeType==='Текст+Картинка'?' selected':'')+'>Текст+Картинка</option><option value="Видео"'+(e&&e.creativeType==='Видео'?' selected':'')+'>Видео</option><option value="Карусель"'+(e&&e.creativeType==='Карусель'?' selected':'')+'>Карусель</option><option value="Квиз"'+(e&&e.creativeType==='Квиз'?' selected':'')+'>Квиз</option></select></div></div>';
+  html+='<div class="form-group"><label>Заголовок (до 56 зн.)</label><input type="text" id="cfHeadline" maxlength="56" value="'+(e?e.headline||'':'')+'" placeholder="Горящие туры в Турцию — скидка до 30%"></div>';
+  html+='<div class="form-group"><label>Текст объявления</label><textarea id="cfBody" rows="2" maxlength="90" placeholder="Только до конца месяца...">'+(e?e.body||'':'')+'</textarea></div>';
+  html+='<div class="form-group"><label>Ссылка / UTM-метка</label><input type="text" id="cfUrl" value="'+(e?e.url||'':'')+'" placeholder="https://moihottur.ru/?utm_source=..."></div>';
+  html+='<div class="form-row"><div class="form-group"><label>Медиа (URL картинки/видео)</label><input type="text" id="cfMedia" value="'+(e?e.media||'':'')+'" placeholder="https://..."></div>';
+  html+='<div class="form-group"><label>Формат</label><select id="cfFormat"><option value="Текстовый"'+(e&&e.format==='Текстовый'?' selected':'')+'>Текстовый</option><option value="Графический"'+(e&&e.format==='Графический'?' selected':'')+'>Графический</option><option value="Видео"'+(e&&e.format==='Видео'?' selected':'')+'>Видео</option></select></div></div>';
+  html+='<div class="form-group"><label>Аудитория / настройки таргетинга</label><textarea id="cfTargeting" rows="2" placeholder="Пол: муж/жен, возраст: 25-45, интересы: туризм, гео: Новосибирск">'+(e?e.targeting||'':'')+'</textarea></div>';
+  html+='<div class="form-row"><div class="form-group"><label>Показы</label><input type="number" id="cfImpressions" value="'+(e?e.impressions||0:0)+'"></div><div class="form-group"><label>Клики</label><input type="number" id="cfClicks" value="'+(e?e.clicks||0:0)+'"></div></div>';
+  html+='<div class="form-row"><div class="form-group"><label>А/Б тест (группа)</label><input type="text" id="cfAB" value="'+(e?e.abTest||'':'')+'" placeholder="A / B / C"></div>';
+  html+='<div class="form-group"><label>Бюджет на креатив</label><input type="number" id="cfBudget" value="'+(e?e.budget||0:0)+'"></div></div>';
+  html+='<div class="form-group"><label>Комментарий / результаты</label><textarea id="cfComment" rows="2" placeholder="Что тестировали, какой результат, гипотезы...">'+(e?e.comment||'':'')+'</textarea></div>';
+  html+='<div class="form-actions"><button type="button" class="btn-secondary" onclick="document.getElementById(\'cfOverlay\').remove()">Отмена</button><button type="button" class="btn-primary" onclick="saveCreative()">Сохранить</button></div></form></div>';
+  ov.innerHTML=html;document.body.appendChild(ov);setTimeout(()=>ov.classList.add('open'),10)
+}
+function saveCreative(){
+  const id=document.getElementById('cfId').value;
+  const data={name:document.getElementById('cfName').value.trim(),platform:document.getElementById('cfPlatform').value,campaign:document.getElementById('cfCampaign').value.trim(),status:document.getElementById('cfStatus').value,creativeType:document.getElementById('cfType').value,headline:document.getElementById('cfHeadline').value.trim(),body:document.getElementById('cfBody').value.trim(),url:document.getElementById('cfUrl').value.trim(),media:document.getElementById('cfMedia').value.trim(),format:document.getElementById('cfFormat').value,targeting:document.getElementById('cfTargeting').value.trim(),impressions:parseInt(document.getElementById('cfImpressions').value)||0,clicks:parseInt(document.getElementById('cfClicks').value)||0,abTest:document.getElementById('cfAB').value.trim(),budget:parseFloat(document.getElementById('cfBudget').value)||0,comment:document.getElementById('cfComment').value.trim()};
+  if(!data.name){alert('Название обязательно');return}
+  if(id){const idx=creatives.findIndex(x=>x.id===id);if(idx>=0)creatives[idx]={...creatives[idx],...data,updatedAt:new Date().toISOString()}
+  }else{data.id=genId();data.createdAt=new Date().toISOString();data.updatedAt=data.createdAt;creatives.push(data)}
+  document.getElementById('cfOverlay').remove();saveData()
+}
+function exportCreativesCSV(){
+  let csv='name;platform;campaign;status;type;headline;body;url;format;impressions;clicks;abTest;budget;comment\n';
+  creatives.forEach(e=>{const p=PLATFORMS.find(x=>x.id===e.platform);csv+=[e.name,p?p.label:e.platform,e.campaign,e.status,e.creativeType,(e.headline||'').replace(/;/g,','),(e.body||'').replace(/;/g,','),e.url,e.format,e.impressions||0,e.clicks||0,e.abTest||'',e.budget||0,(e.comment||'').replace(/;/g,',')].join(';')+'\n'});
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='creatives_export.csv';a.click();URL.revokeObjectURL(a.href)
 }
 
 loadData();renderAll();
