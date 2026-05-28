@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Менеджер лидов — бесплатная CRM для учёта заявок | mktools</title>
+<meta name="description" content="Учёт и анализ лидов: воронка продаж, конверсия по менеджерам и источникам, дубликаты, ROMI, очередь обзвона. Бесплатно, всё в браузере.">
+<meta property="og:title" content="Менеджер лидов — бесплатная CRM для учёта заявок | mktools">
+<meta property="og:description" content="Учёт и анализ лидов: воронка, конверсия по менеджерам, дубликаты, ROMI, очередь обзвона. Бесплатно.">
+<meta property="og:url" content="https://mktgtools.ru/lead-analyzer/">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://mktgtools.ru/lead-analyzer/">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--red:#ef4444;--green:#10b981;--yellow:#f59e0b;--blue:#3b82f6;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+header .container{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.logo{font-weight:800;font-size:1.1rem;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+.nav{display:flex;gap:12px;align-items:center}
+.nav a{color:var(--text2);text-decoration:none;font-size:.85rem;transition:color .12s}
+.nav a:hover{color:var(--accent)}
+h1{font-size:1.3rem;font-weight:800;margin-bottom:4px}
+.hero{padding:24px 0 12px;text-align:center}
+.hero p{color:var(--text2);font-size:.85rem;max-width:550px;margin:0 auto}
+.breadcrumbs{font-size:.8rem;color:var(--text2);margin-bottom:6px}.breadcrumbs a{color:var(--text2);text-decoration:none}.breadcrumbs a:hover{color:var(--accent)}.breadcrumbs span{margin:0 3px}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin-bottom:16px;overflow-x:auto;flex-wrap:wrap}
+.tab{padding:7px 14px;border:none;border-radius:6px;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .12s;background:transparent;color:var(--text2);font-family:var(--font);white-space:nowrap}
+.tab:hover{background:#f3f4f6}
+.tab.active{background:var(--accent);color:#fff}
+.tab .badge{display:inline-block;padding:0 6px;border-radius:10px;background:var(--border);color:var(--text2);font-size:.65rem;margin-left:4px;font-weight:600}
+.tab.active .badge{background:rgba(255,255,255,.25);color:#fff}
+
+/* Dashboard */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.stat-card .num{font-size:1.5rem;font-weight:800}
+.stat-card .label{font-size:.72rem;color:var(--text2);margin-top:2px}
+.stat-card .sub{font-size:.68rem;color:var(--text2);margin-top:1px}
+
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px}
+.chart-card h3{font-size:.85rem;font-weight:600;margin-bottom:8px}
+.chart-card .legend{display:flex;flex-wrap:wrap;gap:3px 10px;margin-bottom:6px;font-size:.72rem;color:var(--text2)}
+.bar-chart{display:flex;flex-direction:column;gap:3px}
+.bar-row{display:flex;align-items:center;gap:6px;font-size:.72rem}
+.bar-row .name{width:80px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.bar-row .bar{flex:1;height:16px;background:#f3f4f6;border-radius:4px;overflow:hidden;position:relative}
+.bar-row .bar-fill{height:100%;border-radius:4px;transition:width .3s;display:flex;align-items:center;padding-left:4px;font-size:.6rem;color:#fff;font-weight:600;overflow:hidden}
+.bar-row .val{width:30px;font-weight:600;text-align:right;flex-shrink:0}
+
+/* Funnel */
+.funnel{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:8px}
+.funnel-step{width:100%;text-align:center;padding:6px 10px;font-size:.75rem;font-weight:600;border-radius:4px;position:relative;transition:all .2s}
+.funnel-step .fn-num{font-size:1rem;display:block}
+
+/* Table */
+.controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.controls input,.controls select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;font-family:var(--font);background:var(--surface);outline:none}
+.controls input:focus,.controls select:focus{border-color:var(--accent)}
+.controls .btn{padding:6px 14px;border:none;border-radius:var(--radius-sm);font-size:.78rem;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .12s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text)}.btn-secondary:hover{background:#e5e7eb}
+.btn-sm{padding:3px 8px;font-size:.7rem}
+
+/* Add lead form */
+.form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;align-items:center;justify-content:center;padding:20px}
+.form-overlay.open{display:flex}
+.form-modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.form-modal h2{font-size:1rem;font-weight:700;margin-bottom:12px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-size:.78rem;font-weight:500;color:var(--text2);margin-bottom:3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;font-family:var(--font);outline:none;transition:border .12s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:50px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+
+/* Table */
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{text-align:left;padding:8px 10px;background:#f9fafb;border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--text)}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover{background:#f9fafb}
+tr.done{opacity:.6}
+.status{display:inline-block;padding:1px 8px;border-radius:100px;font-size:.7rem;font-weight:500;white-space:nowrap}
+.status.new{background:#eff6ff;color:#2563eb}
+.status.qual{background:#ecfdf5;color:#059669}
+.status.work{background:#fffbeb;color:#d97706}
+.status.sold{background:#ecfdf5;color:#059669}
+.status.reject{background:#fef2f2;color:#dc2626}
+.status.ignore{background:#f3f4f6;color:#6b7280}
+.status.duplicate{background:#fdf2f8;color:#be185d}
+.status.wait{background:#fef9c3;color:#854d0e}
+.tag-city{display:inline-block;padding:1px 6px;border-radius:3px;font-size:.65rem;background:#f3f4f6;color:var(--text2)}
+.tag-source{display:inline-block;padding:1px 6px;border-radius:3px;font-size:.65rem;font-weight:500}
+.action-btn{cursor:pointer;padding:2px 5px;border:none;background:none;font-size:.75rem;border-radius:3px;transition:all .12s;color:var(--text2)}
+.action-btn:hover{background:#f3f4f6;color:var(--text)}
+.action-btn.edit:hover{color:var(--accent)}
+.action-btn.del:hover{color:var(--red)}
+.empty{text-align:center;padding:40px;color:var(--text2);font-size:.85rem}
+.dup-warn{color:var(--red);font-size:.65rem;font-weight:500}
+
+/* Call queue */
+.call-item{display:flex;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:6px;align-items:center;transition:all .12s}
+.call-item:hover{border-color:var(--accent)}
+.call-item.overdue{border-left:3px solid var(--red)}
+.call-item.today{border-left:3px solid var(--yellow)}
+.call-item .ci-info{flex:1;min-width:0}
+.call-item .ci-name{font-size:.85rem;font-weight:600}
+.call-item .ci-detail{font-size:.72rem;color:var(--text2);margin-top:1px}
+.call-item .ci-actions{display:flex;gap:4px;flex-shrink:0}
+.call-again{margin-top:4px;font-size:.72rem;color:var(--accent);cursor:pointer;text-decoration:underline dashed}
+
+/* Duplicates */
+.dup-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px}
+.dup-group h4{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.dup-row{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:.75rem;border-bottom:1px solid var(--border)}
+.dup-row:last-child{border-bottom:none}
+.dup-row .dr-phone{font-weight:600;min-width:100px}
+.merge-btn{padding:2px 8px;border:none;border-radius:3px;font-size:.65rem;cursor:pointer;background:var(--accent);color:#fff}
+
+/* Report */
+.report-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;font-size:.78rem;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;margin-bottom:8px}
+.copied-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:8px;font-size:.82rem;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+.copied-toast.show{opacity:1}
+
+footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;color:var(--text2);font-size:.78rem;margin-top:24px}
+footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:700px){
+  .charts-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .controls{flex-direction:column;align-items:stretch}
+  .bar-row .name{width:60px;font-size:.65rem}
+}
+
+/* Yandex Metrika */
+</style>
+</head>
+<body>
+<header><div class="container">
+<a href="/" class="logo"><span>mk</span>tools</a>
+<div class="nav">
+  <a href="/">Инструменты</a>
+  <a href="/lead-analyzer/">Менеджер лидов</a>
+</div>
+</div></header>
+
+<section class="hero"><div class="container">
+<div class="breadcrumbs"><a href="/">Главная</a><span>/</span>Менеджер лидов</div>
+<h1>📋 Менеджер лидов</h1>
+<p>Учёт заявок, воронка продаж, конверсия по менеджерам и источникам, дубликаты, ROMI, очередь обзвона. Все данные в браузере.</p>
+</div></section>
+
+<div class="container">
+
+<div class="tabs" id="tabs"></div>
+<div id="tabContent"></div>
+
+</div>
+
+<footer><div class="container">
+<a href="/">mktools</a> · <a href="/lead-analyzer/">Менеджер лидов</a> · бесплатно, данные не уходят с устройства
+</div></footer>
+
+<div class="copied-toast" id="toast"></div>
+
+<!-- Form modal -->
+<div class="form-overlay" id="formOverlay">
+<div class="form-modal">
+<h2 id="formTitle">Добавить лид</h2>
+<form id="leadForm" onsubmit="return false">
+<input type="hidden" id="editId">
+<div class="form-group">
+<label>Дата</label>
+<input type="date" id="fDate" required>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Город</label>
+<select id="fCity"></select>
+</div>
+<div class="form-group">
+<label>Источник</label>
+<select id="fSource"></select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Телефон</label>
+<input type="text" id="fPhone" placeholder="+7 ___ ___ __ __" required>
+</div>
+<div class="form-group">
+<label>Имя (если есть)</label>
+<input type="text" id="fName" placeholder="Иван">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Менеджер</label>
+<select id="fManager"></select>
+</div>
+<div class="form-group">
+<label>Статус</label>
+<select id="fStatus"></select>
+</div>
+</div>
+<div class="form-group">
+<label>Доход (если продажа)</label>
+<input type="number" id="fRevenue" placeholder="0" step="0.01">
+</div>
+<div class="form-group">
+<label>Комментарий</label>
+<textarea id="fComment" placeholder="История касаний, подборки, причина отказа..."></textarea>
+</div>
+<div class="form-actions">
+<button type="button" class="btn-secondary" onclick="closeForm()">Отмена</button>
+<button type="button" class="btn-primary" onclick="saveLead()">Сохранить</button>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=a,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109294994','ym');ym(109294994,'init',{ssr:true,webvisor:true,clickmap:true,accurateTrackBounce:true,trackLinks:true});
+</script>
+
+<script>
+// ===== CONFIG =====
+const STATUSES = [
+  {id:'new',label:'Новый',cls:'new'},
+  {id:'qual',label:'Квалифицирован',cls:'qual'},
+  {id:'work',label:'В работе',cls:'work'},
+  {id:'wait',label:'Ожидание',cls:'wait'},
+  {id:'sold',label:'Продажа',cls:'sold'},
+  {id:'reject',label:'Отказ',cls:'reject'},
+  {id:'ignore',label:'Игнор',cls:'ignore'},
+  {id:'duplicate',label:'Дубликат',cls:'duplicate'},
+];
+const CITIES = ['','Новосибирск','Томск','Тюмень','Челябинск','Кемерово','Прокопьевск','Барнаул','Омск','Красноярск','Москва','Другой'];
+const SOURCES = ['','Яндекс.Директ','Яндекс.РСЯ','Яндекс.ПромоСтраницы','Яндекс.Карты','2ГИС','Telegram','Авито','Марквиз','Квиз','Коллтрекинг','Органика','Повторный','Партнёр'];
+const MANAGERS = ['','Кирил','Анна','Анастасия','Стрижова','Антоненко','Новикова','Марина','Другой'];
+
+const SK = 'mkt_leads_data';
+
+// ===== STATE =====
+let leads = [];
+let activeTab = 'dashboard';
+
+// ===== INIT =====
+function loadData() {
+  try {
+    const raw = localStorage.getItem(SK);
+    if (raw) leads = JSON.parse(raw);
+  } catch(e) {}
+  if (!Array.isArray(leads)) leads = [];
+}
+function saveData() {
+  try { localStorage.setItem(SK, JSON.stringify(leads)); } catch(e) {}
+  renderAll();
+}
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+// ===== FORM HELPERS =====
+function fillSelect(id, items, val) {
+  const s = document.getElementById(id); s.innerHTML = '';
+  items.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; s.appendChild(o); });
+  if (val !== undefined) s.value = val;
+}
+function getToday() { return new Date().toISOString().slice(0,10); }
+
+function openForm(leadId) {
+  const ov = document.getElementById('formOverlay');
+  if (leadId) {
+    const l = leads.find(x => x.id === leadId);
+    if (!l) return;
+    document.getElementById('formTitle').textContent = '✏️ Редактировать лид';
+    document.getElementById('editId').value = l.id;
+    document.getElementById('fDate').value = l.date;
+    document.getElementById('fCity').value = l.city || '';
+    document.getElementById('fSource').value = l.source || '';
+    document.getElementById('fPhone').value = l.phone || '';
+    document.getElementById('fName').value = l.name || '';
+    document.getElementById('fManager').value = l.manager || '';
+    document.getElementById('fStatus').value = l.status || 'new';
+    document.getElementById('fRevenue').value = l.revenue || '';
+    document.getElementById('fComment').value = l.comment || '';
+  } else {
+    document.getElementById('formTitle').textContent = '➕ Добавить лид';
+    document.getElementById('editId').value = '';
+    document.getElementById('fDate').value = getToday();
+    document.getElementById('fCity').value = '';
+    document.getElementById('fSource').value = '';
+    document.getElementById('fPhone').value = '';
+    document.getElementById('fName').value = '';
+    document.getElementById('fManager').value = '';
+    document.getElementById('fStatus').value = 'new';
+    document.getElementById('fRevenue').value = '';
+    document.getElementById('fComment').value = '';
+  }
+  ov.classList.add('open');
+}
+function closeForm() { document.getElementById('formOverlay').classList.remove('open'); }
+
+function saveLead() {
+  const id = document.getElementById('editId').value;
+  const data = {
+    date: document.getElementById('fDate').value || getToday(),
+    city: document.getElementById('fCity').value,
+    source: document.getElementById('fSource').value,
+    phone: document.getElementById('fPhone').value.trim(),
+    name: document.getElementById('fName').value.trim(),
+    manager: document.getElementById('fManager').value,
+    status: document.getElementById('fStatus').value,
+    revenue: parseFloat(document.getElementById('fRevenue').value) || 0,
+    comment: document.getElementById('fComment').value.trim()
+  };
+  if (!data.phone) { alert('Телефон обязателен'); return; }
+
+  if (id) {
+    const idx = leads.findIndex(x => x.id === id);
+    if (idx >= 0) { leads[idx] = { ...leads[idx], ...data, updatedAt: new Date().toISOString() }; }
+  } else {
+    data.id = genId();
+    data.createdAt = new Date().toISOString();
+    data.updatedAt = data.createdAt;
+    // Check duplicates
+    const dup = leads.find(l => l.phone === data.phone && l.status !== 'duplicate');
+    if (dup) {
+      if (!confirm('⚠️ Найден дубликат номера: ' + dup.phone + ' (' + dup.name + ', ' + dup.date + ').\n\nДобавить как новый лид?')) return;
+    }
+    leads.push(data);
+  }
+  closeForm();
+  saveData();
+}
+
+function deleteLead(id) {
+  if (!confirm('Удалить лид?')) return;
+  leads = leads.filter(x => x.id !== id);
+  saveData();
+}
+
+function setStatus(id, st) {
+  const l = leads.find(x => x.id === id);
+  if (l) { l.status = st; l.updatedAt = new Date().toISOString(); saveData(); }
+}
+
+// ===== RENDER =====
+function renderAll() {
+  renderTabs();
+  renderActiveTab();
+}
+
+function renderTabs() {
+  const totalLeads = leads.length;
+  const callQueue = leads.filter(l => ['new','qual','work','wait'].includes(l.status)).length;
+  const dups = findDuplicates().length;
+  const tc = document.getElementById('tabs');
+  tc.innerHTML = [
+    {id:'dashboard',icon:'📊',label:'Дашборд',badge:''},
+    {id:'leads',icon:'📋',label:'Лиды',badge:totalLeads},
+    {id:'add',icon:'➕',label:'Добавить',badge:''},
+    {id:'call',icon:'📞',label:'Обзвон',badge:callQueue},
+    {id:'duplicates',icon:'🔁',label:'Дубликаты',badge:dups},
+    {id:'report',icon:'📄',label:'Отчёт',badge:''},
+  ].map(t => `<button class="tab${activeTab===t.id?' active':''}" onclick="switchTab('${t.id}')">${t.icon} ${t.label}${t.badge ? ' <span class="badge">' + t.badge + '</span>' : ''}</button>`).join('');
+}
+
+function switchTab(t) { activeTab = t; renderAll(); }
+
+function renderActiveTab() {
+  const c = document.getElementById('tabContent');
+  if (activeTab === 'dashboard') renderDashboard(c);
+  else if (activeTab === 'leads') renderLeads(c);
+  else if (activeTab === 'add') { c.innerHTML = ''; openForm(); }
+  else if (activeTab === 'call') renderCallQueue(c);
+  else if (activeTab === 'duplicates') renderDuplicates(c);
+  else if (activeTab === 'report') renderReport(c);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(c) {
+  const total = leads.length;
+  const sold = leads.filter(l => l.status === 'sold').length;
+  const inWork = leads.filter(l => ['qual','work','wait'].includes(l.status)).length;
+  const rejected = leads.filter(l => ['reject','ignore'].includes(l.status)).length;
+  const dups = findDuplicates().length;
+  const qualLeads = leads.filter(l => ['qual','work','wait','sold'].includes(l.status)).length;
+  const conversion = total > 0 ? (sold / total * 100).toFixed(1) : 0;
+  const conversionQual = qualLeads > 0 ? (sold / qualLeads * 100).toFixed(1) : 0;
+  const totalRevenue = leads.reduce((s,l) => s + (l.status==='sold'?l.revenue:0), 0);
+
+  // Stats
+  let html = `<div class="stats-grid">
+    <div class="stat-card"><div class="num">${total}</div><div class="label">Всего лидов</div></div>
+    <div class="stat-card"><div class="num">${inWork}</div><div class="label">В работе</div></div>
+    <div class="stat-card"><div class="num">${sold}</div><div class="label">Продаж</div></div>
+    <div class="stat-card"><div class="num">${rejected}</div><div class="label">Отказы</div></div>
+    <div class="stat-card"><div class="num">${conversion}%</div><div class="label">Конверсия в продажу</div></div>
+    <div class="stat-card"><div class="num">${conversionQual}%</div><div class="label">Конв. квал → продажа</div></div>
+    <div class="stat-card"><div class="num">${Math.round(totalRevenue).toLocaleString('ru')} ₽</div><div class="label">Доход</div></div>
+    <div class="stat-card"><div class="num">${dups}</div><div class="label">Дубликаты</div></div>
+  </div>`;
+
+  // Funnel
+  const funnelSteps = [
+    {label:'Всего лидов',n:total,color:'#3b82f6'},
+    {label:'Квалифицированы',n:qualLeads,color:'#8b5cf6'},
+    {label:'В работе / Ожидание',n:inWork,color:'#f59e0b'},
+    {label:'Продажа',n:sold,color:'#10b981'},
+  ];
+  html += '<div class="chart-card"><h3>🔻 Воронка продаж</h3><div class="funnel">';
+  const maxFn = funnelSteps[0].n || 1;
+  funnelSteps.forEach(s => {
+    const pct = maxFn > 0 ? (s.n / maxFn * 100) : 0;
+    html += `<div class="funnel-step" style="width:${pct}%;background:${s.color}15;color:${s.color}"><span class="fn-num">${s.n}</span>${s.label}</div>`;
+  });
+  html += '</div></div>';
+
+  // Charts
+  html += '<div class="charts-grid">';
+
+  // By source
+  const srcMap = {};
+  leads.forEach(l => { const k = l.source || 'Без источника'; if (!srcMap[k]) srcMap[k] = {total:0,sold:0,revenue:0}; srcMap[k].total++; if (l.status==='sold') { srcMap[k].sold++; srcMap[k].revenue += l.revenue; } });
+  const srcSorted = Object.entries(srcMap).sort((a,b) => b[1].total - a[1].total).slice(0,8);
+  html += '<div class="chart-card"><h3>📡 По источникам</h3><div class="bar-chart">';
+  srcSorted.forEach(([k,v]) => {
+    const pct = total > 0 ? (v.total / total * 100) : 0;
+    html += `<div class="bar-row"><span class="name">${k}</span><div class="bar"><div class="bar-fill" style="width:${pct}%;background:var(--blue)">${v.total}</div></div><span class="val">${v.sold}п</span></div>`;
+  });
+  html += '</div></div>';
+
+  // By manager
+  const mgrMap = {};
+  leads.forEach(l => { const k = l.manager || 'Без менеджера'; if (!mgrMap[k]) mgrMap[k] = {total:0,sold:0,revenue:0}; mgrMap[k].total++; if (l.status==='sold') { mgrMap[k].sold++; mgrMap[k].revenue += l.revenue; } });
+  const mgrSorted = Object.entries(mgrMap).sort((a,b) => b[1].total - a[1].total);
+  html += '<div class="chart-card"><h3>👤 По менеджерам</h3><div class="bar-chart">';
+  mgrSorted.forEach(([k,v]) => {
+    const conv = v.total > 0 ? (v.sold / v.total * 100).toFixed(0) : 0;
+    html += `<div class="bar-row"><span class="name">${k}</span><div class="bar"><div class="bar-fill" style="width:${conv}%;background:var(--green)">${v.sold}</div></div><span class="val">${conv}%</span></div>`;
+  });
+  html += '</div></div>';
+
+  // By city
+  const cityMap = {};
+  leads.forEach(l => { const k = l.city || 'Без города'; if (!cityMap[k]) cityMap[k] = {total:0,sold:0}; cityMap[k].total++; if (l.status==='sold') cityMap[k].sold++; });
+  const citySorted = Object.entries(cityMap).sort((a,b) => b[1].total - a[1].total);
+  html += '<div class="chart-card"><h3>🏙 По городам</h3><div class="bar-chart">';
+  citySorted.forEach(([k,v]) => {
+    const pct = total > 0 ? (v.total / total * 100) : 0;
+    html += `<div class="bar-row"><span class="name">${k}</span><div class="bar"><div class="bar-fill" style="width:${pct}%;background:var(--accent)">${v.total}</div></div><span class="val">${v.sold}п</span></div>`;
+  });
+  html += '</div></div>';
+
+  // By status
+  const stMap = {};
+  leads.forEach(l => { const k = l.status; if (!stMap[k]) stMap[k] = 0; stMap[k]++; });
+  html += '<div class="chart-card"><h3>🎯 По статусам</h3><div class="bar-chart">';
+  STATUSES.forEach(s => {
+    const n = stMap[s.id] || 0;
+    const pct = total > 0 ? (n/total*100) : 0;
+    if (n > 0) html += `<div class="bar-row"><span class="name">${s.label}</span><div class="bar"><div class="bar-fill" style="width:${pct}%;background:${s.id==='sold'?'var(--green)':s.id==='reject'||s.id==='ignore'?'var(--red)':s.id==='duplicate'?'#be185d':'var(--yellow)'}">${n}</div></div><span class="val">${(pct).toFixed(0)}%</span></div>`;
+  });
+  html += '</div></div>';
+
+  html += '</div>';
+  c.innerHTML = html;
+}
+
+// ===== LEADS TABLE =====
+let sortField = 'date', sortDir = -1;
+let filterSource = '', filterCity = '', filterManager = '', filterStatus = '';
+
+function renderLeads(c) {
+  // Filters
+  let html = `<div class="controls">
+    <button class="btn btn-primary" onclick="openForm()">➕ Добавить лид</button>
+    <button class="btn btn-secondary" onclick="importCSV()">📥 Импорт CSV</button>
+    <select onchange="filterSource=this.value;renderLeads(document.getElementById('tabContent'))">
+      <option value=""></option><option value="">Все источники</option>
+    </select>
+    <select onchange="filterCity=this.value;renderLeads(document.getElementById('tabContent'))"><option value=""></option><option value="">Все города</option></select>
+    <select onchange="filterManager=this.value;renderLeads(document.getElementById('tabContent'))"><option value=""></option><option value="">Все менеджеры</option></select>
+    <select onchange="filterStatus=this.value;renderLeads(document.getElementById('tabContent'))"><option value=""></option><option value="">Все статусы</option></select>
+    <button class="btn btn-secondary btn-sm" onclick="filterSource='';filterCity='';filterManager='';filterStatus='';renderLeads(document.getElementById('tabContent'))">✕ Сброс</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th onclick="sortBy('date')">📅 Дата</th>
+    <th onclick="sortBy('city')">📍 Город</th>
+    <th onclick="sortBy('source')">📡 Источник</th>
+    <th onclick="sortBy('phone')">📞 Телефон</th>
+    <th onclick="sortBy('name')">👤 Имя</th>
+    <th onclick="sortBy('manager')">👤 Менеджер</th>
+    <th>📌 Статус</th>
+    <th onclick="sortBy('revenue')">💰 Доход</th>
+    <th>💬 Комментарий</th>
+    <th>⚡</th>
+  </tr></thead><tbody>`;
+
+  let filtered = leads.filter(l => {
+    if (filterSource && l.source !== filterSource) return false;
+    if (filterCity && l.city !== filterCity) return false;
+    if (filterManager && l.manager !== filterManager) return false;
+    if (filterStatus && l.status !== filterStatus) return false;
+    return true;
+  });
+
+  filtered.sort((a,b) => {
+    let va = a[sortField] || '', vb = b[sortField] || '';
+    if (sortField === 'date' || sortField === 'revenue') { va = a[sortField]||0; vb = b[sortField]||0; }
+    if (va < vb) return -1 * sortDir;
+    if (va > vb) return 1 * sortDir;
+    return 0;
+  });
+
+  if (filtered.length === 0) {
+    html += '<tr><td colspan="10"><div class="empty">📭 Нет лидов. Нажмите «Добавить лид» или импортируйте CSV.</div></td></tr>';
+  } else {
+    filtered.forEach(l => {
+      const st = STATUSES.find(s => s.id === l.status) || STATUSES[0];
+      html += `<tr><td>${l.date}</td><td><span class="tag-city">${l.city||'—'}</span></td><td><span class="tag-source">${l.source||'—'}</span></td>`;
+      html += `<td>${l.phone || '—'}</td><td>${l.name || '—'}</td><td>${l.manager || '—'}</td>`;
+      html += `<td><span class="status ${st.cls}">${st.label}</span></td>`;
+      html += `<td>${l.revenue ? Math.round(l.revenue).toLocaleString('ru') + ' ₽' : '—'}</td>`;
+      html += `<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(l.comment||'').replace(/"/g,'&quot;')}">${l.comment ? l.comment.slice(0,30) + (l.comment.length>30?'...':'') : '—'}</td>`;
+      html += `<td><button class="action-btn edit" onclick="openForm('${l.id}')" title="Редактировать">✏️</button> <button class="action-btn del" onclick="deleteLead('${l.id}')" title="Удалить">🗑</button></td></tr>`;
+    });
+  }
+
+  html += '</tbody></table></div>';
+  c.innerHTML = html;
+
+  // Fill filters
+  c.querySelectorAll('select').forEach(s => {
+    const f = ['filterSource','filterCity','filterManager','filterStatus'];
+    const vals = {filterSource,filterCity,filterManager,filterStatus};
+    const fn = f.find(k => s.onchange.toString().includes(k));
+    if (fn) s.value = vals[fn];
+    
+    // Fill options
+    if (s.options.length <= 2) {
+      const field = {filterSource:'source',filterCity:'city',filterManager:'manager',filterStatus:'status'}[fn];
+      if (field === 'status') {
+        STATUSES.forEach(st => { const o = document.createElement('option'); o.value = st.id; o.textContent = st.label; s.appendChild(o); });
+      } else {
+        const uniq = [...new Set(leads.map(l => l[field]).filter(Boolean))].sort();
+        uniq.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; s.appendChild(o); });
+      }
+    }
+  });
+}
+
+function sortBy(field) {
+  if (sortField === field) sortDir *= -1;
+  else { sortField = field; sortDir = -1; }
+  renderLeads(document.getElementById('tabContent'));
+}
+
+// ===== CALL QUEUE =====
+function renderCallQueue(c) {
+  const queue = leads.filter(l => ['new','qual','work','wait'].includes(l.status));
+  if (queue.length === 0) {
+    c.innerHTML = '<div class="empty">✅ Нет лидов в очереди на обзвон</div>';
+    return;
+  }
+
+  queue.sort((a,b) => {
+    if (a.status === 'new' && b.status !== 'new') return -1;
+    if (a.status !== 'new' && b.status === 'new') return 1;
+    return (a.date || '').localeCompare(b.date || '');
+  });
+
+  let html = '<div class="controls"><button class="btn btn-secondary" onclick="leads.forEach(l => {\'new\'.includes(l.status) && (l.status=\'qual\'));saveData()">📌 Отметить все новые как квалифицированные</button></div>';
+
+  queue.forEach(l => {
+    const daysSince = l.date ? Math.floor((new Date() - new Date(l.date)) / 86400000) : 0;
+    const cls = daysSince > 7 ? 'call-item overdue' : daysSince > 3 ? 'call-item today' : 'call-item';
+    const st = STATUSES.find(s => s.id === l.status) || STATUSES[0];
+    html += `<div class="${cls}">
+      <div class="ci-info">
+        <div class="ci-name">${l.name || l.phone} <span class="status ${st.cls}" style="font-size:.65rem">${st.label}</span></div>
+        <div class="ci-detail">📞 ${l.phone} · 📍 ${l.city||'?'} · 📡 ${l.source||'?'} · 📅 ${l.date||'?'}${daysSince > 0 ? ' · ' + daysSince + ' дн.' : ''}</div>
+        ${l.comment ? '<div class="ci-detail">💬 ' + l.comment.slice(0,60) + '</div>' : ''}
+        <div class="call-again" onclick="setStatus('${l.id}','wait');renderCallQueue(document.getElementById('tabContent'))">🔄 Отложить обзвон</div>
+      </div>
+      <div class="ci-actions">
+        <button class="btn btn-primary btn-sm" onclick="setStatus('${l.id}','work')">📞 Позвонили</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatus('${l.id}','sold')">✅ Продажа</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatus('${l.id}','reject')">❌ Отказ</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatus('${l.id}','ignore')">🙈 Игнор</button>
+      </div>
+    </div>`;
+  });
+
+  c.innerHTML = html;
+}
+
+// ===== DUPLICATES =====
+function findDuplicates() {
+  const phoneMap = {};
+  leads.forEach(l => { if (l.phone) { if (!phoneMap[l.phone]) phoneMap[l.phone] = []; phoneMap[l.phone].push(l); } });
+  return Object.entries(phoneMap).filter(([k,v]) => v.length > 1);
+}
+
+function renderDuplicates(c) {
+  const dups = findDuplicates();
+  if (dups.length === 0) {
+    c.innerHTML = '<div class="empty">✅ Дубликатов не найдено</div>';
+    return;
+  }
+
+  let html = `<p style="font-size:.8rem;color:var(--text2);margin-bottom:8px">Найдено групп дубликатов: ${dups.length}</p>`;
+  dups.forEach(([phone, items]) => {
+    html += `<div class="dup-group"><h4>📞 ${phone} (${items.length} повторов)</h4>`;
+    items.forEach(l => {
+      const st = STATUSES.find(s => s.id === l.status) || STATUSES[0];
+      html += `<div class="dup-row">
+        <span class="dr-phone">${l.date}</span>
+        <span class="tag-source">${l.source||'?'}</span>
+        <span class="tag-city">${l.city||'?'}</span>
+        <span class="status ${st.cls}">${st.label}</span>
+        <span style="flex:1;font-size:.72rem;color:var(--text2)">${l.name||''} · ${l.manager||''}</span>
+        <button class="action-btn del" onclick="deleteLead('${l.id}');renderDuplicates(document.getElementById('tabContent'))" title="Удалить">🗑</button>
+      </div>`;
+    });
+    // Merge: mark all but first as duplicate
+    html += `<button class="merge-btn" onclick="items.slice(1).forEach(x => { const l=leads.find(y=>y.id===x.id); if(l) l.status='duplicate'; });saveData();renderDuplicates(document.getElementById('tabContent'))">🔀 Отметить ${items.length-1} как дубликаты</button>`;
+    html += '</div>';
+  });
+
+  c.innerHTML = html;
+}
+
+// ===== REPORT =====
+function renderReport(c) {
+  const total = leads.length;
+  const sold = leads.filter(l => l.status === 'sold').length;
+  const qualLeads = leads.filter(l => ['qual','work','wait','sold'].includes(l.status)).length;
+  const conv = total > 0 ? (sold/total*100).toFixed(1) : 0;
+  const totalRevenue = leads.reduce((s,l) => s + (l.status==='sold'?l.revenue:0), 0);
+
+  let report = '📊 ОТЧЁТ ПО ЛИДАМ\n';
+  report += '='.repeat(40) + '\n';
+  report += `Дата: ${new Date().toLocaleDateString('ru-RU')}\n`;
+  report += `Всего лидов: ${total}\n`;
+  report += `Квалифицировано: ${qualLeads}\n`;
+  report += `Продаж: ${sold}\n`;
+  report += `Конверсия: ${conv}%\n`;
+  report += `Доход: ${Math.round(totalRevenue).toLocaleString('ru')} ₽\n\n`;
+
+  report += '📡 ПО ИСТОЧНИКАМ:\n';
+  const srcMap = {};
+  leads.forEach(l => { const k = l.source||'Без источника'; if(!srcMap[k]) srcMap[k]={t:0,s:0,r:0}; srcMap[k].t++; if(l.status==='sold'){srcMap[k].s++;srcMap[k].r+=l.revenue;} });
+  Object.entries(srcMap).sort((a,b)=>b[1].t-a[1].t).forEach(([k,v]) => {
+    const c2 = v.t>0 ? (v.s/v.t*100).toFixed(1) : 0;
+    report += `  ${k}: ${v.t} лидов, ${v.s} продаж (${c2}%), ${Math.round(v.r).toLocaleString('ru')} ₽\n`;
+  });
+
+  report += '\n👤 ПО МЕНЕДЖЕРАМ:\n';
+  const mgrMap = {};
+  leads.forEach(l => { const k = l.manager||'Без менеджера'; if(!mgrMap[k]) mgrMap[k]={t:0,s:0,r:0}; mgrMap[k].t++; if(l.status==='sold'){mgrMap[k].s++;mgrMap[k].r+=l.revenue;} });
+  Object.entries(mgrMap).sort((a,b)=>b[1].t-a[1].t).forEach(([k,v]) => {
+    const c2 = v.t>0 ? (v.s/v.t*100).toFixed(1) : 0;
+    report += `  ${k}: ${v.t} лидов, ${v.s} продаж (${c2}%), ${Math.round(v.r).toLocaleString('ru')} ₽\n`;
+  });
+
+  report += '\n🏙 ПО ГОРОДАМ:\n';
+  const cityMap = {};
+  leads.forEach(l => { const k = l.city||'Без города'; if(!cityMap[k]) cityMap[k]={t:0,s:0}; cityMap[k].t++; if(l.status==='sold') cityMap[k].s++; });
+  Object.entries(cityMap).sort((a,b)=>b[1].t-a[1].t).forEach(([k,v]) => {
+    const c2 = v.t>0 ? (v.s/v.t*100).toFixed(1) : 0;
+    report += `  ${k}: ${v.t} лидов, ${v.s} продаж (${c2}%)\n`;
+  });
+
+  c.innerHTML = `<div class="report-content" id="reportText">${report.replace(/\n/g,'<br>')}</div>
+  <div class="controls">
+    <button class="btn btn-primary" onclick="const t=document.getElementById('reportText').innerText.replace(/<br>/g,'\n');navigator.clipboard.writeText(t).then(()=>showToast('Скопировано!'))">📋 Копировать</button>
+    <button class="btn btn-secondary" onclick="exportCSV()">📥 Экспорт CSV</button>
+  </div>`;
+}
+
+// ===== IMPORT/EXPORT =====
+function importCSV() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,.tsv,.txt';
+  input.onchange = async (e) => {
+    const text = await e.target.files[0].text();
+    const lines = text.split('\n').filter(l => l.trim());
+    if (lines.length < 2) { alert('Файл пуст или заголовок без данных'); return; }
+    
+    // Try to detect delimiter
+    const comma = lines[0].split(',').length;
+    const semicolon = lines[0].split(';').length;
+    const tab = lines[0].split('\t').length;
+    let delim = ',';
+    if (semicolon > comma && semicolon >= tab) delim = ';';
+    if (tab > comma && tab > semicolon) delim = '\t';
+
+    const headers = lines[0].split(delim).map(h => h.trim().toLowerCase().replace(/["']/g,''));
+    const expected = ['дата','город','источник','телефон','имя','менеджер','статус','доход','комментарий'];
+    const idx = {};
+    headers.forEach((h,i) => {
+      expected.forEach(e => { if (h.includes(e) || e.includes(h)) idx[e] = i; });
+    });
+
+    if (!idx['телефон'] && !idx['дата']) { alert('Не удалось определить колонки. Ожидаются: дата, телефон, город, источник, менеджер, статус, доход, комментарий'); return; }
+
+    let added = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(delim).map(c => c.trim().replace(/^["']|["']$/g,''));
+      const phone = cols[idx['телефон']] || '';
+      if (!phone) continue;
+
+      // Parse status
+      let status = 'new';
+      const stVal = (cols[idx['статус']] || '').toLowerCase();
+      if (stVal.includes('продаж') || stVal === 'sold') status = 'sold';
+      else if (stVal.includes('квал') || stVal === 'qual') status = 'qual';
+      else if (stVal.includes('работ') || stVal === 'work') status = 'work';
+      else if (stVal.includes('отказ') || stVal === 'reject') status = 'reject';
+      else if (stVal.includes('игнор') || stVal === 'ignore') status = 'ignore';
+      else if (stVal.includes('дубл') || stVal === 'duplicate') status = 'duplicate';
+      else if (stVal.includes('ожид') || stVal === 'wait') status = 'wait';
+
+      const rev = parseFloat((cols[idx['доход']] || '0').replace(/[^\d.,]/g,'').replace(',','.')) || 0;
+
+      // Check duplicate
+      const dup = leads.find(l => l.phone === phone);
+      if (dup) continue; // skip duplicates on import
+
+      leads.push({
+        id: genId(),
+        date: cols[idx['дата']] || getToday(),
+        city: cols[idx['город']] || '',
+        source: cols[idx['источник']] || '',
+        phone: phone,
+        name: cols[idx['имя']] || '',
+        manager: cols[idx['менеджер']] || '',
+        status: status,
+        revenue: rev,
+        comment: cols[idx['комментарий']] || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      added++;
+    }
+    saveData();
+    if (added > 0) showToast(`✅ Импортировано ${added} лидов!`);
+    else showToast('Новых лидов не добавлено (возможно, все уже есть)');
+  };
+  input.click();
+}
+
+function exportCSV() {
+  let csv = 'дата;город;источник;телефон;имя;менеджер;статус;доход;комментарий\n';
+  leads.forEach(l => {
+    const st = STATUSES.find(s => s.id === l.status) || {label:''};
+    csv += [l.date,l.city||'',l.source||'',l.phone||'',l.name||'',l.manager||'',st.label||'',l.revenue||0,(l.comment||'').replace(/;/g,',')].join(';') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'leads_export.csv'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== INIT on page load =====
+loadData();
+renderAll();
+</script>
+</body>
+</html>
