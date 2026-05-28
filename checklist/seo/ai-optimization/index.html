@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Техническая оптимизация под AI — чек-лист | mktools</title>
-<meta name="description" content="Чек-лист технической оптимизации сайта под AI-поиск: Schema.org, структура страниц, AI-friendly контент, 80+ пунктов. Прогресс в браузере.">
-<link rel="canonical" href="https://mktgtools.ru/checklist/ai/tech-optimization/">
+<title>Техническая оптимизация под AI — чек-лист SEO | mktools</title>
+<meta name="description" content="Чек-лист для подготовки сайта к AI-поиску: Schema.org, контент для AI-парсеров, E-E-A-T, Яндекс-специфика. 80+ пунктов, 12 разделов.">
+<link rel="canonical" href="https://mktgtools.ru/checklist/seo/ai-optimization/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#8b5cf6;--accent-hover:#7c3aed;--accent-light:#f5f3ff;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
 .container{max-width:860px;margin:0 auto;padding:0 24px}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
@@ -75,13 +75,11 @@ footer a{color:var(--accent)}
 <noscript><div><img src="https://mc.yandex.ru/watch/109294994" style="position:absolute;left:-9999px" alt=""></div></noscript>
 </head>
 <body>
-<header>
-<div class="container"><a href="/" class="logo"><span>mk</span>tools</a><a href="/checklist/ai/" class="back">← AI-оптимизация</a></div>
-</header>
+<header><div class="container"><a href="/" class="logo"><span>mk</span>tools</a><a href="/checklist/seo/" class="back">← SEO-аудит</a></div></header>
 <section class="hero">
 <div class="container">
-<div class="breadcrumbs"><a href="/">Главная</a><span>/</span><a href="/checklist/">Чек-листы</a><span>/</span><a href="/checklist/ai/">AI-оптимизация</a><span>/</span>Техническая оптимизация</div>
-<h1>⚙️ Техническая оптимизация под AI</h1>
+<div class="breadcrumbs"><a href="/">Главная</a><span>/</span><a href="/checklist/">Чек-листы</a><span>/</span><a href="/checklist/seo/">SEO</a><span>/</span>AI-оптимизация</div>
+<h1>🤖 Техническая оптимизация под AI</h1>
 <p>12 разделов · 80+ пунктов для подготовки сайта к AI-поиску</p>
 <div class="sub">Данные сохраняются в браузере. Отмечайте сделанное — прогресс не пропадёт.</div>
 </div>
@@ -96,10 +94,10 @@ footer a{color:var(--accent)}
 <button class="btn-outline" id="exportBtn">📋 Копировать отчёт</button>
 </div>
 </div>
-<footer><div class="container"><a href="/checklist/ai/">Чек-листы AI-оптимизации</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/seo/">SEO-аудит</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
 <script>
 const SECTIONS=[
-{id:'schema',name:'AI-разметка (Schema.org)',icon:'🟢',color:'#3b82f6',items:[
+{id:'schema',name:'AI-разметка (Schema.org)',icon:'🟢',items:[
 {text:'LocalBusiness schema на главной (адрес, телефон, часы работы)',tag:'must-have',tagColor:'red',desc:'Без неё AI не видит локальный бизнес'},
 {text:'BreadcrumbList schema на всех страницах',tag:'must-have',tagColor:'red',desc:'Хлебные крошки в Rich Results'},
 {text:'FAQPage schema на страницах направлений (5-10 вопросов)',tag:'must-have',tagColor:'red',desc:'Прямой путь в AI-ответы'},
@@ -108,7 +106,7 @@ const SECTIONS=[
 {text:'Review schema для отзывов на сайте',tag:'medium',tagColor:'blue',desc:'Звёздочки в выдаче'},
 {text:'Article schema для блога и статей',tag:'medium',tagColor:'blue',desc:'Правильная индексация контента'},
 {text:'VideoObject schema для видео-обзоров',tag:'nice',tagColor:'green',desc:'Для видео-контента'}]},
-{id:'ai_content',name:'AI-Friendly контент',icon:'🤖',color:'#8b5cf6',items:[
+{id:'ai_content',name:'AI-Friendly контент',icon:'🤖',items:[
 {text:'Чистая семантическая вёрстка (article, section, nav)',tag:'must-have',tagColor:'red',desc:'AI-парсеры читают семантику'},
 {text:'Контент до скролла — полезный, не SEO-мусор',tag:'must-have',tagColor:'red',desc:'Above the fold решает'},
 {text:'Ясная иерархия заголовков (H1→H2→H3 без пропусков)',tag:'must-have',tagColor:'red',desc:'Структура = понимание'},
@@ -118,14 +116,14 @@ const SECTIONS=[
 {text:'Даты: "2026 год", "лето 2026", "июнь 2026"',tag:'high',tagColor:'yellow',desc:'AI понимает временной контекст'},
 {text:'HTML-таблицы с ценами, а не картинки',tag:'medium',tagColor:'blue',desc:'Картинки AI не видит'},
 {text:'Отсутствие popup-ов, перекрывающих контент',tag:'medium',tagColor:'blue',desc:'Мешают парсингу'}]},
-{id:'structure',name:'Структура страниц',icon:'🏠',color:'#f59e0b',items:[
+{id:'structure',name:'Структура страниц',icon:'🏠',items:[
 {text:'Уникальный H1 на каждой странице',tag:'must-have',tagColor:'red',desc:'Не копия шаблона'},
 {text:'Уникальный Title (70-80 символов)',tag:'must-have',tagColor:'red',desc:'Уникальность критична'},
 {text:'Уникальное Description (150-160 символов)',tag:'must-have',tagColor:'red',desc:'Сниппет в выдаче'},
 {text:'Уникальный контент для каждого города',tag:'high',tagColor:'yellow',desc:'Не replace "Новосибирск"→"Томск"'},
 {text:'Уникальные H2 на страницах направлений',tag:'medium',tagColor:'blue',desc:'Подзаголовки не должны дублироваться'},
 {text:'Internal linking между всеми страницами',tag:'high',tagColor:'yellow',desc:'Связность = вес страниц'}]},
-{id:'critical_pages',name:'Критические страницы',icon:'📄',color:'#ef4444',items:[
+{id:'critical_pages',name:'Критические страницы',icon:'📄',items:[
 {text:'/goryashchie-tury/ — список горящих туров',tag:'must-have',tagColor:'red',desc:''},
 {text:'/napravleniya/ — каталог направлений',tag:'must-have',tagColor:'red',desc:''},
 {text:'/tury-v-turciyu-iz-novosibirska/',tag:'must-have',tagColor:'red',desc:'Ключевой запрос'},
@@ -137,7 +135,7 @@ const SECTIONS=[
 {text:'/tury-v-indiya-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/tury-v-kitay-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/tury-vo-vetnam-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''}]},
-{id:'multi_city',name:'Мультигородские страницы',icon:'🌆',color:'#10b981',items:[
+{id:'multi_city',name:'Мультигородские страницы',icon:'🌆',items:[
 {text:'/tury-v-turciyu-iz-tomska/',tag:'high',tagColor:'yellow',desc:''},
 {text:'/tury-v-turciyu-iz-kemerovo/',tag:'high',tagColor:'yellow',desc:''},
 {text:'/tury-v-turciyu-iz-krasnoyarska/',tag:'high',tagColor:'yellow',desc:''},
@@ -147,7 +145,7 @@ const SECTIONS=[
 {text:'/tury-v-turciyu-iz-moskvy/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/tury-v-egipet-iz-tomska/',tag:'high',tagColor:'yellow',desc:''},
 {text:'/tury-v-tailand-iz-tomska/',tag:'medium',tagColor:'blue',desc:''}]},
-{id:'thematic',name:'Тематические страницы',icon:'🏷',color:'#14b8a6',items:[
+{id:'thematic',name:'Тематические страницы',icon:'🏷',items:[
 {text:'/goryashchie-tury-iz-novosibirska/',tag:'high',tagColor:'yellow',desc:''},
 {text:'/tury-iz-novosibirska-na-novyy-god-2027/',tag:'high',tagColor:'yellow',desc:''},
 {text:'/tury-iz-novosibirska-na-mayskie-prazdniki/',tag:'medium',tagColor:'blue',desc:''},
@@ -162,7 +160,7 @@ const SECTIONS=[
 {text:'/tury-iz-novosibirska-s-zavtrakom/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/poslednii-moment-tury-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/luchshie-kurorty-dlya-otdyha-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''}]},
-{id:'blog',name:'Блог и инфо-страницы',icon:'📝',color:'#f97316',items:[
+{id:'blog',name:'Блог и инфо-страницы',icon:'📝',items:[
 {text:'/blog/ — создать главную блога',tag:'must-have',tagColor:'red',desc:'Свежий контент = E-E-A-T'},
 {text:'/o-kompanii/',tag:'must-have',tagColor:'red',desc:'Доверие к бизнесу'},
 {text:'/kontakty/ — исправить 404',tag:'must-have',tagColor:'red',desc:'Критично для Local SEO'},
@@ -179,21 +177,21 @@ const SECTIONS=[
 {text:'"Как выбрать отель"',tag:'medium',tagColor:'blue',desc:''},
 {text:'"Советы первому путешествию"',tag:'medium',tagColor:'blue',desc:''},
 {text:'"Страховка в путешествии"',tag:'medium',tagColor:'blue',desc:''}]},
-{id:'comparison',name:'Страницы сравнения',icon:'📊',color:'#a855f7',items:[
+{id:'comparison',name:'Страницы сравнения',icon:'📊',items:[
 {text:'/sravnenie-cen-na-tury-v-turciyu/',tag:'medium',tagColor:'blue',desc:'Контент для сравнения'},
 {text:'/sravnenie-cen-na-tury-v-egipet/',tag:'medium',tagColor:'blue',desc:''},
 {text:'/luchshie-tury-2026/',tag:'high',tagColor:'yellow',desc:'Сезонный контент'},
 {text:'/top-10-oteley-v-turcii/',tag:'medium',tagColor:'blue',desc:'Списки хорошо ранжируются'},
 {text:'/top-5-stran-dlya-otdyha-iz-novosibirska/',tag:'medium',tagColor:'blue',desc:''}]},
-{id:'tech',name:'Технические улучшения',icon:'⚙',color:'#6b7280',items:[
+{id:'tech',name:'Технические улучшения',icon:'⚙',items:[
 {text:'Sitemap.xml — добавить все новые страницы',tag:'must-have',tagColor:'red',desc:'Без этого новые страницы не индексируются'},
 {text:'Robots.txt — оптимизировать crawl budget',tag:'high',tagColor:'yellow',desc:''},
 {text:'404 — красивая кастомная страница',tag:'high',tagColor:'yellow',desc:''},
 {text:'Core Web Vitals: LCP<2.5с, FID<100ms, CLS<0.1',tag:'high',tagColor:'yellow',desc:'Фактор ранжирования'},
 {text:'Canonical URL — на каждой странице',tag:'high',tagColor:'yellow',desc:'Борьба с дублями'},
 {text:'Open Graph / Twitter Card — для соцсетей',tag:'medium',tagColor:'blue',desc:'Красивые ссылки в соцсетях'},
-{text:'Турбо-страницы Яндекса для блога',tag:'medium',tagColor:'blue',desc:'Мгновенная загрузка в Яндексе'}]},
-{id:'eeat',name:'E-E-A-T сигналы',icon:'🌍',color:'#84cc16',items:[
+{text:'Турбо-страницы Яндекса для блога',tag:'medium',tagColor:'blue',desc:'Мгновенная загрузка'}]},
+{id:'eeat',name:'E-E-A-T сигналы',icon:'🌍',items:[
 {text:'Реальные отзывы клиентов на сайте',tag:'must-have',tagColor:'red',desc:'Google оценивает доверие'},
 {text:'Страница с реквизитами (ИНН, ОГРН, адрес)',tag:'must-have',tagColor:'red',desc:'Юридическая прозрачность'},
 {text:'Политика конфиденциальности',tag:'high',tagColor:'yellow',desc:''},
@@ -203,14 +201,14 @@ const SECTIONS=[
 {text:'Публикации на turizm.ru, travel.ru',tag:'nice',tagColor:'green',desc:'Внешние ссылки'},
 {text:'Гостевые посты на тематических сайтах',tag:'nice',tagColor:'green',desc:'Линкбилдинг + E-E-A-T'},
 {text:'Дзен-публикации',tag:'medium',tagColor:'blue',desc:'Канал контента для Яндекса'}]},
-{id:'yandex',name:'Яндекс-специфика',icon:'📈',color:'#dc2626',items:[
+{id:'yandex',name:'Яндекс-специфика',icon:'📈',items:[
 {text:'Яндекс.Вебмастер — регистрация и проверка',tag:'must-have',tagColor:'red',desc:'Основа для Яндекса'},
 {text:'Яндекс.Бизнес — полная карточка, города, отзывы',tag:'must-have',tagColor:'red',desc:'GEO видимость'},
 {text:'Яндекс.Карты — отметка в каждом городе',tag:'high',tagColor:'yellow',desc:'Локальное присутствие'},
 {text:'Турбо-страницы для блога',tag:'high',tagColor:'yellow',desc:'Приоритет в выдаче Яндекса'},
 {text:'Дзен — публикации статей',tag:'medium',tagColor:'blue',desc:'Дополнительный трафик'},
 {text:'Яндекс.Директ — GEO таргетинг',tag:'medium',tagColor:'blue',desc:'Платный трафик по городам'}]},
-{id:'guides',name:'AI-Путеводители',icon:'🧭',color:'#ec4899',items:[
+{id:'guides',name:'AI-Путеводители',icon:'🧭',items:[
 {text:'Путеводитель: Турция (виза, курорты, цены, FAQ)',tag:'high',tagColor:'yellow',desc:'Всеобъемлющая страница — AI их любит'},
 {text:'Путеводитель: Египет',tag:'high',tagColor:'yellow',desc:''},
 {text:'Путеводитель: Таиланд',tag:'high',tagColor:'yellow',desc:''},
@@ -226,43 +224,12 @@ function k(s,i){return s+'_'+i}
 function d(s,i){return m[k(s,i)]===true}
 function sv(){try{localStorage.setItem(K,JSON.stringify(m))}catch(e){}}
 function tg(s,i){const x=k(s,i);if(m[x])delete m[x];else m[x]=true;sv();rT();rC();uP()}
-function rT(){
-  const c=document.getElementById('sectionTabs');c.innerHTML='';
-  SECTIONS.forEach((s,i)=>{
-    const dn=s.items.filter((_,j)=>d(i,j)).length;
-    const bt=document.createElement('button');
-    bt.className='section-tab'+(i===active?' active':'');
-    bt.innerHTML=s.icon+' '+s.name+' <span class="count">'+dn+'/'+s.items.length+'</span>';
-    bt.onclick=()=>{active=i;rT();rC()};c.appendChild(bt)});
-}
-function rC(){
-  const c=document.getElementById('checklist');const s=SECTIONS[active];c.innerHTML='';
-  s.items.forEach((it,i)=>{
-    const dn=d(active,i);const di=document.createElement('div');
-    di.className='item'+(dn?' done':'');
-    di.innerHTML='<div class="item-check"></div><div class="item-content"><div class="item-text">'+it.text+'</div>'+(it.desc?'<div class="item-desc">'+it.desc+'</div>':'')+(it.tag?'<div class="item-tags"><span class="item-tag '+it.tagColor+'">'+it.tag+'</span></div>':'')+'</div>';
-    di.querySelector('.item-check').onclick=(e)=>{e.stopPropagation();tg(active,i)};
-    di.querySelector('.item-text').onclick=()=>tg(active,i);
-    if(it.desc)di.querySelector('.item-desc').onclick=()=>tg(active,i);
-    c.appendChild(di)});
-}
-function uP(){
-  let td=0,ta=0;SECTIONS.forEach((s,si)=>{s.items.forEach((_,ii)=>{ta++;if(d(si,ii))td++})});
-  document.getElementById('doneTotal').textContent=td;
-  document.getElementById('totalItems').textContent=ta;
-  const p=ta>0?Math.round(td/ta*100):0;
-  document.getElementById('progressFill').style.width=p+'%';
-  document.getElementById('progressPct').textContent=p+'%';
-}
+function rT(){const c=document.getElementById('sectionTabs');c.innerHTML='';SECTIONS.forEach((s,i)=>{const dn=s.items.filter((_,j)=>d(i,j)).length;const bt=document.createElement('button');bt.className='section-tab'+(i===active?' active':'');bt.innerHTML=s.icon+' '+s.name+' <span class="count">'+dn+'/'+s.items.length+'</span>';bt.onclick=()=>{active=i;rT();rC()};c.appendChild(bt)})}
+function rC(){const c=document.getElementById('checklist');const s=SECTIONS[active];c.innerHTML='';s.items.forEach((it,i)=>{const dn=d(active,i);const di=document.createElement('div');di.className='item'+(dn?' done':'');di.innerHTML='<div class="item-check"></div><div class="item-content"><div class="item-text">'+it.text+'</div>'+(it.desc?'<div class="item-desc">'+it.desc+'</div>':'')+(it.tag?'<div class="item-tags"><span class="item-tag '+it.tagColor+'">'+it.tag+'</span></div>':'')+'</div>';di.querySelector('.item-check').onclick=(e)=>{e.stopPropagation();tg(active,i)};di.querySelector('.item-text').onclick=()=>tg(active,i);if(it.desc)di.querySelector('.item-desc').onclick=()=>tg(active,i);c.appendChild(di)})}
+function uP(){let td=0,ta=0;SECTIONS.forEach((s,si)=>{s.items.forEach((_,ii)=>{ta++;if(d(si,ii))td++})});document.getElementById('doneTotal').textContent=td;document.getElementById('totalItems').textContent=ta;const p=ta>0?Math.round(td/ta*100):0;document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressPct').textContent=p+'%'}
 document.getElementById('resetDoneBtn').onclick=()=>{if(!confirm('Сбросить выполненные?'))return;SECTIONS.forEach((s,si)=>{s.items.forEach((_,ii)=>{delete m[k(si,ii)]})});sv();rT();rC();uP()};
 document.getElementById('resetAllBtn').onclick=()=>{if(!confirm('Сбросить ВСЁ?'))return;m={};sv();rT();rC();uP()};
-document.getElementById('exportBtn').onclick=()=>{
-  let t='⚙️ Техническая оптимизация под AI\n'+new Date().toLocaleDateString('ru-RU')+'\n\n';
-  SECTIONS.forEach((s,i)=>{const dn=s.items.filter((_,j)=>d(i,j)).length;t+='─── '+s.icon+' '+s.name+' ('+dn+'/'+s.items.length+') ───\n';s.items.forEach((it,j)=>{t+=(d(i,j)?'✅':'⬜')+' '+it.text+'\n'})});
-  const td=Object.keys(m).filter(x=>!x.startsWith('n_')&&m[x]).length;
-  t+='\nИтого: '+td+'/'+SECTIONS.reduce((s,c)=>s+c.items.length,0);
-  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('exportBtn');b.textContent='✅ Скопировано!';setTimeout(()=>b.textContent='📋 Копировать отчёт',1500)});
-};
+document.getElementById('exportBtn').onclick=()=>{let t='🤖 Техническая оптимизация под AI\n'+new Date().toLocaleDateString('ru-RU')+'\n\n';SECTIONS.forEach((s,i)=>{const dn=s.items.filter((_,j)=>d(i,j)).length;t+='─── '+s.icon+' '+s.name+' ('+dn+'/'+s.items.length+') ───\n';s.items.forEach((it,j)=>{t+=(d(i,j)?'✅':'⬜')+' '+it.text+'\n'})});const td=Object.keys(m).filter(x=>!x.startsWith('n_')&&m[x]).length;t+='\nИтого: '+td+'/'+SECTIONS.reduce((s,c)=>s+c.items.length,0);navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('exportBtn');b.textContent='✅ Скопировано!';setTimeout(()=>b.textContent='📋 Копировать отчёт',1500)})};
 rT();rC();uP();
 </script>
 </body>

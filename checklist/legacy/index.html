@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Чек-лист маркетолога — интерактивный инструмент</title>
+<meta name="description" content="Универсальный чек-лист маркетолога: запуск рекламы, контент-план, SEO-аудит, аналитика, соцсети, email. Прогресс в браузере.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:860px;margin:0 auto;padding:0 24px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+.hero{padding:36px 0 20px;text-align:center}
+.hero p{color:var(--text2);font-size:.9rem}
+.hero .sub{font-size:.8rem;color:var(--text2);margin-top:4px}
+
+/* Progress bar */
+.progress-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.progress-bar .info{font-size:.85rem;flex:1;min-width:120px}
+.progress-bar .info strong{color:var(--text)}
+.progress-bar .info span{color:var(--text2)}
+.progress-track{flex:2;min-width:120px;height:8px;background:#f3f4f6;border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease;width:0%}
+.progress-pct{font-size:.85rem;font-weight:700;color:var(--accent);min-width:36px;text-align:right}
+
+/* Category tabs */
+.cat-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin-bottom:16px;overflow-x:auto}
+.cat-tab{padding:7px 16px;border:none;border-radius:6px;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .12s;background:transparent;color:var(--text2);white-space:nowrap;font-family:var(--font)}
+.cat-tab .count{display:inline-block;padding:0 6px;border-radius:4px;background:#f3f4f6;color:var(--text2);font-size:.7rem;margin-left:4px}
+.cat-tab.active{background:var(--accent);color:#fff}
+.cat-tab.active .count{background:rgba(255,255,255,.2);color:#fff}
+.cat-tab:hover:not(.active){background:#f3f4f6}
+
+/* Checklist items */
+.checklist{margin-bottom:24px}
+.checklist-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.checklist-header h2{font-size:1rem;font-weight:700}
+.checklist-header .done-count{font-size:.8rem;color:var(--text2)}
+.item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;transition:all .15s;cursor:pointer;position:relative}
+.item:hover{border-color:var(--accent)}
+.item.done{opacity:.7;border-color:var(--border)}
+.item.done .item-text{text-decoration:line-through;color:var(--text2)}
+.item.done .item-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.item.done .item-check::after{content:'✓'}
+.item-check{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;transition:all .12s;margin-top:1px;user-select:none}
+.item-content{flex:1;min-width:0}
+.item-text{font-size:.88rem;font-weight:500;transition:color .15s}
+.item-desc{font-size:.75rem;color:var(--text2);margin-top:2px;line-height:1.4}
+.item-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.item-tag{padding:1px 8px;border-radius:4px;font-size:.65rem;font-weight:500;background:#f3f4f6;color:var(--text2)}
+.item-tag.orange{background:var(--accent-light);color:var(--accent)}
+.item-tag.green{background:#ecfdf5;color:#059669}
+.item-tag.blue{background:#eff6ff;color:#2563eb}
+.item-tag.purple{background:#f5f3ff;color:#7c3aed}
+.item-note{display:none;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.item-note.show{display:block}
+.item-note textarea{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:.8rem;font-family:var(--font);resize:vertical;min-height:50px}
+
+.actions{display:flex;gap:8px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
+.actions button{padding:8px 18px;border:none;border-radius:var(--radius-sm);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--font)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:#f3f4f6;color:var(--text)}
+.btn-secondary:hover{background:#e5e7eb}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text2);font-size:.85rem}
+
+@media(max-width:640px){
+  h1{font-size:1.3rem}
+  .cat-tab{padding:6px 10px;font-size:.72rem}
+}
+</style>
+  <link rel="canonical" href="https://mktgtools.ru/checklist/legacy/">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+ (function(m,e,t,r,i,k,a){
+ m[i]=m[i]function(){(m[i].a=m[i].a[]).push(arguments)};
+ m[i].l=1*new Date();
+ for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+ k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+ })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109294994', 'ym');
+
+ ym(109294994, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109294994" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+<header>
+<div class="container">
+<a href="/" class="logo"><span>mk</span>tools</a>
+<a href="/checklist/" class="back">← Чек-листы</a>
+</div>
+</header>
+
+<section class="hero">
+<div class="container">
+<h1>Чек-лист маркетолога — 6 категорий</h1>
+<p>Интерактивные списки для запуска рекламы, контента, SEO и аналитики</p>
+<div class="sub">Прогресс сохраняется в браузере автоматически</div>
+</div>
+</section>
+
+<div class="container">
+
+<div class="progress-bar" id="progressBar">
+<div class="info">Прогресс: <strong id="doneTotal">0</strong> <span>/ <span id="totalItems">0</span></span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-pct" id="progressPct">0%</div>
+</div>
+
+<div class="cat-tabs" id="catTabs"></div>
+
+<div class="checklist" id="checklist"></div>
+
+<div class="actions">
+<button class="btn-primary" id="resetDoneBtn">🔄 Сбросить выполненные</button>
+<button class="btn-secondary" id="resetAllBtn">↺ Сбросить всё</button>
+<button class="btn-outline" id="exportBtn">📋 Экспорт</button>
+</div>
+
+</div>
+
+<footer><div class="container"><a href="https://github.com/Art009bas/mktools" target="_blank" style="color:var(--accent)">mktools</a> — открытый проект</div></footer>
+
+<script>
+const CHECKLISTS={
+  ad_launch:{
+    name:'🚀 Запуск рекламы',
+    icon:'🚀',
+    items:[
+      {text:'Определён бюджет кампании',desc:'Общий бюджет на период, распределение по каналам'},
+      {text:'Выбраны целевые аудитории',desc:'Сегменты, интересы, гео, пол, возраст, устройства'},
+      {text:'Подготовлены креативы (баннеры/видео)',desc:'Минимум 3-5 вариантов для A/B теста'},
+      {text:'Написаны тексты объявлений',desc:'Заголовки, описания, призывы к действию'},
+      {text:'Настроены UTM-метки',desc:'Для всех ссылок во всех объявлениях'},
+      {text:'Настроены пиксели/счётчики',desc:'Яндекс.Метрика, GA4, VK Pixel, соцсети'},
+      {text:'Проверены ссылки и посадочные страницы',desc:'Все ссылки рабочие, мобильная версия ок'},
+      {text:'Настроены цели конверсий',desc:'Заявка, звонок, покупка, подписка'},
+      {text:'Добавлены минус-слова',desc:'Для поисковых кампаний'},
+      {text:'Установлен дневной лимит бюджета',desc:'Чтобы не слить бюджет за час'},
+      {text:'Настроено расписание показов',desc:'Рабочее время, пиковые часы'},
+      {text:'Сделаны скриншоты настроек',desc:'Для отчёта и истории'},
+    ]
+  },
+  content:{
+    name:'📝 Контент-план',
+    icon:'📝',
+    items:[
+      {text:'Составлен план на месяц',desc:'10-20 постов/статей с датами публикаций'},
+      {text:'Определена тематика рубрик',desc:'Постоянные рубрики для регулярности'},
+      {text:'Подготовлен визуал',desc:'Изображения, видео, инфографика, шаблоны'},
+      {text:'Написаны SEO-заголовки',desc:'Ключевые слова в H1, title, description'},
+      {text:'Оптимизированы изображения',desc:'Сжатие, alt-теги, размер'},
+      {text:'Добавлены внутренние ссылки',desc:'На связанные статьи и страницы'},
+      {text:'Проверена уникальность текстов',desc:'Антиплагиат, нет дубликатов'},
+      {text:'Составлены посты для соцсетей',desc:'Адаптировано под каждую платформу'},
+      {text:'Запланирована рассылка',desc:'Email/Telegram, сегментация подписчиков'},
+      {text:'Подготовлены CTA-элементы',desc:'Кнопки, ссылки, формы захвата'},
+      {text:'Согласован контент',desc:'Утверждение у руководителя/клиента'},
+      {text:'Настроены авто-публикации',desc:'Отложенный постинг, часы отправки'},
+    ]
+  },
+  seo:{
+    name:'🔍 SEO-аудит',
+    icon:'🔍',
+    items:[
+      {text:'Проверены мета-теги (title, description)',desc:'Уникальность, длина, ключевые слова'},
+      {text:'Структура заголовков H1-H6',desc:'Один H1 на страницу, иерархия'},
+      {text:'Проверена скорость загрузки',desc:'Core Web Vitals, мобильная версия'},
+      {text:'Настроены ЧПУ (человеко-понятные URL)',desc:'Транслит, без параметров, короткие'},
+      {text:'Проверен файл robots.txt',desc:'Закрыты служебные страницы'},
+      {text:'Создана/обновлена sitemap.xml',desc:'Все значимые страницы, даты обновления'},
+      {text:'Проверены битые ссылки',desc:'Внутренние и внешние'},
+      {text:'Оптимизированы изображения',desc:'Alt-теги, размер, формат WebP'},
+      {text:'Проверен мобильный вид',desc:'Адаптивность, касания, скорость на 3G'},
+      {text:'Канонические URL',desc:'Нет дублей, rel=canonical настроен'},
+      {text:'Микроразметка (Schema.org)',desc:'Organization, LocalBusiness, FAQ, Article'},
+      {text:'Анализ конкурентов по ключевым словам',desc:'Позиции, семантика, пробелы'},
+    ]
+  },
+  analytics:{
+    name:'📊 Аналитика и отчёты',
+    icon:'📊',
+    items:[
+      {text:'Настроены цели в Метрике/GA4',desc:'Микро- и макро-конверсии'},
+      {text:'Создан дашборд для мониторинга',desc:'Ключевые метрики на одном экране'},
+      {text:'Настроена CRM-интеграция',desc:'Лиды, сделки, источник заявки'},
+      {text:'Определены KPI кампании',desc:'ROMI, ROI, CAC, CPL, CPA'},
+      {text:'Создан шаблон еженедельного отчёта',desc:'Автоматизация или готовый шаблон'},
+      {text:'Настроено отслеживание звонков',desc:'Коллтрекинг, запись разговоров'},
+      {text:'Настроены сегменты аудитории',desc:'Новые/вернувшиеся, по каналам, по поведению'},
+      {text:'Проверена корректность данных',desc:'Тестовые заявки, сквозная аналитика'},
+      {text:'Определена периодичность отчётов',desc:'Ежедневно/еженедельно/ежемесячно'},
+      {text:'Сравнение с предыдущими периодами',desc:'MoM, YoY, динамика метрик'},
+      {text:'Подготовлена презентация для руководства',desc:'Выводы, графики, рекомендации'},
+      {text:'Сделаны выводы и план корректировок',desc:'Что работает, что нужно менять'},
+    ]
+  },
+  social:{
+    name:'📱 Соцсети',
+    icon:'📱',
+    items:[
+      {text:'Оформлены профили во всех соцсетях',desc:'Аватар, обложка, описание, ссылки'},
+      {text:'Создан контент-план на месяц',desc:'Посты, сторис, рилс — минимум 3 в неделю'},
+      {text:'Подготовлен визуал',desc:'Единый стиль, шаблоны, цвета'},
+      {text:'Настроено взаимодействие с аудиторией',desc:'Ответы на комментарии, DM, упоминания'},
+      {text:'Запланированы рекламные интеграции',desc:'Блогеры, партнёрства, кросс-посты'},
+      {text:'Подготовлены промо-акции',desc:'Конкурсы, скидки, лид-магниты'},
+      {text:'Настроены UTM для всех постов',desc:'Отслеживание трафика из соцсетей'},
+      {text:'Проверен постинг в выходные',desc:'Или настроена авто-публикация'},
+      {text:'Анализ лучшего времени публикации',desc:'По статистике вовлечения'},
+      {text:'Отчёт по вовлечению',desc:'ER, охваты, клики, подписки'},
+      {text:'План на реанимацию неактивных подписчиков',desc:'Ре-таргетинг, прогрев'},
+    ]
+  },
+  email:{
+    name:'✉️ Email-маркетинг',
+    icon:'✉️',
+    items:[
+      {text:'Сегментирована база подписчиков',desc:'По интересам, активности, гео'},
+      {text:'Создана серия welcome-писем',desc:'Приветствие, прогрев, оффер'},
+      {text:'Подготовлены шаблоны писем',desc:'Адаптивные, брендированные'},
+      {text:'Настроена автоматизация триггеров',desc:'Брошенная корзина, день рождения, реактивация'},
+      {text:'Проверена доставляемость',desc:'SPF, DKIM, DMARC, тёплая репутация'},
+      {text:'A/B тест темы письма',desc:'Минимум 2 варианта, выбор победителя'},
+      {text:'Серия регулярных рассылок',desc:'Дайджест, полезный контент, акции'},
+      {text:'Отслеживание метрик',desc:'Open rate, CTR, отписки, жалобы на спам'},
+      {text:'Чистка базы раз в месяц',desc:'Неактивные, неоткрывающие, hard bounces'},
+      {text:'Опрос/сбор обратной связи',desc:'NPS, удовлетворённость, пожелания'},
+    ]
+  }
+};
+
+const CATEGORIES = Object.keys(CHECKLISTS);
+let activeCat = CATEGORIES[0];
+let doneMap = {}; // {cat_idx: Set of item indices}
+
+// Load from localStorage
+try{
+  const saved = localStorage.getItem('mkt_legacy_checklist');
+  if(saved) doneMap = JSON.parse(saved);
+}catch(e){}
+
+function save(){
+  try{localStorage.setItem('mkt_legacy_checklist', JSON.stringify(doneMap))}catch(e){}
+}
+
+function getKey(catIdx, itemIdx){return catIdx+'_'+itemIdx}
+
+function isDone(catIdx, itemIdx){
+  const key = getKey(catIdx, itemIdx);
+  return doneMap[key] === true;
+}
+
+function toggle(catIdx, itemIdx){
+  const key = getKey(catIdx, itemIdx);
+  if(doneMap[key]) delete doneMap[key];
+  else doneMap[key] = true;
+  save();
+  renderChecklist();
+  updateProgress();
+}
+
+function addNote(catIdx, itemIdx, val){
+  const key = 'note_'+catIdx+'_'+itemIdx;
+  if(val) doneMap[key] = val;
+  else delete doneMap[key];
+  save();
+}
+
+function getNote(catIdx, itemIdx){
+  return doneMap['note_'+catIdx+'_'+itemIdx] || '';
+}
+
+// Render categories tabs
+function renderTabs(){
+  const cont = document.getElementById('catTabs');
+  cont.innerHTML = '';
+  CATEGORIES.forEach((cat, i) => {
+    const checklist = CHECKLISTS[cat];
+    const done = checklist.items.filter((_, j) => isDone(i, j)).length;
+    const total = checklist.items.length;
+    const tab = document.createElement('button');
+    tab.className = 'cat-tab' + (cat === activeCat ? ' active' : '');
+    tab.innerHTML = checklist.icon + ' ' + checklist.name + ' <span class="count">' + done + '/' + total + '</span>';
+    tab.onclick = () => { activeCat = cat; renderTabs(); renderChecklist(); };
+    cont.appendChild(tab);
+  });
+}
+
+// Render checklist
+function renderChecklist(){
+  const cont = document.getElementById('checklist');
+  const catIdx = CATEGORIES.indexOf(activeCat);
+  const checklist = CHECKLISTS[activeCat];
+  
+  cont.innerHTML = '';
+  checklist.items.forEach((item, i) => {
+    const done = isDone(catIdx, i);
+    const note = getNote(catIdx, i);
+    const div = document.createElement('div');
+    div.className = 'item' + (done ? ' done' : '');
+    
+    div.innerHTML =
+      '<div class="item-check"></div>' +
+      '<div class="item-content">' +
+        '<div class="item-text">' + item.text + '</div>' +
+        (item.desc ? '<div class="item-desc">' + item.desc + '</div>' : '') +
+        '<div class="item-note' + (note ? ' show' : '') + '" data-note="' + catIdx + '_' + i + '">' +
+          '<textarea placeholder="Заметка..." onchange="addNote(' + catIdx + ',' + i + ',this.value)">' + escapeHtml(note) + '</textarea>' +
+        '</div>' +
+      '</div>';
+    
+    // Click to toggle
+    div.querySelector('.item-check').onclick = (e) => { e.stopPropagation(); toggle(catIdx, i); };
+    div.querySelector('.item-text').onclick = () => { toggle(catIdx, i); };
+    div.querySelector('.item-desc').onclick = () => { toggle(catIdx, i); };
+    
+    // Double click for note
+    div.ondblclick = () => {
+      const noteEl = div.querySelector('.item-note');
+      noteEl.classList.toggle('show');
+      if(noteEl.classList.contains('show')) noteEl.querySelector('textarea').focus();
+    };
+    
+    cont.appendChild(div);
+  });
+}
+
+function updateProgress(){
+  let totalDone = 0, totalAll = 0;
+  CATEGORIES.forEach((cat, i) => {
+    const items = CHECKLISTS[cat].items;
+    items.forEach((_, j) => {
+      totalAll++;
+      if(isDone(i, j)) totalDone++;
+    });
+  });
+  
+  document.getElementById('doneTotal').textContent = totalDone;
+  document.getElementById('totalItems').textContent = totalAll;
+  const pct = totalAll > 0 ? Math.round(totalDone/totalAll*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+// Actions
+document.getElementById('resetDoneBtn').onclick = () => {
+  if(!confirm('Сбросить все выполненные пункты?')) return;
+  CATEGORIES.forEach((cat, i) => {
+    CHECKLISTS[cat].items.forEach((_, j) => {
+      delete doneMap[getKey(i, j)];
+    });
+  });
+  save(); renderTabs(); renderChecklist(); updateProgress();
+};
+
+document.getElementById('resetAllBtn').onclick = () => {
+  if(!confirm('Сбросить ВСЁ, включая заметки?')) return;
+  doneMap = {};
+  save(); renderTabs(); renderChecklist(); updateProgress();
+};
+
+document.getElementById('exportBtn').onclick = () => {
+  let text = '✅ Чек-лист маркетолога\n';
+  text += 'Дата: ' + new Date().toLocaleDateString('ru-RU') + '\n\n';
+  
+  CATEGORIES.forEach((cat, i) => {
+    const checklist = CHECKLISTS[cat];
+    const done = checklist.items.filter((_, j) => isDone(i, j)).length;
+    text += '─── ' + checklist.name + ' (' + done + '/' + checklist.items.length + ') ───\n';
+    checklist.items.forEach((item, j) => {
+      const d = isDone(i, j);
+      text += (d ? '✅' : '⬜') + ' ' + item.text + '\n';
+      const note = getNote(i, j);
+      if(note) text += '   📝 ' + note + '\n';
+    });
+    text += '\n';
+  });
+  
+  const totalDone = Object.keys(doneMap).filter(k => k.startsWith('note_') ? false : doneMap[k]).length;
+  text += 'Итого: ' + totalDone + '/' + 
+    CATEGORIES.reduce((s,c) => s + CHECKLISTS[c].items.length, 0) + '\n';
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('exportBtn');
+    btn.textContent = '✅ Скопировано!';
+    setTimeout(() => btn.textContent = '📋 Экспорт', 1500);
+  });
+};
+
+function escapeHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// Init
+renderTabs();
+renderChecklist();
+updateProgress();
+</script>
+</body>
+</html>
