@@ -1,282 +1,171 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>🎯 GEO — генеративная выдача — чек-лист | mktools</title>
-<meta name="description" content="Оптимизация для AI Overviews, Perplexity, Gemini, ChatGPT Search. Цитируемость, контекст, answer-форматы.">
+
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>GEO — генеративная выдача — чек-лист AI оптимизации | mktools</title>
+
+<meta name="description" content="AI Overviews, Perplexity, Gemini, ChatGPT Search.">
+
 <link rel="canonical" href="https://mktgtools.ru/checklist/ai/geo/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
+
+<style>*{margin:0;padding:0;box-sizing:border-box}
+
 :root{--bg:#f8f9fb;--surface:#fff;--text:#1a1a2e;--text2:#6b7280;--accent:#f97316;--accent-hover:#ea580c;--accent-light:#fff7ed;--border:#e5e7eb;--radius:16px;--radius-sm:8px;--font:'Inter',system-ui,-apple-system,sans-serif}
+
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+
 .container{max-width:860px;margin:0 auto;padding:0 24px}
+
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+
 header .container{display:flex;align-items:center;justify-content:space-between}
-.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}
-.logo span{color:var(--accent)}
-.back{color:var(--text2);text-decoration:none;font-size:.9rem}
-.back:hover{color:var(--accent)}
+
+.logo{font-weight:800;font-size:1.2rem;color:var(--text);text-decoration:none}.logo span{color:var(--accent)}
+
+.back{color:var(--text2);text-decoration:none;font-size:.9rem}.back:hover{color:var(--accent)}
+
 h1{font-size:1.4rem;font-weight:800;margin-bottom:6px}
-.hero{padding:28px 0 16px;text-align:center}
-.hero p{color:var(--text2);font-size:.85rem;max-width:600px;margin:0 auto}
-.hero .sub{font-size:.78rem;color:var(--text2);margin-top:4px}
-.breadcrumbs{font-size:.8rem;color:var(--text2);margin-bottom:8px;text-align:left}
-.breadcrumbs a{color:var(--text2);text-decoration:none}
-.breadcrumbs a:hover{color:var(--accent)}
-.breadcrumbs span{margin:0 4px;color:var(--text2)}
+
+.hero{padding:28px 0 16px;text-align:center}.hero p{color:var(--text2);font-size:.85rem;max-width:600px;margin:0 auto}.hero .sub{font-size:.78rem;color:var(--text2);margin-top:4px}
+
+.breadcrumbs{font-size:.8rem;color:var(--text2);margin-bottom:8px;text-align:left}.breadcrumbs a{color:var(--text2);text-decoration:none}.breadcrumbs a:hover{color:var(--accent)}.breadcrumbs span{margin:0 4px;color:var(--text2)}
+
 .progress-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.progress-bar .info{font-size:.82rem;flex:1;min-width:120px}
-.progress-bar .info strong{color:var(--text)}
-.progress-bar .info span{color:var(--text2)}
+
+.progress-bar .info{font-size:.82rem;flex:1;min-width:120px}.progress-bar .info strong{color:var(--text)}.progress-bar .info span{color:var(--text2)}
+
 .progress-track{flex:2;min-width:120px;height:8px;background:#f3f4f6;border-radius:100px;overflow:hidden}
+
 .progress-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .4s ease;width:0%}
+
 .progress-pct{font-size:.82rem;font-weight:700;color:var(--accent);min-width:36px;text-align:right}
+
 .section-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;margin-bottom:14px;overflow-x:auto;flex-wrap:wrap}
+
 .section-tab{padding:6px 12px;border:none;border-radius:6px;font-size:.74rem;font-weight:500;cursor:pointer;transition:all .12s;background:transparent;color:var(--text2);white-space:nowrap;font-family:var(--font)}
+
 .section-tab .count{display:inline-block;padding:0 5px;border-radius:3px;background:#f3f4f6;color:var(--text2);font-size:.65rem;margin-left:3px}
-.section-tab.active{background:var(--accent);color:#fff}
-.section-tab.active .count{background:rgba(255,255,255,.2);color:#fff}
-.section-tab:hover:not(.active){background:#f3f4f6}
+
+.section-tab.active{background:var(--accent);color:#fff}.section-tab.active .count{background:rgba(255,255,255,.2);color:#fff}.section-tab:hover:not(.active){background:#f3f4f6}
+
 .checklist{margin-bottom:24px}
-.item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px;transition:all .12s;cursor:pointer}
-.item:hover{border-color:var(--accent)}
-.item.done{opacity:.65;border-color:var(--border)}
-.item.done .item-text{text-decoration:line-through;color:var(--text2)}
-.item.done .item-check{background:var(--accent);border-color:var(--accent);color:#fff}
-.item.done .item-check::after{content:'✓'}
+
+.item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px;transition:all .12s;cursor:pointer}.item:hover{border-color:var(--accent)}
+
+.item.done{opacity:.65;border-color:var(--border)}.item.done .item-text{text-decoration:line-through;color:var(--text2)}.item.done .item-check{background:var(--accent);border-color:var(--accent);color:#fff}
+
 .item-check{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;transition:all .12s;margin-top:1px}
-.item-content{flex:1;min-width:0}
-.item-text{font-size:.85rem;font-weight:500}
-.item-desc{font-size:.73rem;color:var(--text2);margin-top:1px}
-.item-tags{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
-.item-tag{padding:1px 7px;border-radius:3px;font-size:.62rem;font-weight:500}
-.item-tag.red{background:#fef2f2;color:#dc2626}
-.item-tag.yellow{background:#fffbeb;color:#d97706}
-.item-tag.blue{background:#eff6ff;color:#2563eb}
-.item-tag.green{background:#ecfdf5;color:#059669}
-.actions{display:flex;gap:8px;justify-content:center;margin-bottom:28px;flex-wrap:wrap}
-.actions button{padding:7px 16px;border:none;border-radius:var(--radius-sm);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--font)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-hover)}
-.btn-secondary{background:#f3f4f6;color:var(--text)}
-.btn-secondary:hover{background:#e5e7eb}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
-.btn-outline:hover{border-color:var(--accent);color:var(--text)}
-footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--text2);font-size:.82rem}
-footer a{color:var(--accent)}
-@media(max-width:640px){h1{font-size:1.2rem}.section-tab{padding:5px 9px;font-size:.7rem}}
+
+.item-content{flex:1;min-width:0}.item-text{font-size:.85rem;font-weight:500}.item-desc{font-size:.73rem;color:var(--text2);margin-top:1px}
+
+.item-tags{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}.item-tag{padding:1px 7px;border-radius:3px;font-size:.62rem;font-weight:500}
+
+.item-tag.red{background:#fef2f2;color:#dc2626}.item-tag.yellow{background:#fffbeb;color:#d97706}.item-tag.blue{background:#eff6ff;color:#2563eb}.item-tag.green{background:#ecfdf5;color:#059669}
 
 .item-comment{font-size:.73rem;color:var(--text2);margin-top:4px;display:flex;align-items:center;gap:6px;cursor:pointer}
+
 .item-comment .cmt-icon{width:14px;height:14px;border-radius:3px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--text2);flex-shrink:0}
-.item-comment .cmt-text{color:var(--accent);font-size:.72rem;border-bottom:1px dashed var(--border)}
-.item-comment:hover .cmt-text{border-color:var(--accent)}
+
+.item-comment .cmt-text{color:var(--accent);font-size:.72rem;border-bottom:1px dashed var(--border)}.item-comment:hover .cmt-text{border-color:var(--accent)}
+
 .item-comment-input{width:100%;font-size:.75rem;padding:4px 8px;border:1px solid var(--accent);border-radius:4px;background:var(--accent-light);font-family:var(--font);margin-top:2px;outline:none;resize:vertical;min-height:28px;box-sizing:border-box}
+
 .cmt-icon.has-text{background:var(--accent);color:#fff}
+
+.actions{display:flex;gap:8px;justify-content:center;margin-bottom:28px;flex-wrap:wrap}
+
+.actions button{padding:7px 16px;border:none;border-radius:var(--radius-sm);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--font)}
+
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+
+.btn-secondary{background:#f3f4f6;color:var(--text)}.btn-secondary:hover{background:#e5e7eb}
+
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--text2);font-size:.82rem}footer a{color:var(--accent)}
+
+@media(max-width:640px){h1{font-size:1.2rem}.section-tab{padding:5px 9px;font-size:.7rem}}
+
 </style>
-<!-- Yandex.Metrika counter -->
-<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109294994','ym');ym(109294994,'init',{ssr:true,webvisor:true,clickmap:true,accurateTrackBounce:true,trackLinks:true});</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/109294994" style="position:absolute;left:-9999px" alt=""></div></noscript>
-</head>
-<body>
-<header><div class="container"><a href="/" class="logo"><span>mk</span>tools</a><a href="/checklist/ai/" class="back">← AI чек-листы</a></div></header>
-<section class="hero">
-<div class="container">
-<div class="breadcrumbs"><a href="/">Главная</a><span>/</span><a href="/checklist/">Чек-листы</a><span>/</span><a href="/checklist/ai/">AI и GEO</a><span>/</span>GEO — генеративная выдача</div>
-<h1>🎯 GEO — генеративная выдача</h1>
-<p>Оптимизация для AI Overviews, Perplexity, Gemini, ChatGPT Search. Цитируемость, контекст, answer-форматы.</p>
-<div class="sub">Данные сохраняются в браузере. Отмечайте сделанное — прогресс не пропадёт.</div>
-</div>
-</section>
-<div class="container">
-<div class="progress-bar"><div class="info">Прогресс: <strong id="doneTotal">0</strong> <span>/ <span id="totalItems">0</span></span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div class="progress-pct" id="progressPct">0%</div></div>
-<div class="section-tabs" id="sectionTabs"></div>
-<div class="checklist" id="checklist"></div>
-<div class="actions">
-<button class="btn-primary" id="resetDoneBtn">🔄 Сбросить выполненные</button>
-<button class="btn-secondary" id="resetAllBtn">↺ Сбросить всё</button>
-<button class="btn-outline" id="exportBtn">📋 Копировать отчёт</button>
-</div>
-</div>
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+
 <script>
-const SECTIONS=[
-  {
-    "id": "answer",
-    "name": "Answer-форматы",
-    "icon": "💡",
-    "items": [
-      [
-        "Прямой ответ в первом абзаце (lead paragraph)",
-        "must-have",
-        "red",
-        "AI Overviews цитирует первый абзац как ответ"
-      ],
-      [
-        "Определения терминов (глоссарий)",
-        "high",
-        "yellow",
-        "Определения в формате «X — это Y» легко парсятся"
-      ],
-      [
-        "Списки «Топ-N» / «5 способов» / «10 причин»",
-        "high",
-        "yellow",
-        "Списки — излюбленный формат AI-сниппетов"
-      ],
-      [
-        "Сравнительные таблицы (A vs B)",
-        "high",
-        "yellow",
-        "AI предпочитает табличный формат сравнения"
-      ],
-      [
-        "Пошаговые алгоритмы (HowTo)",
-        "high",
-        "yellow",
-        "Инструкции часто цитируются в AI-ответах"
-      ],
-      [
-        "Чек-листы и шаблоны (скачиваемые)",
-        "high",
-        "yellow",
-        "Практическая ценность = повторные визиты"
-      ],
-      [
-        "Калькуляторы / интерактивные инструменты",
-        "medium",
-        "blue",
-        "Интерактивность = сигнал качества"
-      ]
-    ]
-  },
-  {
-    "id": "authority",
-    "name": "Авторитетность и цитируемость",
-    "icon": "🔗",
-    "items": [
-      [
-        "Внешние ссылки на авторитетные исследования",
-        "must-have",
-        "red",
-        "AI проверяет источники утверждений"
-      ],
-      [
-        "Статистика с указанием источника и даты",
-        "high",
-        "yellow",
-        "Без источника и даты статистика бесполезна"
-      ],
-      [
-        "Цитаты экспертов (имя, должность, компания)",
-        "high",
-        "yellow",
-        "Сигнал экспертизы и авторитета"
-      ],
-      [
-        "Авторские материалы (не рерайт чужих статей)",
-        "high",
-        "yellow",
-        "Оригинальность = высокая вероятность цитирования"
-      ],
-      [
-        "Линкбилдинг на тематические ресурсы",
-        "high",
-        "yellow",
-        "Чем больше ссылаются — тем вы авторитетнее"
-      ],
-      [
-        "Профили компаний в Wikipedia / Crunchbase / LinkedIn",
-        "medium",
-        "blue",
-        "Топ-сигнал авторитетности для AI"
-      ],
-      [
-        "Публикации на площадках (vc.ru, Habr, Forbes, РБК)",
-        "high",
-        "yellow",
-        "Перекрёстная цитируемость = доверие"
-      ],
-      [
-        "Упоминания в соцсетях отраслевых экспертов",
-        "medium",
-        "blue",
-        "Social proof для AI-алгоритмов"
-      ]
-    ]
-  },
-  {
-    "id": "context",
-    "name": "Контекст и структура для GEO",
-    "icon": "🧩",
-    "items": [
-      [
-        "Одна страница = один вопрос (не обо всём сразу)",
-        "must-have",
-        "red",
-        "Фокус = точность AI-ответа"
-      ],
-      [
-        "Контент до скролла (above the fold) содержит суть",
-        "must-have",
-        "red",
-        "AI-парсеры могут не доскроллить"
-      ],
-      [
-        "Внутренние перелинковки между связанными страницами",
-        "high",
-        "yellow",
-        "Глубина и контекст для AI"
-      ],
-      [
-        "Hub-and-spoke: тематический хаб + детальные страницы",
-        "high",
-        "yellow",
-        "Кластерная модель контента"
-      ],
-      [
-        "Дата обновления на видном месте (не в подвале)",
-        "high",
-        "yellow",
-        "AI проверяет свежесть контента"
-      ],
-      [
-        "FAQ после каждой статьи (2-3 релевантных вопроса)",
-        "high",
-        "yellow",
-        "FAQPage schema = повышенный шанс цитирования"
-      ],
-      [
-        "Краткое саммари / TL;DR в начале статьи",
-        "high",
-        "yellow",
-        "AI использует саммари как готовый ответ"
-      ],
-      [
-        "Понятный язык для неспециалиста",
-        "medium",
-        "blue",
-        "Доступность = более широкий охват аудитории"
-      ]
-    ]
-  }
-];
-const K='mkt_geo';let active=0,m={};
-try{const s=localStorage.getItem(K);if(s)m=JSON.parse(s)}catch(e){}
-function k(s,i){return s+'_'+i}
-function d(s,i){return m[k(s,i)]===true}
-function sv(){try{localStorage.setItem(K,JSON.stringify(m))}catch(e){}}
-function tg(s,i){const x=k(s,i);if(m[x])delete m[x];else m[x]=true;sv();rT();rC();uP()}
-function rT(){const c=document.getElementById('sectionTabs');c.innerHTML='';SECTIONS.forEach((s,i)=>{const dn=s.items.filter((_,j)=>d(i,j)).length;const bt=document.createElement('button');bt.className='section-tab'+(i===active?' active':'');bt.innerHTML=s.icon+' '+s.name+' <span class="count">'+dn+'/'+s.items.length+'</span>';bt.onclick=()=>{active=i;rT();rC()};c.appendChild(bt)})}
-function rC(){const c=document.getElementById('checklist');const s=SECTIONS[active];c.innerHTML='';s.items.forEach((it,i)=>{const dn=d(active,i);const di=document.createElement('div');di.className='item'+(dn?' done':'');var ck=k(active,i);var cm=m['cmt_'+ck]||'';di.innerHTML='<div class="item-check"></div><div class="item-content"><div class="item-text">'+it.text+'</div>'+(it.desc?'<div class="item-desc">'+it.desc+'</div>':'')+(it.tag?'<div class="item-tags"><span class="item-tag '+it.tagColor+'">'+it.tag+'</span></div>':'')+'<div class="item-comment" data-commentkey="'+ck+'"><span class="cmt-icon'+(cm?' has-text':'')+'">'+'✏</span><span class="cmt-text">'+(cm||'Комментарий')+'</span></div>'+(m['edit_'+ck]?'<textarea class="item-comment-input" data-inputkey="'+ck+'" placeholder="Ваш комментарий...">'+(cm||'')+'</textarea>':'')+'</div>';di.querySelector('.item-check').onclick=(e)=>{e.stopPropagation();tg(active,i)};di.querySelector('.item-text').onclick=()=>tg(active,i);if(it.desc)di.querySelector('.item-desc').onclick=()=>tg(active,i);var ce=di.querySelector('.item-comment');if(ce){ce.onclick=(e)=>{var ek=ce.dataset.commentkey;if(m['edit_'+ek]){delete m['edit_'+ek]}else{m['edit_'+ek]=true}sv();rC()}};var inp=di.querySelector('.item-comment-input');if(inp){inp.oninput=function(){m['cmt_'+this.dataset.inputkey]=this.value;sv()};inp.onblur=function(){delete m['edit_'+this.dataset.inputkey];sv();rC()}}};c.appendChild(di)})}
-function uP(){let td=0,ta=0;SECTIONS.forEach((s,si)=>{s.items.forEach((_,ii)=>{ta++;if(d(si,ii))td++})});document.getElementById('doneTotal').textContent=td;document.getElementById('totalItems').textContent=ta;const p=ta>0?Math.round(td/ta*100):0;document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressPct').textContent=p+'%'}
-document.getElementById('resetDoneBtn').onclick=()=>{if(!confirm('Сбросить выполненные?'))return;SECTIONS.forEach((s,si)=>{s.items.forEach((_,ii)=>{delete m[k(si,ii)]})});sv();rT();rC();uP()};
-document.getElementById('resetAllBtn').onclick=()=>{if(!confirm('Сбросить ВСЁ?'))return;m={};sv();rT();rC();uP()};
-document.getElementById('exportBtn').onclick=()=>{let t='🎯 GEO — генеративная выдача\n'+new Date().toLocaleDateString('ru-RU')+'\n\n';SECTIONS.forEach((s,i)=>{const dn=s.items.filter((_,j)=>d(i,j)).length;t+='─── '+s.icon+' '+s.name+' ('+dn+'/'+s.items.length+') ───\n';s.items.forEach((it,j)=>{var ck=k(i,j);var cm=m['cmt_'+ck];t+=(d(i,j)?'✅':'⬜')+' '+it.text+(cm?' ('+cm+')':'')+'\n'})});const td=Object.keys(m).filter(x=>!x.startsWith('n_')&&m[x]).length;t+='\nИтого: '+td+'/'+SECTIONS.reduce((s,c)=>s+c.items.length,0);navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('exportBtn');b.textContent='✅ Скопировано!';setTimeout(()=>b.textContent='📋 Копировать отчёт',1500)})};
-rT();rC();uP();
+
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109294994','ym');ym(109294994,'init',{ssr:true,webvisor:true,clickmap:true,accurateTrackBounce:true,trackLinks:true});
+
 </script>
-</body>
-</html>
+
+<noscript><div><img src="https://mc.yandex.ru/watch/109294994" style="position:absolute;left:-9999px" alt=""></div></noscript>
+
+</head><body>
+
+<header><div class="container"><a href="/" class="logo"><span>mk</span>tools</a><a href="/checklist/ai/" class="back">← AI чек-листы</a></div></header>
+
+<section class="hero"><div class="container">
+
+<div class="breadcrumbs"><a href="/">Главная</a><span>/</span><a href="/checklist/">Чек-листы</a><span>/</span><a href="/checklist/ai/">AI и GEO</a><span>/</span>GEO — генеративная выдача</div>
+
+<h1>🎯 GEO — генеративная выдача</h1>
+
+<p>AI Overviews, Perplexity, Gemini, ChatGPT Search.</p>
+
+<div class="sub">Данные сохраняются в браузере. Отмечайте сделанное — прогресс не пропадёт.</div>
+
+</div></section>
+
+<div class="container">
+
+<div class="progress-bar"><div class="info">Прогресс: <strong id="doneTotal">0</strong> <span>/ <span id="totalItems">17</span></span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><div class="progress-pct" id="progressPct">0%</div></div>
+
+<div class="section-tabs" id="sectionTabs"></div>
+
+<div class="checklist" id="checklist"></div>
+
+<div class="actions">
+
+<button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
+
+<button class="btn-secondary" id="resetAllBtn">↺ Сбросить всё</button>
+
+<button class="btn-outline" id="exportBtn">U0001f4cb Копировать отчёт</button>
+
+</div>
+
+</div>
+
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+
+<script>
+
+const SECTIONS=[{id:'geo_0',name:'Answer-форматы',icon:'💡',items:[{text:'Прямой ответ в первом абзаце (lead)',tag:'must-have',tagColor:'red',desc:'AI Overviews цитирует lead'},{text:'Списки Топ-N / 5 способов / 10 причин',tag:'high',tagColor:'yellow',desc:'Излюбленный формат AI'},{text:'Сравнительные таблицы (A vs B)',tag:'high',tagColor:'yellow',desc:'AI предпочитает таблицы'},{text:'Пошаговые HowTo-алгоритмы',tag:'high',tagColor:'yellow',desc:'Инструкции цитируются AI'},{text:'Чек-листы и шаблоны (скачиваемые)',tag:'high',tagColor:'yellow',desc:'Практическая ценность'},{text:'Калькуляторы / интерактив',tag:'medium',tagColor:'blue',desc:'Сигнал качества'}]},{id:'geo_1',name:'Авторитетность',icon:'🔗',items:[{text:'Ссылки на авторитетные исследования',tag:'must-have',tagColor:'red',desc:'AI проверяет источники'},{text:'Статистика с датой и источником',tag:'high',tagColor:'yellow',desc:'Без даты = 0'},{text:'Цитаты экспертов (имя, должность)',tag:'high',tagColor:'yellow',desc:'Сигнал экспертизы'},{text:'Авторские материалы (не рерайт)',tag:'high',tagColor:'yellow',desc:'Оригинальность = цитирование'},{text:'Линкбилдинг на тематические ресурсы',tag:'high',tagColor:'yellow',desc:'Больше ссылок = авторитет'},{text:'Публикации на vc.ru, Habr, Forbes',tag:'high',tagColor:'yellow',desc:'Перекрёстная цитируемость'}]},{id:'geo_2',name:'Контекст для GEO',icon:'🧩',items:[{text:'Одна страница = один вопрос (фокус)',tag:'must-have',tagColor:'red',desc:'Фокус = точность AI'},{text:'Контент до скролла содержит ответ',tag:'high',tagColor:'yellow',desc:'Выше = больше шансов'},{text:'Чередование абзацев и списков',tag:'high',tagColor:'yellow',desc:'AI предпочитает смешанный формат'},{text:'Свежий контент (< 1 года)',tag:'high',tagColor:'yellow',desc:'Свежесть важна AI'},{text:'Микроформаты (калькулятор, tool)',tag:'medium',tagColor:'blue',desc:'Интерактив = цитируемость'}]}];
+
+const K='mkt_ai_geo';let active=0,m={};
+
+try{const s=localStorage.getItem(K);if(s)m=JSON.parse(s)}catch(e){}
+
+function k(s,i){return s+'_'+i}
+
+function d(s,i){return m[k(s,i)]===true}
+
+function sv(){try{localStorage.setItem(K,JSON.stringify(m))}catch(e){}}
+
+function tg(s,i){const x=k(s,i);if(m[x])delete m[x];else m[x]=true;sv();rT();rC();uP()}
+
+function rT(){const c=document.getElementById('sectionTabs');c.innerHTML='';SECTIONS.forEach((sec,i)=>{const dn=sec.items.filter((_,j)=>d(i,j)).length;const bt=document.createElement('button');bt.className='section-tab'+(i===active?' active':'');bt.innerHTML=sec.icon+' '+sec.name+' <span class="count">'+dn+'/'+sec.items.length+'</span>';bt.onclick=()=>{active=i;rT();rC()};c.appendChild(bt)})}
+
+function rC(){const c=document.getElementById('checklist');const sec2=SECTIONS[active];c.innerHTML='';sec2.items.forEach((it,i)=>{const dn2=d(active,i);const el=document.createElement('div');el.className='item'+(dn2?' done':'');var ck=k(active,i);var cm=m['c_'+ck]||'';var h='<div class="item-check"></div><div class="item-content"><div class="item-text">'+it.text+'</div>';if(it.desc){h+='<div class="item-desc">'+it.desc+'</div>'}if(it.tag){h+='<div class="item-tags"><span class="item-tag '+it.tagColor+'">'+it.tag+'</span></div>'}h+='<div class="item-comment" data-c="'+ck+'"><span class="cmt-icon'+(cm?' has-text':'')+'">\u270f</span><span class="cmt-text">'+(cm||'\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439')+'</span></div>';if(m['e_'+ck]){h+='<textarea class="item-comment-input" data-ci="'+ck+'" placeholder="\u0412\u0430\u0448 \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439...">'+(m['c_'+ck]||'')+'</textarea>'}h+='</div>';el.innerHTML=h;el.querySelector('.item-check').onclick=function(e){e.stopPropagation();tg(active,i)};el.querySelector('.item-text').onclick=function(){tg(active,i)};var ce=el.querySelector('.item-comment');if(ce){ce.onclick=function(e){e.stopPropagation();var ek=ce.getAttribute('data-c');if(m['e_'+ek]){delete m['e_'+ek]}else{m['e_'+ek]=true}sv();rC()}};var inp=el.querySelector('.item-comment-input');if(inp){inp.oninput=function(){m['c_'+this.getAttribute('data-ci')]=this.value;sv()};inp.onblur=function(){delete m['e_'+this.getAttribute('data-ci')];sv();rC()}};c.appendChild(el)})}
+
+function uP(){let td=0,ta=0;SECTIONS.forEach((sec3,si)=>{sec3.items.forEach((_,ii)=>{ta++;if(d(si,ii))td++})});document.getElementById('doneTotal').textContent=td;document.getElementById('totalItems').textContent=ta;var p=ta>0?Math.round(td/ta*100):0;document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressPct').textContent=p+'%'}
+
+document.getElementById('resetDoneBtn').onclick=function(){if(!confirm('\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043d\u044b\u0435?'))return;SECTIONS.forEach(function(s2,si){s2.items.forEach(function(_,ii){delete m[k(si,ii)]})});sv();rT();rC();uP()};
+
+document.getElementById('resetAllBtn').onclick=function(){if(!confirm('\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0441\u0451?'))return;m={};sv();rT();rC();uP()};
+
+document.getElementById('exportBtn').onclick=function(){var t='🎯 GEO — генеративная выдача\n'+new Date().toLocaleDateString('ru-RU')+'\n\n';SECTIONS.forEach(function(sec4,i){var dn=sec4.items.filter(function(_,j){return d(i,j)}).length;t+='\u2500\u2500\u2500 '+sec4.icon+' '+sec4.name+' ('+dn+'/'+sec4.items.length+') \u2500\u2500\u2500\n';sec4.items.forEach(function(it,j){var ck=k(i,j);var cm=m['c_'+ck];t+=(d(i,j)?'\u2705':'\u2b1c')+' '+it.text+(cm?' ('+cm+')':'')+'\n'})});var td=Object.keys(m).filter(function(x){return !x.startsWith('n_') && m[x]}).length;t+='\n\u0418\u0442\u043e\u0433\u043e: '+td+'/'+SECTIONS.reduce(function(a,c){return a+c.items.length},0);navigator.clipboard.writeText(t).then(function(){var b=document.getElementById('exportBtn');b.textContent='\u2705 \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e!';setTimeout(function(){b.textContent='\U0001f4cb \u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043e\u0442\u0447\u0451\u0442'},1500)})};
+
+rT();rC();uP();
+
+</script>
+
+</body></html>
