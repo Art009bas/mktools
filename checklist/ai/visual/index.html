@@ -143,6 +143,22 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 <div class="checklist" id="checklist"></div>
 
+
+<style>
+.seo-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px;margin-bottom:32px}
+.seo-content h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.seo-content h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text)}
+.seo-content p{font-size:.88rem;color:var(--text2);margin-bottom:12px;line-height:1.7}
+.seo-content p:last-child{margin-bottom:0}
+</style>
+
+<div class="seo-content">
+<h2>Визуальный контент в эпоху AI-поиска</h2>
+<p>AI-поисковики умеют анализировать изображения, видео и инфографику — но только если они правильно размечены. Alt-тексты, подписи (figcaption), структурированные данные VideoObject — всё это влияет на то, как AI интерпретирует визуальный контент вашего сайта.</p>
+<p>Чек-лист охватывает три направления: изображения (alt-тексты, WebP формат, lazy loading, подписи, не использовать картинки вместо текста), видео (субтитры, VideoObject schema, корректный автозапуск) и инфографика (обязательное дублирование текстом, подписи элементов, диаграммы с описанием).</p>
+<h3>Основная ошибка</h3>
+<p>Самая частая ошибка — размещение важной информации в картинках. AI не читает текст на изображениях. Если данные нужны для цитирования — дублируйте их в HTML.</p>
+</div>
 <div class="actions">
 
 <button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
@@ -155,7 +171,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 </div>
 
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Почему alt-тексты важны для AI?","acceptedAnswer":{"@type":"Answer","text":"AI Vision модели используют alt-тексты для понимания содержимого изображений. Без alt AI не может интерпретировать визуальный контент."}},{"@type":"Question","name":"Как правильно размечать видео для AI?","acceptedAnswer":{"@type":"Answer","text":"Используйте VideoObject schema, добавляйте субтитры или транскрипцию. AI индексирует видео по тексту субтитров и Schema.org разметке."}}]
+}
+</script>
+</footer>
 
 <script>
 

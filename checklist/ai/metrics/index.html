@@ -143,6 +143,22 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 <div class="checklist" id="checklist"></div>
 
+
+<style>
+.seo-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px;margin-bottom:32px}
+.seo-content h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.seo-content h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text)}
+.seo-content p{font-size:.88rem;color:var(--text2);margin-bottom:12px;line-height:1.7}
+.seo-content p:last-child{margin-bottom:0}
+</style>
+
+<div class="seo-content">
+<h2>Как отслеживать эффективность AI-оптимизации</h2>
+<p>AI-трафик требует другого подхода к аналитике. Традиционные метрики (позиции в выдаче, CTR, конверсии) работают, но появляются новые: impressions из AI Overviews, количество цитирований в AI-ответах, brand searches в контексте AI.</p>
+<p>Этот чек-лист включает инструменты мониторинга (Google Search Console, Яндекс.Метрика, Ahrefs, Google Trends), ключевые метрики (Impressions, CTR, Conversions, Bounce rate AI-трафика) и процессы (еженедельный аудит, A/B тестирование, обновление FAQ, отчёты, бенчмаркинг конкурентов).</p>
+<h3>Рекомендуемая частота</h3>
+<p>Еженедельный аудит цитирований, ежемесячный полноценный отчёт по AI-трафику с сравнением с предыдущим периодом. A/B тестирование контента под AI — 2-3 теста в месяц для достижения статистической значимости.</p>
+</div>
 <div class="actions">
 
 <button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
@@ -155,7 +171,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 </div>
 
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Как отслеживать позиции в AI-выдаче?","acceptedAnswer":{"@type":"Answer","text":"Используйте Google Search Console (раздел Search Appearance → AI Overviews), Яндекс.Вебмастер, Ahrefs, Semrush. Специализированные Rank Tracking сервисы по AI Overviews."}},{"@type":"Question","name":"Какая частота мониторинга AI-трафика оптимальна?","acceptedAnswer":{"@type":"Answer","text":"Еженедельный аудит цитирований, ежемесячный полноценный отчёт. A/B тестирование контента под AI — 2-3 теста в месяц."}}]
+}
+</script>
+</footer>
 
 <script>
 

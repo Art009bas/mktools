@@ -143,6 +143,22 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 <div class="checklist" id="checklist"></div>
 
+
+<style>
+.seo-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px;margin-bottom:32px}
+.seo-content h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.seo-content h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text)}
+.seo-content p{font-size:.88rem;color:var(--text2);margin-bottom:12px;line-height:1.7}
+.seo-content p:last-child{margin-bottom:0}
+</style>
+
+<div class="seo-content">
+<h2>Как создавать контент, понятный AI-поисковикам</h2>
+<p>Контент для AI-поиска — это не просто SEO-текст с ключевыми словами. AI-поисковики (ChatGPT Search, Perplexity, Google AI Overviews) анализируют глубину, структуру, авторство и фактологическую точность материала. В основе — концепция E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness), которую Google использует для оценки качества контента.</p>
+<p>Этот чек-лист охватывает три ключевых аспекта: правильная структура (заголовки H1→H2→H3, списки, таблицы, вступление-лид), E-E-A-T сигналы (страница О компании, авторство, ссылки на источники, отзывы) и фактологичность (конкретные числа, статистика, исследования, даты).</p>
+<h3>Что даёт правильный контент для AI</h3>
+<p>Сайты с качественным структурированным контентом цитируются в AI-ответах в 3-5 раз чаще. FAQPage schema увеличивает шанс попадания в AI Overviews на 70%. Главное правило: пишите для людей, структурируйте для AI, проверяйте факты.</p>
+</div>
 <div class="actions">
 
 <button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
@@ -155,7 +171,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 </div>
 
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Что такое E-E-A-T в контексте AI-поиска?","acceptedAnswer":{"@type":"Answer","text":"E-E-A-T — это критерии Google: Experience, Expertise, Authoritativeness, Trustworthiness. AI-поисковики используют их для оценки качества контента. Сайты с высоким E-E-A-T чаще цитируются."}},{"@type":"Question","name":"Какой объём контента оптимален для AI-цитирования?","acceptedAnswer":{"@type":"Answer","text":"AI предпочитает контент объёмом 1000-2000 слов с чёткой структурой. Важно: качество и фактологическая точность важнее объёма."}},{"@type":"Question","name":"Нужны ли списки для AI-поиска?","acceptedAnswer":{"@type":"Answer","text":"Да, AI-поисковики отлично парсят нумерованные и маркированные списки. Они часто цитируют их в ответах как структурированную информацию."}}]
+}
+</script>
+</footer>
 
 <script>
 

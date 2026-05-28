@@ -143,6 +143,22 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 <div class="checklist" id="checklist"></div>
 
+
+<style>
+.seo-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px;margin-bottom:32px}
+.seo-content h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.seo-content h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text)}
+.seo-content p{font-size:.88rem;color:var(--text2);margin-bottom:12px;line-height:1.7}
+.seo-content p:last-child{margin-bottom:0}
+</style>
+
+<div class="seo-content">
+<h2>Какие разделы сайта нужны для AI-поиска</h2>
+<p>AI-поисковики оценивают сайт комплексно: они проверяют наличие ключевых страниц, которые подтверждают экспертность и надёжность бизнеса. Сайт без страницы «О компании», контактов или FAQ воспринимается AI как неполноценный, что снижает шансы на цитирование в AI Overviews и других AI-ответах.</p>
+<p>В этом чек-листе собраны страницы, которые AI-поисковики ожидают найти: обязательные (главная, О компании, контакты, услуги, политика конфиденциальности, отзывы, FAQ), блоговые (главная блога, статьи, портфолио, цены) и доверительные (сертификаты, доставка, возврат, партнёрам, безопасность).</p>
+<h3>Сколько страниц нужно для хорошей индексации</h3>
+<p>Минимальный набор — 7 обязательных страниц. Для полноценного E-E-A-T сигнала рекомендуется 15+ страниц. Регулярное обновление блога (2-4 статьи в месяц) даёт сигнал свежести, который положительно влияет на AI-цитирование.</p>
+</div>
 <div class="actions">
 
 <button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
@@ -155,7 +171,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 </div>
 
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Сколько страниц должно быть на сайте для AI-оптимизации?","acceptedAnswer":{"@type":"Answer","text":"Минимум 7 обязательных страниц. Для полноценного E-E-A-T сигнала — от 15 страниц с регулярным обновлением блога."}},{"@type":"Question","name":"Нужна ли страница FAQ для AI-поиска?","acceptedAnswer":{"@type":"Answer","text":"Да, страница FAQ с реальными вопросами и ответами — один из самых эффективных способов попасть в AI Overviews. Используйте FAQPage schema."}}]
+}
+</script>
+</footer>
 
 <script>
 

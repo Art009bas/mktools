@@ -143,6 +143,23 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 <div class="checklist" id="checklist"></div>
 
+
+<style>
+.seo-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:32px;margin-bottom:32px}
+.seo-content h2{font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.seo-content h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text)}
+.seo-content p{font-size:.88rem;color:var(--text2);margin-bottom:12px;line-height:1.7}
+.seo-content p:last-child{margin-bottom:0}
+</style>
+
+<div class="seo-content">
+<h2>Что такое техническая оптимизация под AI и зачем она нужна</h2>
+<p>Техническая оптимизация под AI (искусственный интеллект) — это подготовка сайта к корректному парсингу и интерпретации AI-поисковиками: ChatGPT Search, Perplexity, Google AI Overviews, Яндекс Нейро, Gemini. В отличие от традиционного SEO, AI-поисковики анализируют не только текст, но и структурированные данные Schema.org, скорость загрузки (Core Web Vitals), семантическую вёрстку и логическую структуру контента.</p>
+<p>Без правильной технической базы AI просто не найдёт ваш сайт или процитирует его некорректно. Этот чек-лист поможет проверить: структурированные данные (Organization, BreadcrumbList, FAQPage, Article), метрики скорости (LCP, INP, CLS), robots.txt, sitemap.xml, canonical URL, семантическую вёрстку.</p>
+<h3>Почему это важно в 2026 году</h3>
+<p>По данным исследований, более 60% пользователей хотя бы раз в месяц используют AI-поиск. Google AI Overviews показываются в 15-20% поисковых запросов. Сайты с корректной технической оптимизацией получают до 40% больше цитирований в AI-ответах.</p>
+<p>Используйте чек-лист регулярно — раз в квартал или после каждого крупного обновления сайта.</p>
+</div>
 <div class="actions">
 
 <button class="btn-primary" id="resetDoneBtn">U0001f504 Сбросить выполненные</button>
@@ -155,7 +172,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 
 </div>
 
-<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div></footer>
+<footer><div class="container"><a href="/checklist/">Все чек-листы</a> · <a href="/checklist/ai/">AI и GEO</a> · <a href="https://github.com/Art009bas/mktools">mktools</a></div><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{"@type":"Question","name":"Что такое Schema.org и зачем он нужен для AI?","acceptedAnswer":{"@type":"Answer","text":"Schema.org — это словарь структурированных данных, который помогает AI-поисковикам понимать содержимое страницы. AI Overviews, ChatGPT Search и Perplexity используют Schema.org для формирования ответов."}},{"@type":"Question","name":"Какие метрики Core Web Vitals важнее всего?","acceptedAnswer":{"@type":"Answer","text":"LCP (загрузка основного контента < 2.5с), INP (интерактивность < 200ms) и CLS (стабильность < 0.1). Google AI Overviews учитывает эти метрики при ранжировании."}},{"@type":"Question","name":"Как часто проверять техническую оптимизацию?","acceptedAnswer":{"@type":"Answer","text":"Рекомендуется раз в квартал или после каждого крупного обновления сайта. Key Pages стоит проверять ежемесячно."}}]
+}
+</script>
+</footer>
 
 <script>
 
